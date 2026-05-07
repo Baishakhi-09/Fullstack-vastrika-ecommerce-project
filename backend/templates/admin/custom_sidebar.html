@@ -1,0 +1,91 @@
+{% load admin_sidebar %}
+
+{% if request.user.is_authenticated %}
+<aside class="sidebar" id="sidebar" aria-label="Admin sidebar">
+    <nav class="sidebar-nav" aria-label="Admin navigation">
+
+        <a href="{% url 'admin:index' %}"
+           class="sidebar-link {% if request.path == '/admin/' %}active{% endif %}">
+            <span class="material-icons sidebar-icon">dashboard</span>
+            <span>Dashboard</span>
+        </a>
+
+        {% get_grouped_admin_sidebar as sidebar_sections %}
+
+        {% for section in sidebar_sections %}
+            <div class="sidebar-group">
+                <button type="button" class="sidebar-section-toggle">
+                    <span class="section-left">
+                        <span class="material-icons nav-section-icon">
+                            {{ section.icon|default:"folder" }}
+                        </span>
+                        <span>{{ section.title }}</span>
+                    </span>
+
+                    <span class="material-icons section-arrow">expand_more</span>
+                </button>
+
+                <div class="sidebar-submenu">
+                    {% for model in section.items %}
+                        <a href="{{ model.admin_url }}"
+                           class="sidebar-link {% if request.path|slice:":-1" == model.admin_url|slice:":-1" %} active{% endif %}">
+                            <span class="material-icons sidebar-icon">
+                                {{ model.icon|default:"chevron_right" }}
+                            </span>
+                            <span>{{ model.name }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+    </nav>
+
+    {% get_dynamic_settings_menu as settings_menu %}
+
+    <div class="sidebar-bottom">
+        <div class="sidebar-group">
+            <button type="button" class="sidebar-section-toggle">
+                <span class="section-left">
+                    <span class="material-icons nav-section-icon">settings</span>
+                    <span>Settings</span>
+                </span>
+
+                <span class="material-icons section-arrow">expand_more</span>
+            </button>
+
+            <div class="sidebar-submenu">
+                {% for item in settings_menu %}
+                    <a href="{{ item.get_admin_url }}"
+                       class="sidebar-link {% if request.path == item.get_admin_url %}active{% endif %}">
+                        <span class="material-icons sidebar-icon">
+                            {% if item.key == "general-settings" %}
+                                tune
+                            {% elif item.key == "appearance-settings" %}
+                                palette
+                            {% elif item.key == "security-settings" %}
+                                shield
+                            {% elif item.key == "notification-settings" %}
+                                notifications
+                            {% elif item.key == "payment-settings" %}
+                                credit_card
+                            {% elif item.key == "shipping-settings" %}
+                                local_shipping
+                            {% else %}
+                                settings
+                            {% endif %}
+                        </span>
+
+                        <span>{{ item.name }}</span>
+                    </a>
+                {% empty %}
+                    <a href="{% url 'admin:index' %}" class="sidebar-link">
+                        <span class="material-icons sidebar-icon">settings</span>
+                        <span>General Settings</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}

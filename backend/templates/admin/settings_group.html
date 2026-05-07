@@ -1,0 +1,202 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="settings-shell premium-settings">
+    <div class="settings-topbar">
+        <div>
+            <div class="settings-breadcrumb">
+                Settings / {{ group.name }}
+            </div>
+
+            <h1>{{ group.name }}</h1>
+
+            <p>
+                {{ group.description|default:"Manage your store settings." }}
+            </p>
+        </div>
+
+        <div class="settings-search-wrap">
+            <span class="material-icons">search</span>
+            <input
+                type="text"
+                id="settingsSearch"
+                placeholder="Search settings..."
+                aria-label="Search settings"
+            >
+        </div>
+    </div>
+
+    <div class="settings-layout settings-layout-single">
+        <main class="settings-main">
+            <form
+                id="settingsForm"
+                method="post"
+                enctype="multipart/form-data"
+                novalidate
+            >
+                {% csrf_token %}
+
+                <div class="settings-card premium-card">
+                    <div class="settings-card-head">
+                        <div>
+                            <h2>{{ group.name }}</h2>
+                        </div>
+                    </div>
+
+                    {% for field in fields %}
+                        <div
+                            class="settings-row premium-row"
+                            data-search="{{ field.label }} {{ field.key }} {{ field.help_text }}"
+                        >
+                            <div class="settings-info">
+                                <label for="{{ field.key }}">
+                                    {{ field.label }}
+
+                                    {% if field.is_required %}
+                                        <span class="required">*</span>
+                                    {% endif %}
+                                </label>
+
+                                {% if field.help_text %}
+                                    <small>{{ field.help_text }}</small>
+                                {% endif %}
+
+                                <code>{{ field.key }}</code>
+                            </div>
+
+                            <div class="settings-control">
+                                {% if field.field_type == "textarea" %}
+                                    <textarea
+                                        id="{{ field.key }}"
+                                        name="{{ field.key }}"
+                                        class="settings-input textarea"
+                                        placeholder="{{ field.placeholder }}"
+                                        {% if field.is_required %}required{% endif %}
+                                    >{{ field.value|default:field.default_value }}</textarea>
+
+                                {% elif field.field_type == "select" %}
+                                    <select
+                                        id="{{ field.key }}"
+                                        name="{{ field.key }}"
+                                        class="settings-input"
+                                        {% if field.is_required %}required{% endif %}
+                                    >
+                                        <option value="">Select</option>
+
+                                        {% for opt in field.options %}
+                                            <option
+                                                value="{{ opt.value }}"
+                                                {% if opt.value == field.value %}selected{% endif %}
+                                            >
+                                                {{ opt.label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                {% elif field.field_type == "toggle" %}
+                                    <label class="settings-switch" for="{{ field.key }}">
+                                        <input
+                                            type="checkbox"
+                                            id="{{ field.key }}"
+                                            name="{{ field.key }}"
+                                            value="true"
+                                            {% if field.value == "true" %}
+                                                checked
+                                            {% elif not field.value and field.default_value == "true" %}
+                                                checked
+                                            {% endif %}
+                                        >
+                                        <span></span>
+                                    </label>
+
+                                {% elif field.field_type == "file" %}
+                                    <input
+                                        type="file"
+                                        id="{{ field.key }}"
+                                        name="{{ field.key }}"
+                                        class="settings-input"
+                                        {% if field.is_required and not field.value %}required{% endif %}
+                                    >
+
+                                    {% if field.value %}
+                                        <div class="settings-file-preview">
+                                            <a
+                                                href="{{ field.value }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                View uploaded file
+                                            </a>
+                                        </div>
+                                    {% endif %}
+
+                                {% elif field.field_type == "color" %}
+                                    <div class="settings-color-group">
+                                        <input
+                                            type="color"
+                                            id="{{ field.key }}"
+                                            name="{{ field.key }}"
+                                            value="{{ field.value|default:field.default_value|default:'#000000' }}"
+                                            class="settings-color"
+                                            {% if field.is_required %}required{% endif %}
+                                        >
+
+                                        <input
+                                            type="text"
+                                            value="{{ field.value|default:field.default_value|default:'#000000' }}"
+                                            class="settings-input"
+                                            readonly
+                                            aria-label="{{ field.label }} color value"
+                                        >
+                                    </div>
+
+                                {% elif field.field_type == "password" %}
+                                    <input
+                                        type="password"
+                                        id="{{ field.key }}"
+                                        name="{{ field.key }}"
+                                        value=""
+                                        placeholder="{{ field.placeholder|default:'Enter new password/value' }}"
+                                        class="settings-input"
+                                        autocomplete="new-password"
+                                        {% if field.is_required and not field.value %}required{% endif %}
+                                    >
+
+                                {% else %}
+                                    <input
+                                        type="{{ field.field_type }}"
+                                        id="{{ field.key }}"
+                                        name="{{ field.key }}"
+                                        value="{{ field.value|default:field.default_value }}"
+                                        placeholder="{{ field.placeholder }}"
+                                        class="settings-input"
+                                        {% if field.is_required %}required{% endif %}
+                                    >
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="settings-empty">
+                            No settings available in this group.
+                        </div>
+                    {% endfor %}
+
+                    <div id="settingsEmpty" class="settings-empty" style="display:none;">
+                        No settings found.
+                    </div>
+                </div>
+
+                <div class="settings-sticky-save">
+                    <span>Unsaved changes? Review and save your settings.</span>
+                    <button type="submit" class="settings-primary-btn">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Admin Login | Vastrika{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} admin-login-page{% endblock %}
+
+{% block branding %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="admin-login-page-shell">
+    <div class="admin-login-card">
+
+        <div class="admin-login-panel admin-login-panel-left">
+            <div class="admin-login-accent-line"></div>
+
+            <div class="admin-login-brand">
+                <div class="admin-login-brand-logo">
+                    <img src="{% static 'admin/images/logo/vastrika-logo.png' %}" alt="Vastrika Logo">
+                </div>
+
+                <div>
+                    <h1 class="admin-login-title">Admin Login</h1>
+                    <p class="admin-login-subtitle">
+                        Sign in to manage Vastrika dashboard securely.
+                    </p>
+                </div>
+            </div>
+
+            {% if form.errors and not form.non_field_errors %}
+                <div class="admin-login-alert">
+                    Please enter a valid username and password.
+                </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <div class="admin-login-alert">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form
+                action="{% url 'admin:login' %}"
+                method="post"
+                id="login-form"
+                class="admin-login-form"
+                novalidate
+            >
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <div class="input-wrap">
+                        <span class="material-icons input-icon">person</span>
+                        {{ form.username }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrap password-wrap">
+                        <span class="material-icons input-icon">lock</span>
+                        <input
+                            type="password"
+                            name="password"
+                            id="id_password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                            aria-label="Toggle password visibility"
+                        >
+                            <span class="material-icons" id="passwordToggleIcon">
+                                visibility_off
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+
+                <button type="submit" class="admin-login-btn" id="loginSubmitBtn">
+                    <span class="btn-text">Login Now</span>
+                    <span class="btn-loader"></span>
+                </button>
+            </form>
+
+            <div class="admin-login-meta">
+                <p>Authorized staff access only.</p>
+            </div>
+        </div>
+
+        <div class="admin-login-panel admin-login-panel-right">
+            <img src="{% static 'admin/images/admin-login.jpg' %}" alt="Admin dashboard preview">
+
+            <div class="admin-login-right-content">
+                <h2>Control your store in one place</h2>
+                <p>
+                    Orders, products, customers, categories, reports, and settings.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "admin/base.html" %}
+{% load static admin_sidebar %}
+
+{% block title %}Vastrika Admin{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="icon" type="image/x-icon" href="{% static 'admin/images/logo/favicon/vastrika-favicon.png' %}">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} vastrika-admin{% endblock %}
+
+{% block branding %}
+{% if request.user.is_authenticated %}
+
+<audio id="notificationSound" preload="auto">
+    <source src="{% static 'admin/sounds/notification.mp3' %}" type="audio/mpeg">
+</audio>
+
+<div class="custom-header">
+    <div class="header-left">
+        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle sidebar">
+            <span class="material-icons">menu</span>
+        </button>
+
+        <div class="brand-wrap">
+            <h1 class="brand-logo">Vastrika</h1>
+            <div class="header-title">E-Commerce Admin Dashboard</div>
+        </div>
+    </div>
+
+    <div class="header-center">
+        <form class="search-form" role="search" onsubmit="return false;">
+            <span class="material-icons search-icon">search</span>
+            <input
+                type="text"
+                id="admin-search"
+                name="admin-search"
+                autocomplete="off"
+                placeholder="Search..."
+                aria-label="Search admin menu"
+            >
+            <div class="search-dropdown" id="searchDropdown"></div>
+        </form>
+    </div>
+
+    <div class="header-right">
+        <div class="notification-dropdown" id="notificationDropdown">
+            <button class="icon-btn" id="notificationTrigger" type="button" aria-label="Notifications">
+                <span class="material-icons">notifications</span>
+                <span class="badge" id="notificationBadge">0</span>
+            </button>
+
+            <div class="notification-panel" id="notificationPanel">
+                <div class="notification-header">
+                    <strong>Notifications</strong>
+                    <button type="button" id="markAllNotifications" class="mark-read-btn">
+                        Mark all read
+                    </button>
+                </div>
+
+                <div id="notificationList">
+                    <div class="notification-empty">No new notifications</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-dropdown" id="profileDropdown">
+            <button class="profile-trigger" id="profileTrigger" type="button" aria-label="Admin profile menu">
+                {% if request.user.profile_image %}
+                    <img src="{{ request.user.profile_image.url }}" class="admin-avatar-img" alt="Admin">
+                {% else %}
+                    <span class="avatar-circle">
+                        {% if request.user.first_name %}
+                            {{ request.user.first_name|first|upper }}
+                        {% elif request.user.email %}
+                            {{ request.user.email|first|upper }}
+                        {% elif request.user.username %}
+                            {{ request.user.username|first|upper }}
+                        {% else %}
+                            A
+                        {% endif %}
+                    </span>
+                {% endif %}
+
+                <span class="profile-name">
+                    {% if request.user.first_name %}
+                        {{ request.user.first_name }}
+                    {% elif request.user.email %}
+                        {{ request.user.email|truncatechars:14 }}
+                    {% else %}
+                        Admin
+                    {% endif %}
+                </span>
+
+                <span class="material-icons arrow">expand_more</span>
+            </button>
+
+            <div class="profile-menu" id="profileMenu">
+                <div class="profile-menu-header">
+                    <strong>
+                        {% if request.user.first_name %}
+                            {{ request.user.first_name }}
+                        {% elif request.user.email %}
+                            {{ request.user.email }}
+                        {% elif request.user.username %}
+                            {{ request.user.username }}
+                        {% else %}
+                            Admin
+                        {% endif %}
+                    </strong>
+
+                    <small>
+                        {% if request.user.is_superuser %}
+                            Super Admin
+                        {% elif request.user.is_staff %}
+                            Staff Admin
+                        {% else %}
+                            Admin
+                        {% endif %}
+                    </small>
+                </div>
+
+                <a href="{% url 'admin:index' %}" class="profile-menu-item">
+                    <i class="material-icons">dashboard</i>
+                    Dashboard
+                </a>
+
+                <a href="{% url 'admin_password_change' %}" class="profile-menu-item">
+                    <i class="material-icons">lock</i>
+                    Change Password
+                </a>
+
+                <a href="{% url 'admin:logout' %}" class="profile-menu-item logout">
+                    <i class="material-icons">logout</i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "admin/custom_sidebar.html" %}
+
+{% endif %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    {% block main_content %}
+        {{ block.super }}
+    {% endblock %}
+</main>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+<script src="{% static 'admin/js/custom.js' %}"></script>
+{% endblock %}
