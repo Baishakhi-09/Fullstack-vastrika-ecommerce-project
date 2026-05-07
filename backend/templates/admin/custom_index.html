@@ -8,7 +8,7 @@
     <!-- HERO -->
     <section class="dashboard-hero">
         <div class="dashboard-hero-content">
-            <span class="dashboard-eyebrow">Store Overview</span>
+            <span class="dashboard-eyebrow">Welcome, to</span>
             <h1>Vastrika E-Commerce Dashboard</h1>
             <p>
                 Track revenue, orders, products, categories, customer activity,
@@ -42,9 +42,9 @@
 
         <article class="stat-card">
             <div class="stat-card-top">
-                    <span class="stat-icon orders material-icons">
-                        shopping_cart
-                    </span>
+                <span class="stat-icon orders material-icons">
+                    shopping_cart
+                </span>
                 <span class="stat-trend neutral">{{ pending_orders|default:"0" }} Pending</span>
             </div>
             <p>Total Orders</p>
@@ -53,9 +53,9 @@
 
         <article class="stat-card">
             <div class="stat-card-top">
-                    <span class="stat-icon products material-icons">
-                        inventory_2
-                    </span>
+                <span class="stat-icon products material-icons">
+                    inventory_2
+                </span>
                 <span class="stat-trend neutral">Catalog</span>
             </div>
             <p>Total Products</p>
@@ -64,9 +64,9 @@
 
         <article class="stat-card">
             <div class="stat-card-top">
-                    <span class="stat-icon categories material-icons">
-                        category
-                    </span>
+                <span class="stat-icon categories material-icons">
+                    category
+                </span>
                 <span class="stat-trend neutral">Active</span>
             </div>
             <p>Total Brands</p>
@@ -76,21 +76,6 @@
 
     <!-- MINI STATS -->
     <section class="mini-grid">
-        <article class="mini-card">
-            <strong>{{ total_parent_categories|default:"0" }}</strong>
-            <span>Parent Categories</span>
-        </article>
-
-        <article class="mini-card">
-            <strong>{{ total_sub_categories|default:"0" }}</strong>
-            <span>Sub Categories</span>
-        </article>
-
-        <article class="mini-card">
-            <strong>{{ total_child_categories|default:"0" }}</strong>
-            <span>Child Categories</span>
-        </article>
-
         <article class="mini-card">
             <strong>{{ total_cart_items|default:"0" }}</strong>
             <span>Cart Items</span>
@@ -107,94 +92,34 @@
         </article>
     </section>
 
-    <!-- CHARTS -->
-    <section class="dashboard-grid">
+    <!-- ========================================================= -->
+    <!-- ANALYTICS + TABLE SECTIONS -->
+    <!-- ================================= -->
+    <section class="dashboard-analytics-grid">
+
+        <!-- SALES ANALYTICS -->
         <article class="dashboard-panel chart-panel">
+
             <div class="panel-header">
                 <div>
-                    <h3>Sales Analytics</h3>
-                    <p>Order activity from the last 7 days.</p>
+                    <h3>Sales Analytics Chart</h3>
+                    <p>Weekly / Monthly Revenue</p>
                 </div>
             </div>
 
-            <canvas id="salesChart"></canvas>
-        </article>
-
-        <article class="dashboard-panel chart-panel">
-            <div class="panel-header">
-                <div>
-                    <h3>Category Structure</h3>
-                    <p>Parent, sub, and child category distribution.</p>
-                </div>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
             </div>
 
-            <canvas id="categoryChart"></canvas>
         </article>
-    </section>
 
-    <!-- TABLES -->
-    <section class="dashboard-columns">
-
-        <!-- RECENT ORDERS -->
+        <!-- TOP SELLING PRODUCTS -->
         <article class="dashboard-panel">
+
             <div class="panel-header">
                 <div>
-                    <h3>Recent Orders</h3>
-                    <p>Latest customer order activity.</p>
-                </div>
-
-                <a href="{% url 'admin:orders_order_changelist' %}">
-                    View all
-                </a>
-            </div>
-
-            <div class="table-wrap">
-                <table class="dash-table">
-                    <thead>
-                        <tr>
-                            <th>Order</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {% for order in recent_orders %}
-                            <tr>
-                                <td>
-                                    <a href="{% url 'admin:orders_order_change' order.pk %}">
-                                        #{{ order.order_number|default:order.pk }}
-                                    </a>
-                                </td>
-
-                                <td>
-                                    <span class="status-badge {{ order.status|default:'pending' }}">
-                                        {{ order.status|default:"Pending"|title }}
-                                    </span>
-                                </td>
-
-                                <td>₹{{ order.total_amount|default:"0" }}</td>
-                                <td>{{ order.placed_at|date:"d M Y" }}</td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4" class="empty-state">
-                                    No recent orders found.
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </article>
-
-        <!-- RECENT PRODUCTS -->
-        <article class="dashboard-panel">
-            <div class="panel-header">
-                <div>
-                    <h3>Recent Products</h3>
-                    <p>Recently added catalog items.</p>
+                    <h3>Top Selling Products</h3>
+                    <p>Best performing products</p>
                 </div>
 
                 <a href="{% url 'admin:products_product_changelist' %}">
@@ -203,34 +128,145 @@
             </div>
 
             <div class="product-list">
-                {% for product in recent_products %}
-                    <a
-                        href="{% url 'admin:products_product_change' product.pk %}"
-                        class="product-row"
-                    >
-                        <div class="product-thumb">
-                            {% if product.main_image %}
-                                <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
-                            {% else %}
-                                <span>📦</span>
-                            {% endif %}
-                        </div>
 
-                        <div class="product-info">
-                            <strong>{{ product.name }}</strong>
-                            <p>₹{{ product.price|default:"0" }}</p>
-                        </div>
-                    </a>
+                {% for product in recent_products %}
+                <div class="product-row">
+
+                    <div class="product-thumb">
+                        {% if product.main_image %}
+                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <span>📦</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-info">
+                        <strong>{{ product.name }}</strong>
+                        <p>₹{{ product.price|default:"0" }}</p>
+                    </div>
+
+                </div>
                 {% empty %}
                     <div class="empty-state">
                         No products found.
                     </div>
                 {% endfor %}
+
             </div>
+
+        </article>
+
+        <!-- RECENT ORDERS -->
+        <article class="dashboard-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Recent Orders</h3>
+                    <p>Latest customer orders</p>
+                </div>
+
+                <a href="{% url 'admin:orders_order_changelist' %}">
+                    View all
+                </a>
+            </div>
+
+            <div class="table-wrap">
+
+                <table class="dash-table">
+
+                    <thead>
+                        <tr>
+                            <th>ORDER</th>
+                            <th>STATUS</th>
+                            <th>TOTAL</th>
+                            <th>DATE</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for order in recent_orders %}
+                        <tr>
+
+                            <td>
+                                #{{ order.order_number|default:order.id }}
+                            </td>
+
+                            <td>
+                                <span class="status-badge {{ order.status|default:'pending' }}">
+                                    {{ order.status|title }}
+                                </span>
+                            </td>
+
+                            <td>
+                                ₹{{ order.total_amount|default:"0" }}
+                            </td>
+
+                            <td>
+                                {{ order.placed_at|date:"d M Y" }}
+                            </td>
+
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">
+                                No recent orders found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </article>
+
+        <!-- RECENT PRODUCTS -->
+        <article class="dashboard-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Recent Products</h3>
+                    <p>Recently added catalog items</p>
+                </div>
+
+                <a href="{% url 'admin:products_product_changelist' %}">
+                    View all
+                </a>
+            </div>
+
+            <div class="product-list">
+
+                {% for product in recent_products %}
+                <div class="product-row">
+
+                    <div class="product-thumb">
+                        {% if product.main_image %}
+                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <span>📦</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-info">
+                        <strong>{{ product.name }}</strong>
+                        <p>₹{{ product.price|default:"0" }}</p>
+                    </div>
+
+                </div>
+                {% empty %}
+                    <div class="empty-state">
+                        No products found.
+                    </div>
+                {% endfor %}
+
+            </div>
+
         </article>
 
     </section>
-
 </div>
 
 {{ sales_labels|json_script:"sales-labels-data" }}
