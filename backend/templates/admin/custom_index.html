@@ -113,6 +113,22 @@
 
         </article>
 
+        <!-- TODAY ACTIVITY -->
+        <article class="dashboard-panel chart-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Sales By Category</h3>
+                    <p>Category-wise product analytics</p>
+                </div>
+            </div>
+
+            <div class="analytics-chart-wrapper">
+                <div id="activityChart"></div>
+            </div>
+
+        </article>
+
         <!-- TOP SELLING PRODUCTS -->
         <article class="dashboard-panel">
 
@@ -223,6 +239,45 @@
 
         </article>
 
+        <!-- LOW STOCK PRODUCTS -->
+        <article class="dashboard-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Low Stock Alerts</h3>
+                    <p>Products running out of inventory</p>
+                </div>
+            </div>
+
+            <div class="product-list">
+
+                {% for product in low_stock_products %}
+                <div class="product-row">
+
+                    <div class="product-thumb">
+                        {% if product.main_image %}
+                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <span>📦</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-info">
+                        <strong>{{ product.name }}</strong>
+                        <p>{{ product.stock }} items left</p>
+                    </div>
+
+                </div>
+                {% empty %}
+                    <div class="empty-state">
+                        No low stock products.
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </article>
+
         <!-- RECENT PRODUCTS -->
         <article class="dashboard-panel">
 
@@ -271,9 +326,14 @@
 
 {{ sales_labels|json_script:"sales-labels-data" }}
 {{ sales_data|json_script:"sales-values-data" }}
+
+{{ activity_labels|json_script:"activity-labels-data" }}
+{{ activity_data|json_script:"activity-values-data" }}
+
 {{ category_labels|json_script:"category-labels-data" }}
 {{ category_data|json_script:"category-values-data" }}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 {% endblock %}

@@ -975,6 +975,60 @@ div.breadcrumbs {
     color: #64748b;
 }
 
+/* =========================================
+   PREMIUM ANALYTICS CARD
+========================================= */
+
+.analytics-dark-card{
+    background: linear-gradient(
+        135deg,
+        #081225,
+        #0f172a
+    );
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 28px;
+    overflow: hidden;
+}
+
+/* =========================================
+   DARK PANEL HEADER
+========================================= */
+.panel-header.dark{
+    margin-bottom: 20px;
+}
+
+.panel-header.dark h3{
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.panel-header.dark p{
+    font-size: 14px;
+}
+
+/* =========================================
+   ANALYTICS WRAPPER
+========================================= */
+
+.analytics-chart-wrapper{
+    width: 100%;
+    min-height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================================
+   APEX CHART
+========================================= */
+
+#activityChart{
+    width: 100%;
+    min-height: 340px;
+}
+
 /* ===============================
    CONTENT AREA
 ================================ */

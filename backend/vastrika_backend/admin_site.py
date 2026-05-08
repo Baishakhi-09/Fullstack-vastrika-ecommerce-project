@@ -131,6 +131,21 @@ class VastrikaAdminSite(AdminSite):
                     total_sub_categories,
                     total_child_categories,
                 ],
+
+                # ACTIVITY TIMELINE PIE CHART
+                "activity_labels": [
+                    "Women Fashion",
+                    "Men Fashion",
+                    "Beauty & Skincare",
+                    "Accessories",
+                ],
+
+                "activity_data": [
+                    42,
+                    28,
+                    18,
+                    12,
+                ],
             }
 
             cache.set(cache_key, dashboard_data, 60)
@@ -138,12 +153,17 @@ class VastrikaAdminSite(AdminSite):
         recent_orders = Order.objects.order_by("-placed_at")[:6]
         recent_products = Product.objects.order_by("-created_at")[:6]
 
+        low_stock_products = Product.objects.filter(
+            variants__stock__lte=5
+        ).distinct()[:8]
+
         context = {
             **self.each_context(request),
             # "title": "Dashboard",
             "last_7_days": last_7_days,
             "recent_orders": recent_orders,
             "recent_products": recent_products,
+            "low_stock_products": low_stock_products,
             **dashboard_data,
         }
 

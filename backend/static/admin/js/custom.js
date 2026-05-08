@@ -432,8 +432,13 @@ function initDashboardCharts() {
     const categoryLabels = readJsonScript("category-labels-data");
     const categoryData = readJsonScript("category-values-data");
 
+    const activityLabels = readJsonScript("activity-labels-data");
+    const activityData = readJsonScript("activity-values-data");
+
     const salesCanvas = document.getElementById("salesChart");
     const categoryCanvas = document.getElementById("categoryChart");
+
+    const activityCanvas = document.getElementById("activityChart");
 
     // SALES CHART
     if (salesCanvas) {
@@ -476,5 +481,93 @@ function initDashboardCharts() {
                 maintainAspectRatio: false,
             },
         });
+    }
+
+    /* =========================================
+        PREMIUM SALES CATEGORY CHART
+    ========================================= */
+
+    if (
+        activityCanvas &&
+        activityData.length &&
+        typeof ApexCharts !== "undefined"
+    ) {
+
+        const options = {
+            series: activityData,
+            chart: {
+                type: "donut",
+                height: 340,
+                toolbar: {
+                    show: false,
+                },
+            },
+
+            labels: activityLabels,
+            colors: [
+                "#0f4c81",
+                "#2563eb",
+                "#38bdf8",
+                "#7dd3fc",
+            ],
+
+            stroke: {
+                width: 0,
+            },
+
+            dataLabels: {
+                enabled: false,
+            },
+
+            legend: {
+                position: "right",
+                fontSize: "14px",
+                fontWeight: 600,
+                fontFamily: "'Amaranth', sans-serif",
+                labels: {
+                    colors: "#000",
+                },
+
+                itemMargin: {
+                    vertical: 14,
+                },
+            },
+
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: "68%",
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: "Sales",
+                                color: "#ffffff",
+                                formatter: function () {
+                                    return "100%";
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+
+            responsive: [
+                {
+                    breakpoint: 768,
+                    options: {
+                        legend: {
+                            position: "bottom",
+                        },
+                    },
+                },
+            ],
+        };
+
+        const chart = new ApexCharts(
+            activityCanvas,
+            options
+        );
+        chart.render();
     }
 }

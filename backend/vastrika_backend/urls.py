@@ -31,31 +31,12 @@ urlpatterns = [
 
     # Clean Admin Login URL
     path(
-        "admin-login/",
-        RedirectView.as_view(
-            url="/dashboard/login/",
-            permanent=False,
-        ),
+        "admin-login/", RedirectView.as_view( url="/dashboard/login/", permanent=False,),
         name="admin_login_redirect",
     ),
 
-    # Old Django Admin Login Redirect
-    path(
-        "admin/login/",
-        RedirectView.as_view(
-            url="/dashboard/login/",
-            permanent=False,
-        ),
-    ),
-
     # Old Django Admin Redirect
-    path(
-        "admin/",
-        RedirectView.as_view(
-            url="/dashboard/",
-            permanent=False,
-        ),
-    ),
+    path( "admin/",  RedirectView.as_view(url="/dashboard/", permanent=False,),),
 
     # =========================================================
     # ADMIN PASSWORD CHANGE
