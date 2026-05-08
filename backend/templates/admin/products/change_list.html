@@ -1,0 +1,293 @@
+{% extends "admin/change_list.html" %}
+
+{% load static %}
+{% load admin_list %}
+{% load admin_urls %}
+
+
+{% block extrastyle %}
+    {{ block.super }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}"
+    >
+{% endblock %}
+
+
+{% block object-tools %}
+{% endblock %}
+
+{% block content_title %}
+{% endblock %}
+
+{% block content %}
+
+<div class="products-dashboard">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="product-dashboard-header">
+
+        <div>
+
+            <h1 class="product-dashboard-title">
+                {{ cl.opts.verbose_name_plural|capfirst }}
+            </h1>
+
+            <p class="product-dashboard-subtitle">
+                Manage inventory, stock, pricing and visibility.
+            </p>
+
+        </div>
+
+        <div class="product-dashboard-actions">
+
+            {% if has_add_permission %}
+
+                <a
+                    href="{% url cl.opts|admin_urlname:'add' %}"
+                    class="primary-btn"
+                >
+                    + Add Product
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         KPI CARDS
+    ====================================================== -->
+
+    <div class="product-stats-grid">
+
+        <div class="product-stat-card">
+
+            <span>Total Products</span>
+
+            <h2>
+                {{ total_products|default:"0" }}
+            </h2>
+
+        </div>
+
+        <div class="product-stat-card">
+
+            <span>Active Products</span>
+
+            <h2>
+                {{ active_products|default:"0" }}
+            </h2>
+
+        </div>
+
+        <div class="product-stat-card">
+
+            <span>Featured Products</span>
+
+            <h2>
+                {{ featured_products|default:"0" }}
+            </h2>
+
+        </div>
+
+        <div class="product-stat-card">
+
+            <span>Out Of Stock</span>
+
+            <h2>
+                {{ out_of_stock|default:"0" }}
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOOLBAR
+    ====================================================== -->
+
+    <div class="product-dashboard-toolbar">
+
+        <!-- SEARCH -->
+
+        <div class="toolbar-left">
+
+            <form method="get" class="search-form">
+                {% csrf_token %}
+
+                {% for key, value in request.GET.items %}
+
+                    {% if key != "q" %}
+
+                        <input
+                            type="hidden"
+                            name="{{ key }}"
+                            value="{{ value }}"
+                        >
+
+                    {% endif %}
+
+                {% endfor %}
+
+                <div class="search-wrapper">
+                    <label for="searchbar" class="sr-only">
+                        Search products
+                    </label>
+
+                    <svg
+                        class="search-icon"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                    </svg>
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ cl.query|default_if_none:'' }}"
+                        placeholder="Search products..."
+                        id="searchbar"
+                        autocomplete="off"
+                    >
+
+                    <button
+                        type="submit"
+                        class="search-submit-btn"
+                        aria-label="Search"
+                    >
+                        Search
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="toolbar-right">
+
+            <a
+                href="{{ request.get_full_path }}{% if '?' in request.get_full_path %}&{% else %}?{% endif %}export=csv"
+                class="toolbar-btn"
+            >
+                Export
+            </a>
+
+            {% if cl.has_filters %}
+
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    id="toggle-filters"
+                    aria-label="Toggle filters"
+                >
+                    Filters
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <div class="product-dashboard-content">
+
+
+        <!-- =================================================
+             TABLE SECTION
+        ================================================== -->
+
+        <div class="table-container">
+
+            <form id="changelist-form" method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if cl.formset %}
+                    {{ cl.formset.management_form }}
+                {% endif %}
+
+                {% if action_form and actions_on_top and cl.show_admin_actions %}
+                <div class="admin-actions-top">
+                    {% admin_actions %}
+                </div>
+                {% endif %}
+                <!-- RESULT TABLE -->
+                {% result_list cl %}
+                {% if action_form and actions_on_bottom and cl.show_admin_actions %}
+                    <div class="admin-actions-bottom">
+                        {% admin_actions %}
+                    </div>
+                {% endif %}
+            </form>
+
+
+            <!-- PAGINATION -->
+
+            <div class="pagination-wrapper">
+
+                {% pagination cl %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FILTER SIDEBAR
+        ================================================== -->
+
+        {% if cl.has_filters %}
+
+            <aside id="changelist-filter">
+
+                <div class="filter-header">
+
+                    <h2>Filters</h2>
+
+                </div>
+
+                <div class="filter-body">
+
+                    {% for spec in cl.filter_specs %}
+
+                        <div class="filter-block">
+
+                            {% admin_list_filter cl spec %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </aside>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
