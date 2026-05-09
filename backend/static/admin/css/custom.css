@@ -1,6 +1,7 @@
 /* ===============================
    ROOT VARIABLES
 ================================ */
+@import url('https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap');
 
 :root {
     --header-height: 86px;
@@ -2231,12 +2232,14 @@ body:has(.admin-password-page) {
     display: flex;
     align-items: center;
     max-width: 420px;
+    font-family: 'Amaranth', sans-serif;
 }
 
 .product-dashboard-toolbar .toolbar-left .search-form .search-wrapper {
     position: relative;
     width: 100%;
     display: flex;
+    font-family: 'Amaranth', sans-serif;
     align-items: center;
 }
 
@@ -2248,6 +2251,7 @@ body:has(.admin-password-page) {
     background: transparent !important;
     color: #000;
     outline: none !important;
+    font-family: 'Amaranth', sans-serif;
     padding: 0 16px !important;
     font-size: 14px !important;
     box-shadow: none !important;
@@ -2255,24 +2259,20 @@ body:has(.admin-password-page) {
 
 .product-dashboard-toolbar .toolbar-left .search-form .search-wrapper #searchbar::placeholder{
     color: #000;
+    font-family: 'Amaranth', sans-serif;
 }
 
 .product-dashboard-toolbar .toolbar-left .search-form .search-wrapper .search-icon {
 
     position: absolute;
-
     left: 18px;
-
+    font-family: 'Amaranth', sans-serif;
     top: 50%;
-
     transform: translateY(-50%);
-
     width: 18px;
     height: 18px;
     opacity: 0.45;
-
     pointer-events: none;
-
     z-index: 2;
 }
 
@@ -2286,6 +2286,7 @@ input[type="submit"].default,
 .product-dashboard-toolbar .toolbar-left .search-form .search-wrapper #searchbar:focus{
     border-color: #000 !important;
     outline: none !important;
+    font-family: 'Amaranth', sans-serif;
 }
 
 .product-dashboard-toolbar .toolbar-left .search-form .search-wrapper .search-submit-btn {
@@ -2294,6 +2295,7 @@ input[type="submit"].default,
     top: 48%;
     transform: translateY(-50%);
     height: 47px;
+    font-family: 'Amaranth', sans-serif;
     padding: 0 24px;
     border: none;
     border-radius: 999px;
@@ -2318,14 +2320,15 @@ input[type="submit"].default,
     align-items: center;
     justify-content: center;
     height: 37px;
-    padding: 0 35px;
+    padding: 0 20px;
     border-radius: 12px;
     background: #c5396a;
+    font-family: 'Amaranth', sans-serif;
     text-decoration: none;
     color: #fff;
     cursor: pointer;
     transition: 0.2s ease;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .product-dashboard-content{
@@ -2393,6 +2396,7 @@ input[type="submit"].default,
 
 .filter-header h2 {
     margin: 0;
+    font-family: 'Amaranth', sans-serif;
     font-size: 20px;
     color: var(--text-main);
 }
@@ -2406,6 +2410,94 @@ input[type="submit"].default,
 ========================================================= */
 .pagination-wrapper {
     margin-top: 24px;
+}
+
+/* =========================================
+   EXPORT DROPDOWN
+========================================= */
+
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+    overflow: visible !important;
+}
+
+.export-toggle-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 20;
+}
+
+.export-arrow {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+    font-family: 'Amaranth', sans-serif;
+}
+
+.export-dropdown.is-open .export-arrow {
+    transform: rotate(180deg);
+}
+
+.export-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 220px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    font-family: 'Amaranth', sans-serif;
+    border-radius: 5px;
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.14);
+    z-index: 999999;
+}
+
+.export-menu a{
+    color: #000;
+    font-family: 'Amaranth', sans-serif;
+}
+
+.export-dropdown.is-open .export-menu {
+    display: flex !important;
+}
+
+.export-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    font-family: 'Amaranth', sans-serif;
+    color: #111827;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.export-menu-item:hover {
+    background: #f3f4f6;
+    color: #111827;
+    text-decoration: none !important;
+}
+
+.export-menu-item:focus {
+    outline: none;
+    background: #eef2ff;
+    color: #111827;
+    text-decoration: none !important;
+}
+
+.table-container {
+    overflow-x: auto;
+    overflow-y: visible;
 }
 
 /* ===============================
@@ -2594,6 +2686,12 @@ input[type="submit"].default,
 
     .product-dashboard-toolbar .toolbar-right .toolbar-btn {
         flex: 1;
+    }
+    .export-menu {
+        right: auto;
+        left: 0;
+
+        min-width: 200px;
     }
 }
 

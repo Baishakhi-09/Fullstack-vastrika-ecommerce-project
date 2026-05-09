@@ -50,7 +50,7 @@ class VastrikaAdminSite(AdminSite):
         custom_urls = [
             path("", self.admin_view(self.custom_index), name="index",),
             path(
-                "products/product/<str:search_query>/",
+                "products/product/search/<str:search_query>/",
                 self.admin_view(self.product_search_redirect),
                 name="product_search_redirect",
             ),

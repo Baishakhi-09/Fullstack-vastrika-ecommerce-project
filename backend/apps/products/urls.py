@@ -15,6 +15,7 @@ from .views import (
     WishlistCheckView,
     WishlistItemDetailView,
     WishlistItemListCreateView,
+    export_products_csv,
 )
 
 urlpatterns = [
@@ -42,6 +43,13 @@ urlpatterns = [
 
     # -------------------- ADMIN NOTIFICATIONS -------------------- #
     path("admin-notifications/", include("apps.products.notifications.urls")),
+
+    # -------------------- EXPORTS -------------------- #
+    path(
+        "admin/products/export/csv/",
+        export_products_csv,
+        name="export_products_csv",
+    ),
 
     # -------------------- PRODUCT DETAIL - ALWAYS LAST -------------------- #
     path("<slug:slug>/", ProductDetailAPIView.as_view(), name="product_detail"),

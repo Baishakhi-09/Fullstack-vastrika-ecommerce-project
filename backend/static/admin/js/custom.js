@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initProfileDropdown();
     initAdminSearch();
     initProductSearchRedirect();
+    initExportDropdown();
     initSidebarToggle();
     initAdminLogin();
     initPasswordToggle();
@@ -100,7 +101,41 @@ function initProductSearchRedirect() {
         const query = searchInput.value.trim();
         if (!query) return;
         window.location.href =
-            `/dashboard/products/product/${encodeURIComponent(query)}/`;
+            `/dashboard/products/product/search/${encodeURIComponent(query)}/`;
+    });
+}
+
+/* =========================
+   Export Dropdown
+========================= */
+function initExportDropdown() {
+
+    const dropdowns = document.querySelectorAll(
+        ".export-dropdown"
+    );
+
+    if (!dropdowns.length) return;
+
+    dropdowns.forEach(function (dropdown) {
+
+        const button = dropdown.querySelector(
+            ".export-toggle-btn"
+        );
+
+        if (!button) return;
+
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            dropdown.classList.toggle("is-open");
+        });
+    });
+
+    document.addEventListener("click", function () {
+        dropdowns.forEach(function (dropdown) {
+            dropdown.classList.remove("is-open");
+        });
     });
 }
 
@@ -166,7 +201,7 @@ function initPasswordToggle() {
             const wrapper = toggle.closest(".admin-password-wrapper");
             if (!wrapper) return;
 
-             const input = wrapper.querySelector("input");
+            const input = wrapper.querySelector("input");
             if (!input) return;
 
             const isHidden = input.type === "password";
@@ -387,8 +422,10 @@ function initSidebarSections() {
 
         // Toggle open/close
         btn.addEventListener("click", function () {
-            groups.forEach(g => {
-                if (g !== group) g.classList.remove("is-open");
+            groups.forEach(function (g) {
+                if (g !== group) {
+                    g.classList.remove("is-open");
+                }
             });
 
             group.classList.toggle("is-open");

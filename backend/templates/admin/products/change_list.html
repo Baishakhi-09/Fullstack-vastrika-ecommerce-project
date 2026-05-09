@@ -182,12 +182,44 @@
         <!-- ACTIONS -->
         <div class="toolbar-right">
 
-            <a
-                href="{{ request.get_full_path }}{% if '?' in request.get_full_path %}&{% else %}?{% endif %}export=csv"
-                class="toolbar-btn"
-            >
-                Export
-            </a>
+            <div class="export-dropdown">
+
+                <button
+                    type="button"
+                    class="toolbar-btn export-toggle-btn"
+                >
+                    <span>Export</span>
+                    <span class="material-icons export-arrow">
+                        expand_more
+                    </span>
+                </button>
+
+                <div class="export-menu">
+
+                    <a
+                        href="/admin/products/export/csv/"
+                        class="export-menu-item"
+                    >
+                        Export CSV
+                    </a>
+
+                    <a
+                        href="/admin/products/export/excel/"
+                        class="export-menu-item"
+                    >
+                        Export Excel
+                    </a>
+
+                    <a
+                        href="/admin/products/export/pdf/"
+                        class="export-menu-item"
+                    >
+                        Export PDF
+                    </a>
+
+                </div>
+
+            </div>
 
             {% if cl.has_filters %}
 
@@ -289,4 +321,10 @@
 
 </div>
 
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+    <script src="{% static 'admin/js/custom.js' %}"></script>
 {% endblock %}

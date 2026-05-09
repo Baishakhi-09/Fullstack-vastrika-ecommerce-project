@@ -1,6 +1,11 @@
+import csv
 from decimal import Decimal
 
-from django.db.models import Min, Max, Q
+from django.contrib.admin.views.decorators import (
+    staff_member_required,
+)
+from django.db.models import Max, Min, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, permissions, status, serializers
@@ -29,6 +34,66 @@ from .serializers import (
     WishlistItemSerializer,
 )
 from .pagination import ProductPagination
+
+
+@staff_member_required
+def export_products_csv(request):
+    response = HttpResponse(
+        content_type="text/csv; charset=utf-8"
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="products.csv"'
+    )
+
+    response.write("\ufeff")
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        "ID",
+        "Name",
+        "Brand",
+        "Parent Category",
+        "Sub Category",
+        "Child Category",
+        "Selling Price",
+        "MRP",
+        "Stock",
+        "Status",
+    ])
+
+    products = (
+        Product.objects.select_related(
+            "brand",
+            "parent_category",
+            "sub_category",
+            "child_category",
+        )
+        .prefetch_related("variants")
+        .order_by("-created_at")
+    )
+
+    for product in products:
+        total_stock = sum(
+            variant.stock
+            for variant in product.variants.all()
+        )
+
+        writer.writerow([
+            product.id,
+            product.name,
+            getattr(product.brand, "name", "-"),
+            getattr(product.parent_category, "name", "-"),
+            getattr(product.sub_category, "name", "-"),
+            getattr(product.child_category, "name", "-"),
+            product.selling_price,
+            product.mrp,
+            total_stock,
+            "Active" if product.is_active else "Inactive",
+        ])
+
+    return response
 
 
 # -------------------- PRODUCT LIST / PLP -------------------- #
@@ -77,7 +142,10 @@ class ProductListAPIView(generics.ListAPIView):
         sort = params.get("sort")
 
         def to_bool(value):
-            return str(value).lower() in ["true", "1", "yes"]
+            return (
+                str(value).strip().lower()
+                in {"true", "1", "yes"}
+            )
 
         def is_number(value):
             try:
