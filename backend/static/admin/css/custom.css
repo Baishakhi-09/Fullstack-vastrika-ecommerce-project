@@ -2160,7 +2160,7 @@ body:has(.admin-password-page) {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
-    background: #071a33;
+    background: linear-gradient(135deg, #071a33, #123c69);
     padding: 25px;
 }
 

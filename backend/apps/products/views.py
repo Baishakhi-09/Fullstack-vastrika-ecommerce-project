@@ -1,9 +1,21 @@
 import csv
 from decimal import Decimal
 
+from openpyxl import Workbook
+
 from django.contrib.admin.views.decorators import (
     staff_member_required,
 )
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Spacer,
+    Table,
+    TableStyle,
+)
+
 from django.db.models import Max, Min, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -92,6 +104,159 @@ def export_products_csv(request):
             total_stock,
             "Active" if product.is_active else "Inactive",
         ])
+
+    return response
+
+
+@staff_member_required
+def export_products_excel(request):
+    workbook = Workbook()
+
+    worksheet = workbook.active
+    worksheet.title = "Products"
+
+    headers = [
+        "ID",
+        "Name",
+        "Brand",
+        "Parent Category",
+        "Sub Category",
+        "Child Category",
+        "Selling Price",
+        "MRP",
+        "Stock",
+        "Status",
+    ]
+
+    worksheet.append(headers)
+
+    products = (
+        Product.objects.select_related(
+            "brand",
+            "parent_category",
+            "sub_category",
+            "child_category",
+        )
+        .prefetch_related("variants")
+        .order_by("-created_at")
+    )
+
+    for product in products:
+
+        total_stock = sum(
+            variant.stock
+            for variant in product.variants.all()
+        )
+
+        worksheet.append([
+            product.id,
+            product.name,
+            getattr(product.brand, "name", "-"),
+            getattr(product.parent_category, "name", "-"),
+            getattr(product.sub_category, "name", "-"),
+            getattr(product.child_category, "name", "-"),
+            product.selling_price,
+            product.mrp,
+            total_stock,
+            "Active" if product.is_active else "Inactive",
+        ])
+
+    response = HttpResponse(
+        content_type=(
+            "application/vnd.openxmlformats-officedocument"
+            ".spreadsheetml.sheet"
+        )
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="products.xlsx"'
+    )
+
+    workbook.save(response)
+
+    return response
+
+
+@staff_member_required
+def export_products_pdf(request):
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="products.pdf"'
+    )
+
+    document = SimpleDocTemplate(
+        response,
+        pagesize=letter,
+    )
+
+    elements = []
+
+    data = [[
+        "ID",
+        "Name",
+        "Brand",
+        "Price",
+        "Stock",
+        "Status",
+    ]]
+
+    products = (
+        Product.objects.select_related(
+            "brand",
+            "parent_category",
+            "sub_category",
+            "child_category",
+        )
+        .prefetch_related("variants")
+        .order_by("-created_at")
+    )
+
+    for product in products:
+
+        total_stock = sum(
+            variant.stock
+            for variant in product.variants.all()
+        )
+
+        data.append([
+            str(product.id),
+            product.name,
+            getattr(product.brand, "name", "-"),
+            str(product.selling_price),
+            str(total_stock),
+            (
+                "Active"
+                if product.is_active
+                else "Inactive"
+            ),
+        ])
+
+    table = Table(
+        data,
+        colWidths=[40, 120, 80, 70, 60, 70],
+    )
+
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.black),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+
+        ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
+
+        ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 12))
+
+    document.build(elements)
 
     return response
 

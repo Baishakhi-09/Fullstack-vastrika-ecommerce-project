@@ -197,23 +197,21 @@
                 <div class="export-menu">
 
                     <a
-                        href="/admin/products/export/csv/"
+                        href="{% url 'export_products_csv' %}"
                         class="export-menu-item"
                     >
                         Export CSV
                     </a>
 
                     <a
-                        href="/admin/products/export/excel/"
-                        class="export-menu-item"
-                    >
+                        href="{% url 'export_products_excel' %}"
+                        class="export-menu-item">
                         Export Excel
                     </a>
 
                     <a
-                        href="/admin/products/export/pdf/"
-                        class="export-menu-item"
-                    >
+                        href="{% url 'export_products_pdf' %}"
+                        class="export-menu-item">
                         Export PDF
                     </a>
 

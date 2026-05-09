@@ -16,6 +16,8 @@ from .views import (
     WishlistItemDetailView,
     WishlistItemListCreateView,
     export_products_csv,
+    export_products_excel,
+    export_products_pdf,
 )
 
 urlpatterns = [
@@ -49,6 +51,17 @@ urlpatterns = [
         "admin/products/export/csv/",
         export_products_csv,
         name="export_products_csv",
+    ),
+    path(
+        "admin/products/export/excel/",
+        export_products_excel,
+        name="export_products_excel",
+    ),
+
+    path(
+        "admin/products/export/pdf/",
+        export_products_pdf,
+        name="export_products_pdf",
     ),
 
     # -------------------- PRODUCT DETAIL - ALWAYS LAST -------------------- #
