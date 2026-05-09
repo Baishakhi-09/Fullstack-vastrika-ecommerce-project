@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     initProfileDropdown();
     initAdminSearch();
+    initProductSearchRedirect();
     initSidebarToggle();
     initAdminLogin();
     initPasswordToggle();
@@ -74,6 +75,32 @@ function initAdminSearch() {
         if (!e.target.closest(".search-form")) {
             searchSuggestions.classList.remove("open");
         }
+    });
+}
+
+/* =========================
+   Product Search Redirect
+========================= */
+function initProductSearchRedirect() {
+    const searchForm = document.querySelector(
+        "#changelist-search form"
+    );
+    if (!searchForm) return;
+
+    searchForm.setAttribute("method", "GET");
+
+    searchForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const searchInput = searchForm.querySelector(
+            'input[name="q"]'
+        );
+
+        if (!searchInput) return;
+        const query = searchInput.value.trim();
+        if (!query) return;
+        window.location.href =
+            `/dashboard/products/product/${encodeURIComponent(query)}/`;
     });
 }
 

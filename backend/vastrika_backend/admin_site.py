@@ -50,6 +50,11 @@ class VastrikaAdminSite(AdminSite):
         custom_urls = [
             path("", self.admin_view(self.custom_index), name="index",),
             path(
+                "products/product/<str:search_query>/",
+                self.admin_view(self.product_search_redirect),
+                name="product_search_redirect",
+            ),
+            path(
                 "search-suggestions/",
                 self.admin_view(self.search_suggestions),
                 name="search_suggestions",
@@ -238,6 +243,11 @@ class VastrikaAdminSite(AdminSite):
             else:
                 field.value = request.POST.get(field.key, "")
                 field.save(update_fields=["value"])
+
+    def product_search_redirect(self, request, search_query):
+        return redirect(
+            f"/dashboard/products/product/?q={search_query}"
+        )
 
     # =========================================================
     # GLOBAL SEARCH
