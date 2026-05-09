@@ -36,7 +36,13 @@ urlpatterns = [
     ),
 
     # Old Django Admin Redirect
-    path( "admin/",  RedirectView.as_view(url="/dashboard/", permanent=False,),),
+    path(
+        "admin/",
+        RedirectView.as_view(
+            url="/dashboard/",
+            permanent=False,
+        ),
+    ),
 
     # =========================================================
     # ADMIN PASSWORD CHANGE
@@ -45,6 +51,11 @@ urlpatterns = [
         "dashboard/password_change/",
         AdminPasswordChangeView.as_view(),
         name="admin_password_change",
+    ),
+
+    path(
+        "dashboard/",
+        include("apps.core.urls"),
     ),
 
     # =========================================================

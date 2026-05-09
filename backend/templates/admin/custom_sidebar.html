@@ -4,8 +4,8 @@
 <aside class="sidebar" id="sidebar" aria-label="Admin sidebar">
     <nav class="sidebar-nav" aria-label="Admin navigation">
 
-        <a href="{% url 'admin:index' %}"
-           class="sidebar-link {% if request.path == '/admin/' %}active{% endif %}">
+        <a href="{% url 'vastrika_admin:index' %}"
+           class="sidebar-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
             <span class="material-icons sidebar-icon">dashboard</span>
             <span>Dashboard</span>
         </a>
@@ -14,7 +14,7 @@
 
         {% for section in sidebar_sections %}
             <div class="sidebar-group">
-                <button type="button" class="sidebar-section-toggle">
+                <button type="button" class="sidebar-section-toggle" aria-expanded="false">
                     <span class="section-left">
                         <span class="material-icons nav-section-icon">
                             {{ section.icon|default:"folder" }}
@@ -27,13 +27,18 @@
 
                 <div class="sidebar-submenu">
                     {% for model in section.items %}
-                        <a href="{{ model.admin_url }}"
-                           class="sidebar-link {% if request.path|slice:":-1" == model.admin_url|slice:":-1" %} active{% endif %}">
-                            <span class="material-icons sidebar-icon">
-                                {{ model.icon|default:"chevron_right" }}
-                            </span>
-                            <span>{{ model.name }}</span>
-                        </a>
+                        {% if model.admin_url %}
+                            <a
+                                href="{{ model.admin_url }}"
+                                class="sidebar-link {% if request.path|slice:':-1' == model.admin_url|slice:':-1' %}active{% endif %}"
+                            >
+                                <span class="material-icons sidebar-icon">
+                                    {{ model.icon|default:"chevron_right" }}
+                                </span>
+
+                                <span>{{ model.name }}</span>
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -45,7 +50,7 @@
 
     <div class="sidebar-bottom">
         <div class="sidebar-group">
-            <button type="button" class="sidebar-section-toggle">
+            <button type="button" class="sidebar-section-toggle" aria-expanded="false">
                 <span class="section-left">
                     <span class="material-icons nav-section-icon">settings</span>
                     <span>Settings</span>
@@ -79,7 +84,7 @@
                         <span>{{ item.name }}</span>
                     </a>
                 {% empty %}
-                    <a href="{% url 'admin:index' %}" class="sidebar-link">
+                    <a href="{% url 'vastrika_admin:index' %}" class="sidebar-link">
                         <span class="material-icons sidebar-icon">settings</span>
                         <span>General Settings</span>
                     </a>
