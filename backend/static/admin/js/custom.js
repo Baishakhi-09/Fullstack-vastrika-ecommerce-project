@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
     initAdminSearch();
     initProductSearchRedirect();
     initExportDropdown();
+    initFilterToggle();
+    initDeleteModal
     initSidebarToggle();
     initAdminLogin();
     initPasswordToggle();
@@ -136,6 +138,33 @@ function initExportDropdown() {
         dropdowns.forEach(function (dropdown) {
             dropdown.classList.remove("is-open");
         });
+    });
+}
+
+/* =========================
+   Filter Toggle
+========================= */
+function initFilterToggle() {
+
+    const layout = document.querySelector(
+        "#product-layout"
+    );
+
+    const toggleButton = document.querySelector(
+        "#toggle-filters"
+    );
+
+    if (!layout || !toggleButton) return;
+
+    toggleButton.addEventListener("click", function () {
+
+        layout.classList.toggle(
+            "filters-visible"
+        );
+
+        layout.classList.toggle(
+            "filters-hidden"
+        );
     });
 }
 
@@ -634,4 +663,99 @@ function initDashboardCharts() {
         );
         chart.render();
     }
+}
+
+/* =========================================
+   DELETE CONFIRM MODAL
+========================================= */
+
+function initDeleteModal() {
+
+    const form = document.querySelector(
+        "#changelist-form"
+    );
+
+    const actionSelect = document.querySelector(
+        "select[name='action']"
+    );
+
+    const submitButton = document.querySelector(
+        ".actions button"
+    );
+
+    const modal = document.querySelector(
+        "#delete-modal"
+    );
+
+    const cancelButton = document.querySelector(
+        "#modal-cancel-btn"
+    );
+
+    const confirmButton = document.querySelector(
+        "#modal-delete-btn"
+    );
+
+    if (
+        !form ||
+        !actionSelect ||
+        !submitButton ||
+        !modal
+    ) {
+        return;
+    }
+
+    submitButton.addEventListener(
+        "click",
+        function (e) {
+
+            const selectedAction =
+                actionSelect.value;
+
+            if (
+                selectedAction === "delete_selected"
+            ) {
+
+                e.preventDefault();
+
+                modal.classList.add(
+                    "is-open"
+                );
+            }
+        }
+    );
+
+    cancelButton.addEventListener(
+        "click",
+        function () {
+
+            modal.classList.remove(
+                "is-open"
+            );
+        }
+    );
+
+    modal.addEventListener(
+        "click",
+        function (e) {
+
+            if (
+                e.target.classList.contains(
+                    "delete-modal-backdrop"
+                )
+            ) {
+
+                modal.classList.remove(
+                    "is-open"
+                );
+            }
+        }
+    );
+
+    confirmButton.addEventListener(
+        "click",
+        function () {
+
+            form.submit();
+        }
+    );
 }

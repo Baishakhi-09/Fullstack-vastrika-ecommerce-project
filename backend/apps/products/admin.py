@@ -433,21 +433,21 @@ class ProductAdmin(
 
     list_display = (
         "product_image",
-        "name",
-        "brand",
+        "display_name",
+        "product_brand",
         "category_display",
-        "selling_price",
-        "mrp",
+        "product_selling_price",
+        "product_mrp",
         "discount_badge",
         "stock_badge",
-        "is_active",
-        "is_featured",
-        "created_at",
+        "display_is_active",
+        "display_is_featured",
+        "display_created_at",
     )
 
     list_display_links = (
         "product_image",
-        "name",
+        "display_name",
     )
 
     list_filter = (
@@ -657,6 +657,43 @@ class ProductAdmin(
             request,
             extra_context=extra_context,
         )
+    
+    @admin.display(description="Name")
+    def display_name(self, obj):
+        return obj.name
+
+
+    @admin.display(description="Is Active")
+    def display_is_active(self, obj):
+        return obj.is_active
+
+
+    @admin.display(description="Is Featured")
+    def display_is_featured(self, obj):
+        return obj.is_featured
+
+
+    @admin.display(description="Created At")
+    def display_created_at(self, obj):
+        return obj.created_at
+    
+    @admin.display(description="Brand")
+    def product_brand(self, obj):
+
+        if obj.brand:
+            return obj.brand.name
+
+        return "-"
+
+
+    @admin.display(description="Selling Price")
+    def product_selling_price(self, obj):
+        return obj.selling_price
+
+
+    @admin.display(description="MRP")
+    def product_mrp(self, obj):
+        return obj.mrp
 
     @admin.display(description="Image")
     def product_image(self, obj):

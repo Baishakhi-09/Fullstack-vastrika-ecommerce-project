@@ -241,22 +241,18 @@
          MAIN CONTENT
     ====================================================== -->
 
-    <div class="product-dashboard-content">
-
+    <div class="product-dashboard-content product-layout filters-hidden" id="product-layout">
 
         <!-- =================================================
              TABLE SECTION
         ================================================== -->
 
-        <div class="table-container">
-
+        <div class="table-container product-table-area">
             <form id="changelist-form" method="post" novalidate>
                 {% csrf_token %}
-                
                 {% if cl.formset %}
                     {{ cl.formset.management_form }}
                 {% endif %}
-
                 {% if action_form and actions_on_top and cl.show_admin_actions %}
                 <div class="admin-actions-top">
                     {% admin_actions %}
@@ -271,54 +267,93 @@
                 {% endif %}
             </form>
 
-
             <!-- PAGINATION -->
-
             <div class="pagination-wrapper">
-
                 {% pagination cl %}
-
             </div>
-
         </div>
-
 
         <!-- =================================================
              FILTER SIDEBAR
         ================================================== -->
 
         {% if cl.has_filters %}
-
-            <aside id="changelist-filter">
-
+            <aside id="changelist-filter" class="product-filter-sidebar">
                 <div class="filter-header">
-
                     <h2>Filters</h2>
-
                 </div>
 
                 <div class="filter-body">
-
                     {% for spec in cl.filter_specs %}
-
                         <div class="filter-block">
-
                             {% admin_list_filter cl spec %}
-
                         </div>
-
                     {% endfor %}
-
                 </div>
-
             </aside>
-
         {% endif %}
-
     </div>
 
-</div>
+    <!-- ======================================
+    DELETE CONFIRM MODAL
+    ====================================== -->
 
+    <div class="delete-modal" id="delete-modal">
+        <div class="delete-modal-backdrop"></div>
+        <div class="delete-modal-card">
+            <div class="delete-modal-header">
+                <div class="delete-modal-icon">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path d="M3 6h18"></path>
+                        <path d="M8 6V4h8v2"></path>
+                        <path d="M19 6l-1 14H6L5 6"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                    </svg>
+                </div>
+
+                <div>
+                    <h3>
+                        Delete Selected Products?
+                    </h3>
+
+                    <p>
+                        This action cannot be undone.
+                        Selected products and related
+                        records will be permanently deleted.
+                    </p>
+                </div>
+            </div>
+
+            <div class="delete-modal-actions">
+                <button
+                    type="button"
+                    class="modal-cancel-btn"
+                    id="modal-cancel-btn">
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="modal-delete-btn"
+                    id="modal-delete-btn">
+                    Delete Permanently
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+    
+</div>
 {% endblock %}
 
 {% block extrahead %}
