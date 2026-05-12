@@ -1,0 +1,141 @@
+<section class="admin-card">
+    <!-- =====================================================
+        CARD HEADER
+    ====================================================== -->
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>Media Gallery</h2>
+            <p>Upload and manage product media assets.</p>
+        </div>
+    </div>
+
+    <!-- =====================================================
+        CARD BODY
+    ====================================================== -->
+    <div class="card-body">
+        <!-- =================================================
+            MEDIA UPLOAD FIELD
+        ================================================== -->
+        <div class="form-group">
+            <label
+                for="{{ adminform.form.images.id_for_label }}"
+                class="{% if adminform.form.images.field.required %}required{% endif %}">
+                Product Images
+            </label>
+
+            <!-- =============================================
+                FIELD ERRORS
+            ============================================== -->
+            <div class="field-errors">
+                {{ adminform.form.images.errors }}
+            </div>
+
+            <!-- =============================================
+                MEDIA DROPZONE
+            ============================================== -->
+            <div
+                class="media-dropzone"
+                role="button"
+                tabindex="0"
+                aria-label="Upload product images">
+                <div class="media-dropzone-content">
+                    <h3>Upload Product Images</h3>
+                    <p>
+                        Drag and drop product images here,
+                        or click to browse files.
+                    </p>
+
+                    <!-- =====================================
+                        DJANGO FILE INPUT
+                    ====================================== -->
+                    {{ adminform.form.images }}
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================
+            MEDIA PREVIEW GRID
+        ================================================== -->
+        <div class="media-preview-grid">
+            {% if original %}
+                <!-- =========================================
+                    FUTURE MEDIA PREVIEW SYSTEM
+                ========================================== -->
+                {% comment %}
+                    Example future implementation:
+                    {% for image in original.images.all %}
+                        <div class="media-preview-item">
+                            <img
+                                src="{{ image.image.url }}"
+                                alt="{{ image.alt_text|default:original.name }}">
+                            <div class="media-preview-actions">
+                                <button
+                                    type="button"
+                                    class="delete-image-btn">
+                                    Delete
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="primary-image-btn">
+                                    Set Primary
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endcomment %}
+            {% else %}
+                <!-- =========================================
+                    EMPTY STATE
+                ========================================== -->
+                <div class="media-preview-empty">
+                    <!-- EMPTY STATE ICON -->
+                    <div class="media-preview-empty-icon">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                            class="empty-media-icon">
+                            <!-- IMAGE FRAME -->
+                            <rect
+                                x="3"
+                                y="5"
+                                width="18"
+                                height="14"
+                                rx="2"
+                                ry="2">
+                            </rect>
+                            <!-- SUN -->
+                            <circle
+                                cx="9"
+                                cy="10"
+                                r="1.5">
+                            </circle>
+
+                            <!-- MOUNTAIN -->
+                            <path
+                                d="M21 16l-5-5-4 4-2-2-4 3">
+                            </path>
+                        </svg>
+                    </div>
+
+                    <!-- EMPTY STATE MESSAGE -->
+                    <p>
+                        No media uploaded yet.
+                    </p>
+                    <!-- OPTIONAL CTA -->
+                    <button
+                        type="button"
+                        class="upload-media-btn">
+                        Upload Images
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

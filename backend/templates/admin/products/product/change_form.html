@@ -1,0 +1,193 @@
+{% extends "admin/change_form.html" %}
+
+{% load admin_modify %}
+{% load admin_urls %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+
+    <link
+        rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+    <script src="{% static 'admin/js/custom.js' %}" defer></script>
+{% endblock %}
+
+{% block object-tools %}
+{% endblock %}
+
+{% block content %}
+    <form
+        id="product-admin-form"
+        method="post"
+        enctype="multipart/form-data"
+        novalidate
+        autocomplete="off">
+
+        {% csrf_token %}
+
+        <!-- =====================================================
+            FORM MEDIA
+        ====================================================== -->
+
+        {{ adminform.form.media }}
+
+        {{ media }}
+
+        <!-- =====================================================
+            HIDDEN FIELDS
+        ====================================================== -->
+
+        {% for hidden in adminform.form.hidden_fields %}
+
+            {{ hidden }}
+
+        {% endfor %}
+
+        <!-- =====================================================
+            GLOBAL ERRORS
+        ====================================================== -->
+
+        {% if adminform.form.non_field_errors %}
+            <div class="global-form-errors">
+                {{ adminform.form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="product-page">
+
+            <!-- =====================================================
+                PAGE HEADER
+            ====================================================== -->
+
+            <div class="product-page-header">
+
+                <!-- HEADER LEFT -->
+                <div class="product-page-header-left">
+                    <span class="product-breadcrumb">
+                        {{ opts.verbose_name_plural|capfirst }} /
+                        {% if add %}
+                            Add
+                        {% else %}
+                            Edit
+                        {% endif %}
+                        {{ opts.verbose_name|capfirst }}
+                    </span>
+
+                    <h1 class="product-page-title">
+                        {% if original %}
+                            {{ original }}
+                        {% else %}
+                            Add Product
+                        {% endif %}
+                    </h1>
+
+                    <p class="product-page-subtitle">
+                        Create and manage your product information.
+                    </p>
+
+                </div>
+
+                <!-- HEADER RIGHT -->
+                <div class="product-page-header-right">
+                    {% if original and original.get_absolute_url %}
+                        <a
+                            href="{{ original.get_absolute_url }}"
+                            target="_blank"
+                            rel="noopener"
+                            class="header-btn secondary-btn">
+                            Preview
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- =====================================================
+                MAIN EDITOR LAYOUT
+            ====================================================== -->
+
+            <div class="product-editor-layout">
+
+                <!-- =================================================
+                    MAIN CONTENT
+                ================================================== -->
+
+                <div class="editor-main">
+
+                    <!-- BASIC INFORMATION -->
+                    {% include "admin/products/product/includes/basic_information.html" %}
+
+                    <!-- MEDIA GALLERY -->
+                    {% include "admin/products/product/includes/media_gallery.html" %}
+
+                    <!-- PRICING -->
+                    {% include "admin/products/product/includes/pricing.html" %}
+
+                    <!-- INVENTORY -->
+                    {% include "admin/products/product/includes/inventory.html" %}
+
+                    <!-- VARIANTS -->
+                    {% include "admin/products/product/includes/variants.html" %}
+
+                    <!-- SHIPPING -->
+                    {% include "admin/products/product/includes/shipping.html" %}
+
+                    <!-- SEO -->
+                    {% include "admin/products/product/includes/seo.html" %}
+
+                    <!-- RELATED PRODUCTS -->
+                    {% include "admin/products/product/includes/related_products.html" %}
+                </div>
+
+                <!-- =================================================
+                    SIDEBAR
+                ================================================== -->
+
+                <aside class="editor-sidebar">
+                    {% include "admin/products/product/includes/sidebar.html" %}
+                </aside>
+            </div>
+        </div>
+
+        <!-- =====================================================
+            STICKY SAVE BAR
+        ====================================================== -->
+
+        <div class="save-bar" role="toolbar">
+            <!-- LEFT ACTIONS -->
+            <div class="save-bar-left">
+                {% if original %}
+                    <a
+                        href="{% url opts|admin_urlname:'delete' original.pk %}"
+                        class="delete-btn" aria-label="Delete product">
+                        Delete
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- RIGHT ACTIONS -->
+            <div class="save-bar-right">
+
+                <button
+                    type="submit"
+                    name="_save"
+                    class="save-draft-btn"
+                    aria-label="Save product">
+                    Save Product
+                </button>
+
+                <button
+                    type="submit"
+                    name="_continue"
+                    class="publish-btn"
+                    aria-label="Save and continue editing">
+                    Save & Continue
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

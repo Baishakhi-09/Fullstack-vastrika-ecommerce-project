@@ -1,9 +1,11 @@
 from django.contrib import admin
-from django import forms
 from django.db.models import Count
 from django.utils.html import format_html
+from django.urls import reverse
 
 from vastrika_backend.admin_site import admin_site
+
+from .forms import ProductAdminForm
 
 from .models import (
     Brand,
@@ -31,109 +33,53 @@ from .notifications.models import (
 # =========================================================
 
 class RoleBasedAdminMixin:
+
     def _has_admin_access(self, request):
+
         return (
             request.user.is_authenticated
             and (
                 request.user.is_superuser
-                or getattr(request.user, "role", None) == "admin"
+                or getattr(
+                    request.user,
+                    "role",
+                    None,
+                ) == "admin"
             )
         )
 
-    def has_module_permission(self, request):
+    def has_module_permission(
+        self,
+        request,
+    ):
         return self._has_admin_access(request)
 
-    def has_view_permission(self, request, obj=None):
+    def has_view_permission(
+        self,
+        request,
+        obj=None,
+    ):
         return request.user.is_authenticated
 
-    def has_add_permission(self, request):
+    def has_add_permission(
+        self,
+        request,
+    ):
         return self._has_admin_access(request)
 
-    def has_change_permission(self, request, obj=None):
+    def has_change_permission(
+        self,
+        request,
+        obj=None,
+    ):
         return self._has_admin_access(request)
 
-    def has_delete_permission(self, request, obj=None):
+    def has_delete_permission(
+        self,
+        request,
+        obj=None,
+    ):
         return self._has_admin_access(request)
-
-
-# =========================================================
-# PRODUCT ADMIN FORM
-# =========================================================
-
-class ProductAdminForm(forms.ModelForm):
-
-    class Meta:
-        model = Product
-        fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-
-        self.fields["sub_category"].queryset = (
-            SubCategory.objects.none()
-        )
-
-        self.fields["child_category"].queryset = (
-            ChildCategory.objects.none()
-        )
-
-        # Existing Product
-        if self.instance and self.instance.pk:
-
-            if self.instance.parent_category:
-
-                self.fields["sub_category"].queryset = (
-                    SubCategory.objects.filter(
-                        parent_category=self.instance.parent_category,
-                        is_active=True,
-                    )
-                )
-
-            if self.instance.sub_category:
-
-                self.fields["child_category"].queryset = (
-                    ChildCategory.objects.filter(
-                        sub_category=self.instance.sub_category,
-                        is_active=True,
-                    )
-                )
-
-        # Dynamic Parent Category
-        if "parent_category" in self.data:
-
-            try:
-                parent_id = int(
-                    self.data.get("parent_category")
-                )
-
-                self.fields["sub_category"].queryset = (
-                    SubCategory.objects.filter(
-                        parent_category_id=parent_id,
-                        is_active=True,
-                    )
-                )
-
-            except (TypeError, ValueError):
-                pass
-
-        # Dynamic Sub Category
-        if "sub_category" in self.data:
-
-            try:
-                sub_id = int(
-                    self.data.get("sub_category")
-                )
-
-                self.fields["child_category"].queryset = (
-                    ChildCategory.objects.filter(
-                        sub_category_id=sub_id,
-                        is_active=True,
-                    )
-                )
-
-            except (TypeError, ValueError):
-                pass
 
 
 # =========================================================
@@ -145,6 +91,8 @@ class ProductImageInline(admin.TabularInline):
     model = ProductImage
 
     extra = 1
+
+    ordering = ("sort_order",)
 
     fields = (
         "image_preview",
@@ -158,49 +106,28 @@ class ProductImageInline(admin.TabularInline):
         "image_preview",
     )
 
-    ordering = ("sort_order",)
-
+    @admin.display(description="Preview")
     def image_preview(self, obj):
 
         if obj and obj.image:
 
             return format_html(
-                '''
+                """
                 <img
                     src="{}"
-                    style="
-                        width:70px;
-                        height:70px;
-                        object-fit:cover;
-                        border-radius:12px;
-                        border:1px solid #e2e8f0;
-                    "
+                    class="admin-product-inline-image"
                 >
-                ''',
+                """,
                 obj.image.url,
             )
 
         return format_html(
-            '''
-            <div
-                style="
-                    width:70px;
-                    height:70px;
-                    border-radius:12px;
-                    background:#f1f5f9;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    color:#64748b;
-                    font-size:11px;
-                "
-            >
+            """
+            <div class="admin-no-image">
                 No Image
             </div>
-            '''
+            """
         )
-
-    image_preview.short_description = "Preview"
 
 
 # =========================================================
@@ -227,16 +154,13 @@ class ProductVariantInline(admin.TabularInline):
         "available_stock_display",
     )
 
+    @admin.display(description="Available Stock")
     def available_stock_display(self, obj):
 
         if obj and obj.pk:
             return obj.available_stock
 
         return 0
-
-    available_stock_display.short_description = (
-        "Available Stock"
-    )
 
 
 # =========================================================
@@ -431,6 +355,10 @@ class ProductAdmin(
         "admin/products/change_list.html"
     )
 
+    change_form_template = (
+        "admin/products/product/change_form.html"
+    )
+
     list_display = (
         "product_image",
         "display_name",
@@ -443,12 +371,30 @@ class ProductAdmin(
         "display_is_active",
         "display_is_featured",
         "display_created_at",
+        "edit_product",
     )
 
-    list_display_links = (
-        "product_image",
-        "display_name",
-    )
+    list_display_links = None
+
+    @admin.display(description="Actions")
+    def edit_product(self, obj):
+
+        return format_html(
+            """
+            <a
+                href="{}"
+                class="admin-edit-btn"
+            >
+                <span class="edit-btn-text">
+                    Edit
+                </span>
+            </a>
+            """,
+            reverse(
+                "admin:products_product_change",
+                args=[obj.pk]
+            )
+        )
 
     list_filter = (
         "is_active",
@@ -491,6 +437,7 @@ class ProductAdmin(
     )
 
     list_per_page = 20
+
     show_full_result_count = False
 
     list_select_related = (
@@ -508,13 +455,16 @@ class ProductAdmin(
     )
 
     date_hierarchy = "created_at"
+
     empty_value_display = "-"
+
     save_as = True
+
+    save_on_top = True
+
     search_help_text = (
         "Search by product name, SKU, slug or brand."
     )
-
-    save_on_top = True
 
     actions = (
         "mark_active",
@@ -597,6 +547,18 @@ class ProductAdmin(
         }),
     )
 
+    class Media:
+
+        css = {
+            "all": (
+                "admin/css/custom.css",
+            )
+        }
+
+        js = (
+            "admin/js/custom.js",
+        )
+
     def get_queryset(self, request):
 
         queryset = super().get_queryset(request)
@@ -612,24 +574,14 @@ class ProductAdmin(
             "tags",
         )
 
-    class Media:
-
-        css = {
-            "all": (
-                "admin/css/custom.css",
-            )
-        }
-
-        js = (
-            "admin/js/custom.js",
-        )
-
     def changelist_view(
         self,
         request,
         extra_context=None,
     ):
+
         extra_context = extra_context or {}
+
         queryset = self.get_queryset(request)
 
         extra_context.update({
@@ -657,26 +609,11 @@ class ProductAdmin(
             request,
             extra_context=extra_context,
         )
-    
+
     @admin.display(description="Name")
     def display_name(self, obj):
         return obj.name
 
-
-    @admin.display(description="Is Active")
-    def display_is_active(self, obj):
-        return obj.is_active
-
-
-    @admin.display(description="Is Featured")
-    def display_is_featured(self, obj):
-        return obj.is_featured
-
-
-    @admin.display(description="Created At")
-    def display_created_at(self, obj):
-        return obj.created_at
-    
     @admin.display(description="Brand")
     def product_brand(self, obj):
 
@@ -685,15 +622,25 @@ class ProductAdmin(
 
         return "-"
 
-
     @admin.display(description="Selling Price")
     def product_selling_price(self, obj):
         return obj.selling_price
 
-
     @admin.display(description="MRP")
     def product_mrp(self, obj):
         return obj.mrp
+
+    @admin.display(description="Is Active")
+    def display_is_active(self, obj):
+        return obj.is_active
+
+    @admin.display(description="Is Featured")
+    def display_is_featured(self, obj):
+        return obj.is_featured
+
+    @admin.display(description="Created At")
+    def display_created_at(self, obj):
+        return obj.created_at
 
     @admin.display(description="Image")
     def product_image(self, obj):
@@ -710,39 +657,21 @@ class ProductAdmin(
         if primary_image and primary_image.image:
 
             return format_html(
-                '''
+                """
                 <img
                     src="{}"
-                    style="
-                        width:60px;
-                        height:60px;
-                        object-fit:cover;
-                        border-radius:14px;
-                        border:1px solid #e2e8f0;
-                    "
+                    class="admin-product-image"
                 >
-                ''',
+                """,
                 primary_image.image.url,
             )
 
         return format_html(
-            '''
-            <div
-                style="
-                    width:60px;
-                    height:60px;
-                    border-radius:14px;
-                    background:#f1f5f9;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    color:#64748b;
-                    font-size:11px;
-                "
-            >
+            """
+            <div class="admin-no-image">
                 No Image
             </div>
-            '''
+            """
         )
 
     @admin.display(description="Category")
@@ -765,30 +694,21 @@ class ProductAdmin(
         discount = obj.discount_percent
 
         if discount <= 0:
-            color = "#64748b"
+            badge_class = "badge-secondary"
 
         elif discount <= 20:
-            color = "#10b981"
+            badge_class = "badge-success"
 
         else:
-            color = "#ef4444"
+            badge_class = "badge-danger"
 
         return format_html(
-            '''
-            <span
-                style="
-                    background:{};
-                    color:white;
-                    padding:6px 12px;
-                    border-radius:30px;
-                    font-size:12px;
-                    font-weight:600;
-                "
-            >
+            """
+            <span class="admin-badge {}">
                 {}%
             </span>
-            ''',
-            color,
+            """,
+            badge_class,
             discount,
         )
 
@@ -799,55 +719,50 @@ class ProductAdmin(
 
         if total_stock <= 0:
 
-            color = "#ef4444"
+            badge_class = "badge-danger"
             label = "Out of Stock"
 
         elif total_stock <= 5:
 
-            color = "#f59e0b"
+            badge_class = "badge-warning"
             label = "Low Stock"
 
         else:
 
-            color = "#10b981"
+            badge_class = "badge-success"
             label = "In Stock"
 
         return format_html(
-            '''
-            <span
-                style="
-                    background:{};
-                    color:white;
-                    padding:6px 12px;
-                    border-radius:30px;
-                    font-size:12px;
-                    font-weight:600;
-                "
-            >
+            """
+            <span class="admin-badge {}">
                 {}
             </span>
-            ''',
-            color,
+            """,
+            badge_class,
             label,
         )
-    
-    @admin.action(description="Mark selected products as Active")
+
+    @admin.action(
+        description="Mark selected products as Active"
+    )
     def mark_active(self, request, queryset):
 
         queryset.update(
             is_active=True
         )
 
-
-    @admin.action(description="Mark selected products as Inactive")
+    @admin.action(
+        description="Mark selected products as Inactive"
+    )
     def mark_inactive(self, request, queryset):
 
         queryset.update(
             is_active=False
         )
 
-
-    @admin.action(description="Mark selected products as Featured")
+    @admin.action(
+        description="Mark selected products as Featured"
+    )
     def mark_featured(self, request, queryset):
 
         queryset.update(
@@ -891,28 +806,22 @@ class ProductImageAdmin(
         "-created_at",
     )
 
+    @admin.display(description="Preview")
     def image_preview(self, obj):
 
         if obj.image:
 
             return format_html(
-                '''
+                """
                 <img
                     src="{}"
-                    style="
-                        width:70px;
-                        height:70px;
-                        object-fit:cover;
-                        border-radius:12px;
-                    "
+                    class="admin-product-inline-image"
                 >
-                ''',
+                """,
                 obj.image.url,
             )
 
         return "No Image"
-
-    image_preview.short_description = "Preview"
 
 
 # =========================================================
@@ -958,12 +867,9 @@ class ProductVariantAdmin(
         "size",
     )
 
+    @admin.display(description="Available Stock")
     def available_stock_display(self, obj):
         return obj.available_stock
-
-    available_stock_display.short_description = (
-        "Available Stock"
-    )
 
 
 # =========================================================
@@ -1037,10 +943,9 @@ class AdminNotificationAdmin(
             reads_count=Count("reads")
         )
 
+    @admin.display(description="Read Count")
     def read_count(self, obj):
         return obj.reads_count
-
-    read_count.short_description = "Read Count"
 
 
 class AdminNotificationReadAdmin(

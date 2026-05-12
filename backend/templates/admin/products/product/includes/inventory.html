@@ -1,0 +1,121 @@
+<section class="admin-card">
+    <!-- =====================================================
+        CARD HEADER
+    ====================================================== -->
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>Inventory</h2>
+            <p>
+                Manage product stock and inventory tracking.
+            </p>
+        </div>
+    </div>
+
+    <!-- =====================================================
+        CARD BODY
+    ====================================================== -->
+    <div class="card-body">
+
+        <!-- =================================================
+            FIELDSET
+        ================================================== -->
+        <fieldset class="form-fieldset">
+            <legend>
+                Inventory Management
+            </legend>
+
+            <!-- =============================================
+                INVENTORY STATUS BADGES
+            ============================================== -->
+            <div class="inventory-status-badges">
+                {% if original and original.stock_quantity == 0 %}
+                    <span class="status-badge out-of-stock">
+                        Out of Stock
+                    </span>
+                {% elif original and original.stock_quantity < 5 %}
+                    <span class="status-badge low-stock">
+                        Low Stock
+                    </span>
+                {% else %}
+                    <span class="status-badge in-stock">
+                        In Stock
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- =============================================
+                TWO COLUMN GRID
+            ============================================== -->
+            <div class="form-grid two-column-grid">
+
+                <!-- =========================================
+                    SKU
+                ========================================== -->
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.sku.id_for_label }}"
+                        class="{% if adminform.form.sku.field.required %}required{% endif %}">
+                        SKU
+                    </label>
+
+                    <!-- FIELD ERRORS -->
+                    <div class="field-errors">
+                        {{ adminform.form.sku.errors }}
+                    </div>
+
+                    <!-- FIELD -->
+                    {{ adminform.form.sku }}
+
+                    <!-- GENERATE SKU BUTTON -->
+                    <button
+                        type="button"
+                        class="generate-sku-btn"
+                        id="generate-sku-btn">
+                        Generate SKU
+                    </button>
+
+                    <!-- HELP TEXT -->
+                    {% if adminform.form.sku.help_text %}
+                        <p class="help-text">
+                            {{ adminform.form.sku.help_text|safe }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- =========================================
+                    STOCK QUANTITY
+                ========================================== -->
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.stock_quantity.id_for_label }}"
+                        class="{% if adminform.form.stock_quantity.field.required %}required{% endif %}">
+                        Stock Quantity
+                    </label>
+
+                    <!-- FIELD ERRORS -->
+                    <div class="field-errors">
+                        {{ adminform.form.stock_quantity.errors }}
+                    </div>
+
+                    <!-- FIELD -->
+                    {{ adminform.form.stock_quantity }}
+
+                    <!-- LOW STOCK WARNING -->
+                    {% if original and original.stock_quantity < 5 %}
+                        <div class="stock-warning low-stock">
+                            Low stock alert:
+                            Only {{ original.stock_quantity }} items remaining.
+                        </div>
+                    {% endif %}
+
+                    <!-- HELP TEXT -->
+                    {% if adminform.form.stock_quantity.help_text %}
+                        <p class="help-text">
+                            {{ adminform.form.stock_quantity.help_text|safe }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</section>

@@ -1,0 +1,94 @@
+<div class="sidebar-stack">
+
+    <!-- STATUS -->
+    <div class="admin-card sticky-card">
+
+        <div class="card-header">
+
+            <h2>Status</h2>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="status-badge draft-status">
+                Draft
+            </div>
+
+            <div class="sidebar-meta">
+                Last updated just now.
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- VISIBILITY -->
+    <div class="admin-card">
+
+        <div class="card-header">
+
+            <h2>Visibility</h2>
+
+        </div>
+
+        <div class="card-body sidebar-form-list">
+
+            <label class="toggle-row">
+
+                {{ adminform.form.is_active }}
+
+                <span>
+                    Visible on storefront
+                </span>
+
+            </label>
+
+            <label class="toggle-row">
+
+                {{ adminform.form.is_featured }}
+
+                <span>
+                    Featured product
+                </span>
+
+            </label>
+
+            <label class="toggle-row">
+
+                {{ adminform.form.is_best_seller }}
+
+                <span>
+                    Best seller
+                </span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- SEO SCORE -->
+    <div class="admin-card">
+
+        <div class="card-header">
+
+            <h2>SEO Score</h2>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="seo-score-circle">
+                82
+            </div>
+
+            <p class="seo-score-text">
+                Your SEO is looking good.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>

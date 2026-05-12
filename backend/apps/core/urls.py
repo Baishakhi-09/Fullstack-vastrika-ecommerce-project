@@ -6,7 +6,6 @@ from django.urls import path
 
 from .views import (
     DashboardProductListView,
-    ProductSearchView,
 )
 
 app_name = "core"
@@ -21,15 +20,5 @@ urlpatterns = [
         "products/",
         DashboardProductListView.as_view(),
         name="dashboard-products",
-    ),
-
-    # =====================================================
-    # DASHBOARD PRODUCT SEARCH
-    # =====================================================
-
-    path(
-        "products/product/<str:query>/",
-        ProductSearchView.as_view(),
-        name="dashboard-product-search",
     ),
 ]

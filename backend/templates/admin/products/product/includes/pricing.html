@@ -1,0 +1,88 @@
+<section class="admin-card">
+    <!-- =====================================================
+        CARD HEADER
+    ====================================================== -->
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>Pricing</h2>
+            <p>Configure product pricing and discounts.</p>
+        </div>
+    </div>
+
+    <!-- =====================================================
+        CARD BODY
+    ====================================================== -->
+    <div class="card-body">
+
+        <!-- =================================================
+            FIELDSET
+        ================================================== -->
+        <fieldset class="form-fieldset">
+            <legend>
+                Pricing Configuration
+            </legend>
+
+            <!-- =============================================
+                TWO COLUMN GRID
+            ============================================== -->
+            <div class="form-grid two-column-grid">
+
+                <!-- =========================================
+                    SELLING PRICE
+                ========================================== -->
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.selling_price.id_for_label }}"
+                        class="{% if adminform.form.selling_price.field.required %}required{% endif %}">
+                        Selling Price
+                    </label>
+
+                    <!-- FIELD ERRORS -->
+                    <div class="field-errors">
+                        {{ adminform.form.selling_price.errors }}
+                    </div>
+
+                    <!-- FIELD -->
+                    <div class="input-with-prefix">
+                        <span class="input-prefix">
+                            ₹
+                        </span>
+                        {{ adminform.form.selling_price }}
+                    </div>
+                    <!-- HELP TEXT -->
+                    {% if adminform.form.selling_price.help_text %}
+                        <p class="help-text">
+                            {{ adminform.form.selling_price.help_text|safe }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- =========================================
+                    COMPARE PRICE
+                ========================================== -->
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.mrp.id_for_label }}"
+                        class="{% if adminform.form.mrp.field.required %}required{% endif %}">
+                        Compare Price
+                    </label>
+
+                    <!-- FIELD ERRORS -->
+                    <div class="field-errors">
+                        {{ adminform.form.mrp.errors }}
+                    </div>
+
+                    <!-- FIELD -->
+                    {{ adminform.form.mrp }}
+
+                    <!-- HELP TEXT -->
+                    {% if adminform.form.mrp.help_text %}
+                        <p class="help-text">
+                            {{ adminform.form.mrp.help_text|safe }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</section>

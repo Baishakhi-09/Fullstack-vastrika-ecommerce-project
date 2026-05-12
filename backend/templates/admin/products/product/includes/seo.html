@@ -1,0 +1,550 @@
+<section class="admin-card">
+
+    <!-- =====================================================
+         CARD HEADER
+    ====================================================== -->
+
+    <div class="card-header">
+
+        <div class="card-header-content">
+
+            <h2>
+                SEO
+            </h2>
+
+            <p>
+                Optimize your product for search engines.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CARD BODY
+    ====================================================== -->
+
+    <div class="card-body">
+
+
+        <!-- =================================================
+             FIELDSET
+        ================================================== -->
+
+        <fieldset class="form-fieldset">
+
+            <legend>
+                Search Engine Optimization
+            </legend>
+
+
+            <!-- =============================================
+                 META TITLE
+            ============================================== -->
+
+            <div class="form-group">
+
+                <label
+                    for="{{ adminform.form.meta_title.id_for_label }}"
+                    class="{% if adminform.form.meta_title.field.required %}required{% endif %}"
+                >
+                    Meta Title
+                </label>
+
+
+                <!-- FIELD ERRORS -->
+
+                <div class="field-errors">
+
+                    {{ adminform.form.meta_title.errors }}
+
+                </div>
+
+
+                <!-- FIELD -->
+
+                {{ adminform.form.meta_title }}
+
+
+                <!-- CHARACTER COUNT -->
+
+                <div class="character-count">
+
+                    <span
+                        id="meta-title-count"
+                        class="character-count-value"
+                    >
+                        0
+                    </span>
+
+                    / 70 Characters
+
+                </div>
+
+
+                <!-- HELP TEXT -->
+
+                {% if adminform.form.meta_title.help_text %}
+
+                    <p class="help-text">
+
+                        {{ adminform.form.meta_title.help_text|safe }}
+
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =============================================
+                 META DESCRIPTION
+            ============================================== -->
+
+            <div class="form-group">
+
+                <label
+                    for="{{ adminform.form.meta_description.id_for_label }}"
+                    class="{% if adminform.form.meta_description.field.required %}required{% endif %}"
+                >
+                    Meta Description
+                </label>
+
+
+                <!-- FIELD ERRORS -->
+
+                <div class="field-errors">
+
+                    {{ adminform.form.meta_description.errors }}
+
+                </div>
+
+
+                <!-- FIELD -->
+
+                {{ adminform.form.meta_description }}
+
+
+                <!-- CHARACTER COUNT -->
+
+                <div class="character-count">
+
+                    <span
+                        id="meta-description-count"
+                        class="character-count-value"
+                    >
+                        0
+                    </span>
+
+                    / 160 Characters
+
+                </div>
+
+
+                <!-- HELP TEXT -->
+
+                {% if adminform.form.meta_description.help_text %}
+
+                    <p class="help-text">
+
+                        {{ adminform.form.meta_description.help_text|safe }}
+
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =============================================
+                 SEO PREVIEW
+            ============================================== -->
+
+            <div class="seo-preview">
+
+
+                <!-- SEO URL -->
+
+                <span class="seo-url">
+
+                    https://vastrika.com/product/
+
+                    {% if adminform.form.slug.value %}
+
+                        {{ adminform.form.slug.value }}
+
+                    {% else %}
+
+                        sample-product
+
+                    {% endif %}
+
+                </span>
+
+
+                <!-- SEO TITLE -->
+
+                <h3 id="seo-preview-title">
+
+                    {% if adminform.form.meta_title.value %}
+
+                        {{ adminform.form.meta_title.value }}
+
+                    {% else %}
+
+                        Sample Product Title
+
+                    {% endif %}
+
+                </h3>
+
+
+                <!-- SEO DESCRIPTION -->
+
+                <p id="seo-preview-description">
+
+                    {% if adminform.form.meta_description.value %}
+
+                        {{ adminform.form.meta_description.value }}
+
+                    {% else %}
+
+                        Product SEO description preview appears here.
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <!-- =============================================
+                 SEO SCORE PANEL
+            ============================================== -->
+
+            <div class="seo-score-panel">
+
+                <div class="seo-score good">
+
+                    SEO Score: Good
+
+                </div>
+
+                <ul class="seo-recommendations">
+
+                    <li>
+                        Meta title length is optimal.
+                    </li>
+
+                    <li>
+                        Add more focus keywords.
+                    </li>
+
+                    <li>
+                        Improve description readability.
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="seo-performance-analytics">
+
+                <div class="seo-analytics-card">
+
+                    <span class="analytics-label">
+                        CTR
+                    </span>
+
+                    <strong>
+                        {{ seo_ctr }}%
+                    </strong>
+
+                </div>
+
+                <div class="seo-analytics-card">
+
+                    <span class="analytics-label">
+                        Impressions
+                    </span>
+
+                    <strong>
+                        {{ seo_impressions }}
+                    </strong>
+
+                </div>
+
+                <div class="seo-analytics-card">
+
+                    <span class="analytics-label">
+                        Ranking
+                    </span>
+
+                    <strong>
+                        #{{ seo_ranking }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <div class="seo-live-analysis">
+
+                <div class="seo-analysis-item">
+
+                    <span class="analysis-label">
+                        Keyword Density
+                    </span>
+
+                    <span class="analysis-value good">
+                        Optimal
+                    </span>
+
+                </div>
+
+                <div class="seo-analysis-item">
+
+                    <span class="analysis-label">
+                        Readability
+                    </span>
+
+                    <span class="analysis-value average">
+                        Average
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="structured-data-validation">
+
+                <div class="schema-status valid">
+
+                    Schema.org Validation Passed
+
+                </div>
+
+                <div class="merchant-status connected">
+
+                    Google Merchant Compatible
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 OPEN GRAPH PREVIEW
+            ============================================== -->
+
+            <div class="open-graph-preview">
+
+                <h4>
+                    Facebook / LinkedIn Preview
+                </h4>
+
+                <div class="og-card">
+
+
+                    <!-- OG IMAGE -->
+
+                    <div class="og-image">
+
+                        Product Image Preview
+
+                    </div>
+
+
+                    <!-- OG CONTENT -->
+
+                    <div class="og-content">
+
+                        <h5>
+
+                            {% if adminform.form.meta_title.value %}
+
+                                {{ adminform.form.meta_title.value }}
+
+                            {% else %}
+
+                                Product Title Preview
+
+                            {% endif %}
+
+                        </h5>
+
+                        <p>
+
+                            {% if adminform.form.meta_description.value %}
+
+                                {{ adminform.form.meta_description.value }}
+
+                            {% else %}
+
+                                Product description preview.
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="social-image-tools">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                >
+                    Generate Open Graph Image
+                </button>
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                >
+                    Generate Twitter Card
+                </button>
+
+            </div>
+
+
+            <!-- =============================================
+                 TWITTER / X CARD PREVIEW
+            ============================================== -->
+
+            <div class="twitter-card-preview">
+
+                <h4>
+                    Twitter / X Card Preview
+                </h4>
+
+                <div class="twitter-card">
+
+
+                    <!-- TWITTER IMAGE -->
+
+                    <div class="twitter-card-image">
+
+                        Twitter Image Preview
+
+                    </div>
+
+
+                    <!-- TWITTER CONTENT -->
+
+                    <div class="twitter-card-content">
+
+                        <h5>
+
+                            {% if adminform.form.meta_title.value %}
+
+                                {{ adminform.form.meta_title.value }}
+
+                            {% else %}
+
+                                Product Twitter Title
+
+                            {% endif %}
+
+                        </h5>
+
+                        <p>
+
+                            {% if adminform.form.meta_description.value %}
+
+                                {{ adminform.form.meta_description.value }}
+
+                            {% else %}
+
+                                Twitter summary preview.
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 AI SEO ASSISTANT
+            ============================================== -->
+
+            <div class="ai-seo-assistant">
+
+                <div class="ai-seo-header">
+
+                    AI SEO Assistant
+
+                </div>
+
+                <ul class="ai-seo-suggestions">
+
+                    <li>
+                        Add "Premium" to improve CTR.
+                    </li>
+
+                    <li>
+                        Shorten meta description by 12 characters.
+                    </li>
+
+                    <li>
+                        Include focus keyword in title.
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="ai-content-generation">
+
+                <button
+                    type="button"
+                    class="primary-btn"
+                    id="generate-meta-title-btn"
+                >
+                    Generate AI Meta Title
+                </button>
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    id="generate-meta-description-btn"
+                >
+                    Generate AI Meta Description
+                </button>
+
+            </div>
+
+
+            <!-- =============================================
+                 FUTURE SEO ANALYTICS
+            ============================================== -->
+
+            {% comment %}
+
+                Future enterprise SEO features:
+
+                - Live SEO scoring
+                - Keyword optimization
+                - Readability analysis
+                - Open Graph image upload
+                - Twitter card image upload
+                - Schema markup validation
+                - AI SEO automation
+
+            {% endcomment %}
+
+        </fieldset>
+
+    </div>
+
+</section>
