@@ -31,6 +31,10 @@ html, body {
     scroll-behavior: smooth;
 }
 
+a:focus {
+    text-decoration: none !important;
+}
+
 body.vastrika-admin {
     font-family: 'Amaranth', sans-serif;
     color: var(--text);
@@ -782,6 +786,11 @@ div.breadcrumbs {
 .dash-btn.primary {
     background: #d63384;
     color: #fff;
+}
+
+.dash-btn.primary a:hover,
+.dash-btn.primary a:focus{
+    text-decoration: none !important;
 }
 
 .dash-btn.secondary {

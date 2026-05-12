@@ -1,154 +1,246 @@
-from functools import lru_cache
-from typing import Dict, Any, List
-import logging
-
 from django import template
-
 from vastrika_backend.admin_site import admin_site
 from apps.site_settings.models import SettingGroup
 
-from apps.accounts.constants import (
-    SECTION_OTHERS,
-)
-
-from apps.accounts.sidebar_config import (
-    SECTION_ORDER,
-    SECTION_ICONS,
-    SIDEBAR_CONFIG,
-    SETTINGS_ORDER,
-)
-
 register = template.Library()
 
-logger = logging.getLogger(__name__)
+SECTION_ORDER = [
+    "Products",
+    "Product Categories",
+    "Inventory",
+    "Orders",
+    "Customers",
+    "Marketing",
+    "Reports",
+    "Others",
+]
+
+SECTION_ICONS = {
+    "Products": "inventory_2",
+    "Product Categories": "category",
+    "Inventory": "warehouse",
+    "Orders": "receipt_long",
+    "Customers": "groups",
+    "Marketing": "campaign",
+    "Reports": "bar_chart",
+    "Others": "more_horiz",
+}
+
+MODEL_ICONS = {
+    # Products
+    "Brands": "store",
+    "Product tags": "local_offer",
+    "Products": "shopping_bag",
+    "Product images": "image",
+
+    # Categories
+    "Parent Categories": "folder",
+    "Sub Categories": "layers",
+    "Child Categories": "category",
+
+    # Inventory
+    "Product variants": "tune",         
+    "Stocks": "inventory_2",   
+    "Warehouses": "warehouse",
+
+    # Order
+    "Orders": "shopping_cart",
+    "Payments": "payments",
+    "Refunds": "undo",
+    "Invoices": "receipt_long",
+
+    # Customers
+    "Customers": "person",
+    "Cart items": "shopping_cart",
+    "Wishlist items": "favorite",
+    "Reviews": "rate_review",
+
+    # Marketing / Other
+    "Newsletter Subscribers": "mail",
+    "Admin notifications": "notifications",
+
+    # System
+    "Users": "person",
+    "Groups": "admin_panel_settings",
+
+    "Sales reports": "bar_chart",
+    "Product reports": "inventory_2",
+    "Customer reports": "groups",
+
+    "Setting Levels": "settings_applications",
+    "Setting Groups": "settings",
+    "Setting Fields": "tune",
+    "Setting Files": "attach_file",
+}
 
 
-# HELPERS
-@lru_cache(maxsize=256)
-def get_model_config(
-    app_label: str,
-    model_name: str,
-) -> Dict[str, Any]:
-    """
-    Cached sidebar model configuration lookup.
-    """
+MODEL_ORDER = {
+    "Products": {
+        "Products": 1,
+        "Brands": 2,
+        "Product tags": 3,      
+        "Product images": 4,    
+    },
+    "Product Categories": {
+        "Parent Categories": 1,
+        "Sub Categories": 2,
+        "Child Categories": 3,
+    },
+    "Orders": {
+        "Orders": 1,
+        "Payments": 2,
+        "Refunds": 3,
+        "Invoices": 4,
+    },
+    "Customers": {
+        "Customers": 1,
+        "Cart items": 2,
+        "Wishlist items": 3,
+        "Reviews": 4,
+    },
 
-    return SIDEBAR_CONFIG.get(
-        (app_label.lower(), model_name.lower()),
-        {
-            "section": SECTION_OTHERS,
-            "icon": "chevron_right",
-            "order": 99,
-        },
-    )
+    "Reports": {
+        "Sales reports": 1,
+        "Product reports": 2,
+        "Customer reports": 3,
+    },
+}
 
-# ADMIN SIDEBAR
+SETTINGS_ORDER = {
+        "General Settings": 1,
+        "Appearance Settings": 2,
+        "Security Settings": 3,
+        "Notification Settings": 4,
+        "Payment Settings": 5,
+        "Shipping Settings": 6,
+    }
+
+def get_section_from_url(admin_url: str) -> str:
+    admin_url = admin_url.lower()
+
+    if "/products/product/" in admin_url:
+        return "Products"
+    if "/products/brand/" in admin_url:
+        return "Products"
+    if "/products/productimage/" in admin_url:
+        return "Products"
+    if "/products/producttag/" in admin_url:
+        return "Products"
+    
+    if "/products/parentcategory/" in admin_url:
+        return "Product Categories"
+    if "/products/subcategory/" in admin_url:
+        return "Product Categories"
+    if "/products/childcategory/" in admin_url:
+        return "Product Categories"
+    
+    if "/products/stock/" in admin_url:
+        return "Inventory"    
+    if "/products/productvariant/" in admin_url:
+        return "Inventory"
+    if "/products/warehouse/" in admin_url:
+        return "Inventory"
+    
+    if "/orders/order/" in admin_url:
+        return "Orders"
+    if "/orders/payment/" in admin_url:
+        return "Orders"
+    if "/orders/refund/" in admin_url:
+        return "Orders"
+    if "/orders/invoice/" in admin_url:
+        return "Orders"
+    
+    if "/customers/customer/" in admin_url:
+        return "Customers"
+    if "/customers/review/" in admin_url:
+        return "Customers"
+    if "/products/cartitem/" in admin_url:
+        return "Customers"
+    if "/products/wishlistitem/" in admin_url:
+        return "Customers"
+    
+    if "/reports/salesreport/" in admin_url:
+        return "Reports"
+    if "/reports/productreport/" in admin_url:
+        return "Reports"
+    if "/reports/customerreport/" in admin_url:
+        return "Reports"
+    
+    if "/accounts/newslettersubscriber/" in admin_url:
+        return "Marketing"
+    
+    # if "/accounts/user/" in admin_url:
+    #     return "Others"
+    # if "/auth/group/" in admin_url:
+    #     return "Others"
+    # if "/products/adminnotification/" in admin_url:
+    #     return "Others"
+    
+    # return None
+
+    return "Others"
+
+
 @register.simple_tag(takes_context=True)
-def get_grouped_admin_sidebar(
-    context: Dict[str, Any],
-) -> List[Dict[str, Any]]:
-    """
-    Dynamically build grouped admin sidebar.
-    """
+def get_grouped_admin_sidebar(context):
+    request = context["request"]
+    app_list = admin_site.get_app_list(request)
 
-    request = context.get("request")
+    grouped = {section: [] for section in SECTION_ORDER}
+    # others = []
 
-    if request is None:
-        return []
+    for app in app_list:
+        for model in app.get("models", []):
+            admin_url = model.get("admin_url", "")
+            model_name = model.get("name", "")
+            section = get_section_from_url(admin_url)
 
-    try:
-        app_list = admin_site.get_app_list(request)
+            model["icon"] = MODEL_ICONS.get(model_name, "chevron_right")
 
-        grouped = {
-            section: []
-            for section in SECTION_ORDER
-        }
+            grouped.setdefault(section, []).append(model)
 
-        for app in app_list:
-            app_label = app.get(
-                "app_label",
-                "",
-            ).lower()
+            # if section:
+            #     grouped[section].append(model)
+            # else:
+            #     others.append(model)
 
-            for model in app.get("models", []):
-                model_object_name = model.get(
-                    "object_name",
-                    "",
-                ).lower()
+    final_sections = []
 
-                config = get_model_config(
-                    app_label,
-                    model_object_name,
-                )
+    for section in SECTION_ORDER:
+        items = grouped.get(section, [])
 
-                model["icon"] = config["icon"]
-                model["menu_order"] = config["order"]
+        if items:
 
-                grouped.setdefault(
-                    config["section"],
-                    [],
-                ).append(model)
-
-        final_sections = []
-
-        for section in SECTION_ORDER:
-            items = grouped.get(section, [])
-
-            if not items:
-                continue
-
-            sorted_items = sorted(
+            items = sorted(
                 items,
-                key=lambda item: item.get(
-                    "menu_order",
-                    99,
-                ),
+                key=lambda x: MODEL_ORDER.get(section, {}).get(x.get("name"), 99),
             )
 
             final_sections.append({
                 "title": section,
-                "icon": SECTION_ICONS.get(
-                    section,
-                    "folder",
-                ),
-                "items": sorted_items,
+                "icon": SECTION_ICONS.get(section, "folder"),
+                "items": items,
             })
 
-        return final_sections
-            
-    except Exception:
-        logger.exception(
-            "Failed to generate admin sidebar.",
-        )
+    # if others:
+    #     final_sections.append({
+    #          "title": "Others",
+    #         "icon": "folder_open",
+    #         "items": others,
+    #     })
 
-        return []
-    
-# DYNAMIC SETTINGS MENU
+    return final_sections
+
 @register.simple_tag
-def get_dynamic_settings_menu() -> List[SettingGroup]:
-    """
-    Load active settings groups dynamically.
-    """
-
+def get_dynamic_settings_menu():
     try:
-        settings_menu = (
-            SettingGroup.objects
-            .filter(is_active=True)
-            .select_related("level")
-            .order_by("name")
-        )
+        settings_menu = SettingGroup.objects.filter(
+            is_active=True
+        ).select_related("level")
 
         return sorted(
             settings_menu,
-            key=lambda item: SETTINGS_ORDER.get(
-                item.name,
-                99,
-            ),
+            key=lambda item: SETTINGS_ORDER.get(item.name, 99)
         )
-    
     except Exception:
-        logger.exception(
-            "Failed to load dynamic settings menu.",
-        )
-
         return []
