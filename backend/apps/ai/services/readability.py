@@ -38,10 +38,6 @@ class ReadabilityResult:
 
 
 class ReadabilityService:
-    """
-    Enterprise readability analysis service.
-    """
-
     WORDS_PER_MINUTE = 200
 
     @classmethod
@@ -49,10 +45,6 @@ class ReadabilityService:
         cls,
         content: str,
     ) -> ReadabilityResult:
-        """
-        Main readability analysis pipeline.
-        """
-
         start_time = time.perf_counter()
 
         try:
@@ -228,10 +220,6 @@ class ReadabilityService:
 
     @staticmethod
     def normalize_text(text: str) -> str:
-        """
-        Normalize multilingual-safe text.
-        """
-
         text = unicodedata.normalize(
             "NFKC",
             text,
@@ -249,13 +237,6 @@ class ReadabilityService:
     def extract_sentences(
         text: str,
     ) -> List[str]:
-        """
-        Basic sentence extraction.
-
-        Future enterprise upgrade:
-        Replace with spaCy tokenizer.
-        """
-
         return [
             sentence.strip()
             for sentence in re.split(
@@ -282,13 +263,6 @@ class ReadabilityService:
     def count_syllables(
         word: str,
     ) -> int:
-        """
-        Approximate syllable counting.
-
-        Future upgrade:
-        Replace with NLP syllable engine.
-        """
-
         word = word.lower()
 
         vowels = "aeiouy"
@@ -323,10 +297,6 @@ class ReadabilityService:
         total_sentences: int,
         total_syllables: int,
     ) -> float:
-        """
-        Calculate Flesch Reading Ease.
-        """
-
         return (
             206.835
             - 1.015
@@ -347,10 +317,6 @@ class ReadabilityService:
         total_sentences: int,
         total_syllables: int,
     ) -> float:
-        """
-        Calculate Flesch-Kincaid grade.
-        """
-
         return (
             0.39
             * (
@@ -369,10 +335,6 @@ class ReadabilityService:
     def detect_readability_level(
         reading_ease_score: float,
     ) -> ReadabilityLevel:
-        """
-        Detect readability level.
-        """
-
         if reading_ease_score >= 70:
             return "easy"
 
@@ -387,10 +349,6 @@ class ReadabilityService:
         average_sentence_length: float,
         difficult_word_count: int,
     ) -> List[str]:
-        """
-        Generate readability recommendations.
-        """
-
         recommendations = []
 
         if reading_ease_score < 60:
@@ -423,10 +381,6 @@ class ReadabilityService:
     def generate_cache_key(
         content: str,
     ) -> str:
-        """
-        Generate stable cache key.
-        """
-
         content_hash = hashlib.sha256(
             content.encode("utf-8")
         ).hexdigest()
