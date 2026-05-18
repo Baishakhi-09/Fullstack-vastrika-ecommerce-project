@@ -1,246 +1,379 @@
+from __future__ import annotations
+
+import logging
+
+from collections import defaultdict
+from typing import Any
+
 from django import template
-from vastrika_backend.admin_site import admin_site
+from django.core.cache import cache
+
 from apps.site_settings.models import SettingGroup
+from vastrika_backend.admin_site import admin_site
 
 register = template.Library()
 
-SECTION_ORDER = [
-    "Products",
-    "Product Categories",
-    "Inventory",
-    "Orders",
-    "Customers",
-    "Marketing",
-    "Reports",
-    "Others",
-]
+logger = logging.getLogger(__name__)
 
-SECTION_ICONS = {
-    "Products": "inventory_2",
-    "Product Categories": "category",
-    "Inventory": "warehouse",
-    "Orders": "receipt_long",
-    "Customers": "groups",
-    "Marketing": "campaign",
-    "Reports": "bar_chart",
-    "Others": "more_horiz",
+# =========================================================
+# PROFESSIONAL SIDEBAR CONFIGURATION
+# =========================================================
+
+SIDEBAR_CONFIG = {
+    "products": {
+        "title": "Products",
+        "icon": "inventory_2",
+        "order": 1,
+        "models": {
+            "product": {
+                "icon": "shopping_bag",
+                "order": 1,
+            },
+            "brand": {
+                "icon": "store",
+                "order": 2,
+            },
+            "producttag": {
+                "icon": "local_offer",
+                "order": 3,
+            },
+            "productimage": {
+                "icon": "image",
+                "order": 4,
+            },
+        },
+    },
+    "categories": {
+        "title": "Product Categories",
+        "icon": "category",
+        "order": 2,
+        "models": {
+            "parentcategory": {
+                "icon": "folder",
+                "order": 1,
+            },
+            "subcategory": {
+                "icon": "layers",
+                "order": 2,
+            },
+            "childcategory": {
+                "icon": "category",
+                "order": 3,
+            },
+        },
+    },
+    "inventory": {
+        "title": "Inventory",
+        "icon": "warehouse",
+        "order": 3,
+        "models": {
+            "stock": {
+                "icon": "inventory_2",
+                "order": 1,
+            },
+            "productvariant": {
+                "icon": "tune",
+                "order": 2,
+            },
+            "warehouse": {
+                "icon": "warehouse",
+                "order": 3,
+            },
+        },
+    },
+    "orders": {
+        "title": "Orders",
+        "icon": "receipt_long",
+        "order": 4,
+        "models": {
+            "order": {
+                "icon": "shopping_cart",
+                "order": 1,
+            },
+            "payment": {
+                "icon": "payments",
+                "order": 2,
+            },
+            "refund": {
+                "icon": "undo",
+                "order": 3,
+            },
+            "invoice": {
+                "icon": "receipt_long",
+                "order": 4,
+            },
+        },
+    },
+    "customers": {
+        "title": "Customers",
+        "icon": "groups",
+        "order": 5,
+        "models": {
+            "customer": {
+                "icon": "person",
+                "order": 1,
+            },
+            "cartitem": {
+                "icon": "shopping_cart",
+                "order": 2,
+            },
+            "wishlistitem": {
+                "icon": "favorite",
+                "order": 3,
+            },
+            "review": {
+                "icon": "rate_review",
+                "order": 4,
+            },
+        },
+    },
+    "marketing": {
+        "title": "Marketing",
+        "icon": "campaign",
+        "order": 6,
+        "models": {
+            "newslettersubscriber": {
+                "icon": "mail",
+                "order": 1,
+            },
+        },
+    },
+    "reports": {
+        "title": "Reports",
+        "icon": "bar_chart",
+        "order": 7,
+        "models": {
+            "salesreport": {
+                "icon": "bar_chart",
+                "order": 1,
+            },
+            "productreport": {
+                "icon": "inventory_2",
+                "order": 2,
+            },
+            "customerreport": {
+                "icon": "groups",
+                "order": 3,
+            },
+        },
+    },
 }
 
-MODEL_ICONS = {
-    # Products
-    "Brands": "store",
-    "Product tags": "local_offer",
-    "Products": "shopping_bag",
-    "Product images": "image",
+# =========================================================
+# FALLBACK ICONS
+# =========================================================
 
-    # Categories
-    "Parent Categories": "folder",
-    "Sub Categories": "layers",
-    "Child Categories": "category",
+DEFAULT_MODEL_ICON = "chevron_right"
+DEFAULT_SECTION = "Others"
+DEFAULT_SECTION_ICON = "more_horiz"
 
-    # Inventory
-    "Product variants": "tune",         
-    "Stocks": "inventory_2",   
-    "Warehouses": "warehouse",
-
-    # Order
-    "Orders": "shopping_cart",
-    "Payments": "payments",
-    "Refunds": "undo",
-    "Invoices": "receipt_long",
-
-    # Customers
-    "Customers": "person",
-    "Cart items": "shopping_cart",
-    "Wishlist items": "favorite",
-    "Reviews": "rate_review",
-
-    # Marketing / Other
-    "Newsletter Subscribers": "mail",
-    "Admin notifications": "notifications",
-
-    # System
-    "Users": "person",
-    "Groups": "admin_panel_settings",
-
-    "Sales reports": "bar_chart",
-    "Product reports": "inventory_2",
-    "Customer reports": "groups",
-
-    "Setting Levels": "settings_applications",
-    "Setting Groups": "settings",
-    "Setting Fields": "tune",
-    "Setting Files": "attach_file",
-}
-
-
-MODEL_ORDER = {
-    "Products": {
-        "Products": 1,
-        "Brands": 2,
-        "Product tags": 3,      
-        "Product images": 4,    
-    },
-    "Product Categories": {
-        "Parent Categories": 1,
-        "Sub Categories": 2,
-        "Child Categories": 3,
-    },
-    "Orders": {
-        "Orders": 1,
-        "Payments": 2,
-        "Refunds": 3,
-        "Invoices": 4,
-    },
-    "Customers": {
-        "Customers": 1,
-        "Cart items": 2,
-        "Wishlist items": 3,
-        "Reviews": 4,
-    },
-
-    "Reports": {
-        "Sales reports": 1,
-        "Product reports": 2,
-        "Customer reports": 3,
-    },
-}
+# =========================================================
+# SETTINGS MENU ORDER
+# =========================================================
 
 SETTINGS_ORDER = {
-        "General Settings": 1,
-        "Appearance Settings": 2,
-        "Security Settings": 3,
-        "Notification Settings": 4,
-        "Payment Settings": 5,
-        "Shipping Settings": 6,
+    "General Settings": 1,
+    "Appearance Settings": 2,
+    "Security Settings": 3,
+    "Notification Settings": 4,
+    "Payment Settings": 5,
+    "Shipping Settings": 6,
+}
+
+# =========================================================
+# UTILITIES
+# =========================================================
+
+
+def get_model_key(model: dict[str, Any]) -> str:
+    """
+    Extract clean model key from admin_url dynamically.
+
+    Example:
+    /admin/products/product/
+    -> product
+    """
+
+    admin_url = model.get("admin_url", "")
+
+    if not admin_url:
+        return ""
+
+    parts = [part for part in admin_url.split("/") if part]
+
+    if len(parts) >= 3:
+        return parts[-1].lower()
+
+    return ""
+
+
+def get_section_by_model(model_key: str) -> tuple[str, dict[str, Any]]:
+    """
+    Dynamically find sidebar section from model key.
+    """
+
+    for _, section_config in SIDEBAR_CONFIG.items():
+        models = section_config.get("models", {})
+
+        if model_key in models:
+            return section_config["title"], section_config
+
+    return DEFAULT_SECTION, {
+        "title": DEFAULT_SECTION,
+        "icon": DEFAULT_SECTION_ICON,
+        "order": 999,
+        "models": {},
     }
 
-def get_section_from_url(admin_url: str) -> str:
-    admin_url = admin_url.lower()
 
-    if "/products/product/" in admin_url:
-        return "Products"
-    if "/products/brand/" in admin_url:
-        return "Products"
-    if "/products/productimage/" in admin_url:
-        return "Products"
-    if "/products/producttag/" in admin_url:
-        return "Products"
-    
-    if "/products/parentcategory/" in admin_url:
-        return "Product Categories"
-    if "/products/subcategory/" in admin_url:
-        return "Product Categories"
-    if "/products/childcategory/" in admin_url:
-        return "Product Categories"
-    
-    if "/products/stock/" in admin_url:
-        return "Inventory"    
-    if "/products/productvariant/" in admin_url:
-        return "Inventory"
-    if "/products/warehouse/" in admin_url:
-        return "Inventory"
-    
-    if "/orders/order/" in admin_url:
-        return "Orders"
-    if "/orders/payment/" in admin_url:
-        return "Orders"
-    if "/orders/refund/" in admin_url:
-        return "Orders"
-    if "/orders/invoice/" in admin_url:
-        return "Orders"
-    
-    if "/customers/customer/" in admin_url:
-        return "Customers"
-    if "/customers/review/" in admin_url:
-        return "Customers"
-    if "/products/cartitem/" in admin_url:
-        return "Customers"
-    if "/products/wishlistitem/" in admin_url:
-        return "Customers"
-    
-    if "/reports/salesreport/" in admin_url:
-        return "Reports"
-    if "/reports/productreport/" in admin_url:
-        return "Reports"
-    if "/reports/customerreport/" in admin_url:
-        return "Reports"
-    
-    if "/accounts/newslettersubscriber/" in admin_url:
-        return "Marketing"
-    
-    # if "/accounts/user/" in admin_url:
-    #     return "Others"
-    # if "/auth/group/" in admin_url:
-    #     return "Others"
-    # if "/products/adminnotification/" in admin_url:
-    #     return "Others"
-    
-    # return None
-
-    return "Others"
+# =========================================================
+# MAIN SIDEBAR GENERATOR
+# =========================================================
 
 
 @register.simple_tag(takes_context=True)
 def get_grouped_admin_sidebar(context):
+    """
+    Enterprise-grade dynamic admin sidebar.
+    """
+
     request = context["request"]
+
+    cache_key = f"admin_sidebar_{request.user.pk}"
+
+    cached_sidebar = cache.get(cache_key)
+
+    if cached_sidebar:
+        return cached_sidebar
+
     app_list = admin_site.get_app_list(request)
 
-    grouped = {section: [] for section in SECTION_ORDER}
-    # others = []
+    grouped_data = defaultdict(list)
 
     for app in app_list:
         for model in app.get("models", []):
-            admin_url = model.get("admin_url", "")
-            model_name = model.get("name", "")
-            section = get_section_from_url(admin_url)
 
-            model["icon"] = MODEL_ICONS.get(model_name, "chevron_right")
+            model_key = get_model_key(model)
 
-            grouped.setdefault(section, []).append(model)
+            section_title, section_config = get_section_by_model(model_key)
 
-            # if section:
-            #     grouped[section].append(model)
-            # else:
-            #     others.append(model)
+            model_config = (
+                section_config.get("models", {}).get(model_key, {})
+            )
+
+            model["icon"] = model_config.get(
+                "icon",
+                DEFAULT_MODEL_ICON,
+            )
+
+            model["order"] = model_config.get("order", 999)
+
+            model["model_key"] = model_key
+
+            grouped_data[section_title].append(model)
 
     final_sections = []
 
-    for section in SECTION_ORDER:
-        items = grouped.get(section, [])
+    for _, section_config in sorted(
+        SIDEBAR_CONFIG.items(),
+        key=lambda item: item[1].get("order", 999),
+    ):
 
-        if items:
+        section_title = section_config["title"]
 
-            items = sorted(
-                items,
-                key=lambda x: MODEL_ORDER.get(section, {}).get(x.get("name"), 99),
-            )
+        items = grouped_data.get(section_title, [])
 
-            final_sections.append({
-                "title": section,
-                "icon": SECTION_ICONS.get(section, "folder"),
+        if not items:
+            continue
+
+        items = sorted(
+            items,
+            key=lambda item: item.get("order", 999),
+        )
+
+        final_sections.append(
+            {
+                "title": section_title,
+                "icon": section_config["icon"],
+                "order": section_config["order"],
                 "items": items,
-            })
+            }
+        )
 
-    # if others:
-    #     final_sections.append({
-    #          "title": "Others",
-    #         "icon": "folder_open",
-    #         "items": others,
-    #     })
+    # =====================================================
+    # HANDLE UNKNOWN / THIRD PARTY MODELS
+    # =====================================================
+
+    known_sections = [
+        config["title"]
+        for config in SIDEBAR_CONFIG.values()
+    ]
+
+    others = []
+
+    for section_name, models in grouped_data.items():
+        if section_name not in known_sections:
+            others.extend(models)
+
+    if others:
+        final_sections.append(
+            {
+                "title": DEFAULT_SECTION,
+                "icon": DEFAULT_SECTION_ICON,
+                "order": 999,
+                "items": sorted(
+                    others,
+                    key=lambda item: item.get("name", ""),
+                ),
+            }
+        )
+
+    # =====================================================
+    # CACHE
+    # =====================================================
+
+    cache.set(cache_key, final_sections, timeout=300)
 
     return final_sections
 
+
+# =========================================================
+# SETTINGS MENU
+# =========================================================
+
+
 @register.simple_tag
 def get_dynamic_settings_menu():
-    try:
-        settings_menu = SettingGroup.objects.filter(
-            is_active=True
-        ).select_related("level")
+    """
+    Dynamic settings sidebar menu.
+    """
 
-        return sorted(
-            settings_menu,
-            key=lambda item: SETTINGS_ORDER.get(item.name, 99)
+    cache_key = "dynamic_settings_menu"
+
+    cached_menu = cache.get(cache_key)
+
+    if cached_menu:
+        return cached_menu
+
+    try:
+        settings_menu = (
+            SettingGroup.objects.filter(is_active=True)
+            .select_related("level")
+            .order_by("name")
         )
-    except Exception:
+
+        sorted_menu = sorted(
+            settings_menu,
+            key=lambda item: SETTINGS_ORDER.get(item.name, 999),
+        )
+
+        cache.set(cache_key, sorted_menu, timeout=300)
+
+        return sorted_menu
+
+    except Exception as exc:
+        logger.exception(
+            "Failed to generate dynamic settings menu: %s",
+            exc,
+        )
         return []

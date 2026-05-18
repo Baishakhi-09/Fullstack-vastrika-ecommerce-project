@@ -423,10 +423,6 @@ class ProductAdmin(
         "updated_at",
     )
 
-    filter_horizontal = (
-        "tags",
-    )
-
     inlines = [
         ProductImageInline,
         ProductVariantInline,
@@ -449,6 +445,7 @@ class ProductAdmin(
 
     autocomplete_fields = (
         "brand",
+        "tags",
         "parent_category",
         "sub_category",
         "child_category",

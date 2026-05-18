@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initProductSearchRedirect();
     initExportDropdown();
     initFilterToggle();
-    initDeleteModal
+    initDeleteModal();
     initSidebarToggle();
     initAdminLogin();
     initPasswordToggle();
@@ -15,6 +15,9 @@ document.addEventListener("DOMContentLoaded", function () {
     initSidebarSections();
     initSettingsSearch();
     initDashboardCharts();
+    initProductAutoSlug();
+    initSeoCharacterCounters();
+    initProductFormEnhancements();
 });
 
 /* =========================
@@ -758,4 +761,136 @@ function initDeleteModal() {
             form.submit();
         }
     );
+}
+
+/* =========================================
+   PRODUCT AUTO SLUG
+========================================= */
+
+function initProductAutoSlug() {
+
+    const nameField = document.getElementById(
+        "id_name"
+    );
+
+    const slugField = document.getElementById(
+        "id_slug"
+    );
+
+    if (!nameField || !slugField) {
+        return;
+    }
+
+    nameField.addEventListener(
+        "input",
+        function () {
+
+            const slug = nameField.value
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+
+            slugField.value = slug;
+        }
+    );
+}
+
+
+/* =========================================
+   SEO CHARACTER COUNTERS
+========================================= */
+
+function initSeoCharacterCounters() {
+
+    setupSeoCounter(
+        "id_meta_title",
+        "meta-title-counter"
+    );
+
+    setupSeoCounter(
+        "id_meta_description",
+        "meta-description-counter"
+    );
+}
+
+
+function setupSeoCounter(
+    fieldId,
+    counterId
+) {
+
+    const field = document.getElementById(
+        fieldId
+    );
+
+    const counter = document.getElementById(
+        counterId
+    );
+
+    if (!field || !counter) {
+        return;
+    }
+
+    updateCounter();
+
+    field.addEventListener(
+        "input",
+        updateCounter
+    );
+
+    function updateCounter() {
+
+        counter.textContent =
+            field.value.length;
+    }
+}
+
+
+/* =========================================
+   PRODUCT FORM UX
+========================================= */
+
+function initProductFormEnhancements() {
+
+    const fields = document.querySelectorAll(
+        ".admin-card input, .admin-card textarea, .admin-card select"
+    );
+
+    if (!fields.length) {
+        return;
+    }
+
+    fields.forEach(function (field) {
+
+        field.addEventListener(
+            "focus",
+            function () {
+
+                const formGroup =
+                    field.closest(".form-group");
+
+                if (formGroup) {
+                    formGroup.classList.add(
+                        "is-focused"
+                    );
+                }
+            }
+        );
+
+        field.addEventListener(
+            "blur",
+            function () {
+
+                const formGroup =
+                    field.closest(".form-group");
+
+                if (formGroup) {
+                    formGroup.classList.remove(
+                        "is-focused"
+                    );
+                }
+            }
+        );
+    });
 }

@@ -92,7 +92,7 @@
 
                     <!-- UNIT SELECTOR -->
                     <div class="unit-selector">
-                        <select class="admin-select">
+                        <select class="admin-select" name="weight_unit" id="id_weight_unit">
                             {% for unit in weight_units %}
                                 <option value="{{ unit.value }}">
                                     {{ unit.label }}
@@ -129,7 +129,7 @@
 
                     <!-- UNIT SELECTOR -->
                     <div class="unit-selector">
-                        <select class="admin-select">
+                        <select class="admin-select" name="dimension_unit_length" id="id_dimension_unit_length">
                             {% for unit in dimension_units %}
                                 <option value="{{ unit.value }}">
                                     {{ unit.label }}
@@ -166,7 +166,7 @@
 
                     <!-- UNIT SELECTOR -->
                     <div class="unit-selector">
-                        <select class="admin-select">
+                        <select class="admin-select" name="dimension_unit_width" id="id_dimension_unit_width">
                             {% for unit in dimension_units %}
                                 <option value="{{ unit.value }}">
                                     {{ unit.label }}
@@ -203,7 +203,7 @@
 
                     <!-- UNIT SELECTOR -->
                     <div class="unit-selector">
-                        <select class="admin-select">
+                        <select class="admin-select" name="dimension_unit_height" id="id_dimension_unit_height">
                             {% for unit in dimension_units %}
                                 <option value="{{ unit.value }}">
                                     {{ unit.label }}
@@ -286,7 +286,8 @@
                     <h4>FedEx</h4>
 
                     <p>
-                        ₹120 • 2 Days
+                        {{ fedex_rate.price }}
+                        {{ fedex_rate.eta }}
                     </p>
                 </div>
 

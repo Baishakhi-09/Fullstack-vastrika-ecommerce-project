@@ -1,91 +1,81 @@
 <section class="admin-card">
-    <!-- =====================================================
-        CARD HEADER
-    ====================================================== -->
 
+    <!-- CARD HEADER -->
     <div class="card-header">
         <div class="card-header-content">
             <h2>Basic Information</h2>
-
             <p>Core product details and descriptions.</p>
         </div>
     </div>
 
-    <!-- =====================================================
-        CARD BODY
-    ====================================================== -->
-
+    
+    <!-- CARD BODY -->
     <div class="card-body">
         <fieldset class="form-fieldset">
             <legend>Product Classification</legend>
 
-            <!-- =================================================
-            PRODUCT NAME
-            ================================================== -->
+            <!-- PRODUCT NAME -->
             <div class="form-group">
-                <label
-                    for="{{ adminform.form.name.id_for_label }}"
-                    class="{% if adminform.form.name.field.required %}required{% endif %}">
+                <label for="{{ adminform.form.name.id_for_label }}" class="{% if adminform.form.name.field.required %}required{% endif %}">
                     Product Name
                 </label>
 
                 <div class="field-errors">
                     {{ adminform.form.name.errors }}
                 </div>
+
                 {{ adminform.form.name }}
             </div>
 
-            <!-- =================================================
-            SLUG
-            ================================================== -->
-
+            <!-- SLUG -->
             <div class="form-group">
-                <label
-                    for="{{ adminform.form.slug.id_for_label }}"
-                    class="{% if adminform.form.slug.field.required %}required{% endif %}">
+                <label for="{{ adminform.form.slug.id_for_label }}" class="{% if adminform.form.slug.field.required %}required{% endif %}">
                     Slug
                 </label>
 
                 <div class="field-errors">
                     {{ adminform.form.slug.errors }}
                 </div>
+
                 {{ adminform.form.slug }}
+
                 {% if adminform.form.slug.help_text %}
-                    <p id="slug-help" class="help-text">
+                    <p class="help-text">
                         {{ adminform.form.slug.help_text|safe }}
                     </p>
                 {% endif %}
             </div>
         </fieldset>
 
-        <!-- =================================================
-            BRAND + TAGS
-        ================================================== -->
-
+        <!-- BRAND + TAGS -->
         <div class="form-grid two-column-grid">
             <!-- BRAND -->
             <div class="form-group">
-                <label
-                    for="{{ adminform.form.brand.id_for_label }}"
-                    class="{% if adminform.form.brand.field.required %}required{% endif %}">
+                <div
+                    class="field-label {% if adminform.form.brand.field.required %}required{% endif %}">
+
                     Brand
-                </label>
+                </div>
+
                 <div class="field-errors">
                     {{ adminform.form.brand.errors }}
                 </div>
+
                 {{ adminform.form.brand }}
             </div>
 
             <!-- TAGS -->
             <div class="form-group">
-                <label
-                    for="{{ adminform.form.tags.id_for_label }}"
-                    class="{% if adminform.form.tags.field.required %}required{% endif %}">
+                <div
+                    class="field-label {% if adminform.form.tags.field.required %}required{% endif %}">
+
                     Tags
-                </label>
+                </div>
+
                 <div class="field-errors">
                     {{ adminform.form.tags.errors }}
                 </div>
+                
                 {{ adminform.form.tags }}
             </div>
         </div>
@@ -94,9 +84,7 @@
             SHORT DESCRIPTION
         ================================================== -->
         <div class="form-group">
-            <label
-                for="{{ adminform.form.short_description.id_for_label }}"
-                class="{% if adminform.form.short_description.field.required %}required{% endif %}">
+            <label for="{{ adminform.form.short_description.id_for_label }}" class="{% if adminform.form.short_description.field.required %}required{% endif %}">
                 Short Description
             </label>
             <div class="field-errors">
@@ -109,9 +97,7 @@
             FULL DESCRIPTION
         ================================================== -->
         <div class="form-group">
-            <label
-                for="{{ adminform.form.description.id_for_label }}"
-                class="{% if adminform.form.description.field.required %}required{% endif %}">
+            <label for="{{ adminform.form.description.id_for_label }}" class="{% if adminform.form.description.field.required %}required{% endif %}">
                 Full Description
             </label>
             <div class="field-errors">

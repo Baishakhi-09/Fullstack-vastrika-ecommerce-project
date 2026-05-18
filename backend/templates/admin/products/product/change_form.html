@@ -4,6 +4,9 @@
 {% load admin_urls %}
 {% load static %}
 
+{% block content_title %}
+{% endblock %}
+
 {% block extrastyle %}
     {{ block.super }}
 
@@ -60,14 +63,20 @@
 
         <div class="product-page">
 
-            <!-- =====================================================
-                PAGE HEADER
-            ====================================================== -->
-
+            <!-- PAGE HEADER -->
             <div class="product-page-header">
 
                 <!-- HEADER LEFT -->
                 <div class="product-page-header-left">
+
+                    <h1 class="product-page-title">
+                        {% if original %}
+                            {{ original }}
+                        {% else %}
+                            Add Product
+                        {% endif %}
+                    </h1>
+
                     <span class="product-breadcrumb">
                         {{ opts.verbose_name_plural|capfirst }} /
                         {% if add %}
@@ -77,14 +86,6 @@
                         {% endif %}
                         {{ opts.verbose_name|capfirst }}
                     </span>
-
-                    <h1 class="product-page-title">
-                        {% if original %}
-                            {{ original }}
-                        {% else %}
-                            Add Product
-                        {% endif %}
-                    </h1>
 
                     <p class="product-page-subtitle">
                         Create and manage your product information.

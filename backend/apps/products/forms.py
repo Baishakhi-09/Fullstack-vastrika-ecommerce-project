@@ -9,6 +9,15 @@ class ProductAdminForm(forms.ModelForm):
         model = Product
         fields = "__all__"
 
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "admin-input",
+                    "autocomplete": "off",
+                }
+            ),
+        }
+
     BASE_INPUT_CLASS = "admin-input"
     TEXTAREA_CLASS = "admin-textarea"
     SELECT_CLASS = "admin-select"

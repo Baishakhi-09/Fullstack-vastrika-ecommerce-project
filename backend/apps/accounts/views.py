@@ -1,571 +1,818 @@
-import re
+from __future__ import annotations
 
+import logging
+import re
+from typing import Any
+
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, get_user_model, logout
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import (
+    authenticate,
+    get_user_model,
+    logout,
+)
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.password_validation import (
+    validate_password,
+)
+from django.contrib.auth.views import (
+    PasswordChangeView,
+)
 from django.core.cache import cache
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
+from django.urls import reverse_lazy
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+)
+from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+
+from rest_framework_simplejwt.tokens import (
+    RefreshToken,
+    TokenError,
+)
 
 from .authentication import CookieJWTAuthentication
 from .models import NewsletterSubscriber
-from .serializers import SignupSerializer, NewsletterSubscribeSerializer, ProfileSerializer
-from .utils import mask_phone, normalize_phone
-from .twilio_verify import send_verification_code, check_verification_code
+from .serializers import (
+    NewsletterSubscribeSerializer,
+    ProfileSerializer,
+    SignupSerializer,
+)
+from .twilio_verify import (
+    check_verification_code,
+    send_verification_code,
+)
+from .utils import (
+    mask_phone,
+    normalize_phone,
+)
 
-from django.contrib.auth.views import PasswordChangeView
-from django.urls import reverse_lazy
-from django.conf import settings
-
-# Create your views here.
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-# --------------- Login --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def login_view(request):
-    username = request.data.get("username", "").strip()
-    password = request.data.get("password", "")
 
-    if not username or not password:
-        return Response(
-            {"error": "Username and password are required"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    
-    user = authenticate(request=request, username=username, password=password)
+# =========================================================
+# CONSTANTS
+# =========================================================
+ACCESS_TOKEN_COOKIE = "access_token"
+REFRESH_TOKEN_COOKIE = "refresh_token"
 
-    if user is None:
-        return Response(
-            {
-                "success": False,
-                "error": "Invalid username or password. Please try again."
-            },
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-    
-    refresh = RefreshToken.for_user(user)
-    access_token = str(refresh.access_token)
-    refresh_token = str(refresh)
+ACCESS_TOKEN_MAX_AGE = 60 * 60
+REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7
 
-    response = Response(
-        {
-            "success": True,
-            "message": "Login successful",
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "first_name": user.first_name,
-                "role": getattr(user, "role", "user"),
-            },
-        },
-        status=status.HTTP_200_OK,
+OTP_CACHE_TIMEOUT = 10 * 60
+OTP_EXPIRY_SECONDS = 30 * 60
+
+OTP_REGEX = re.compile(r"^\d{4,10}$")
+
+
+# =========================================================
+# RESPONSE HELPERS
+# =========================================================
+def success_response(
+    *,
+    message: str,
+    data: dict[str, Any] | None = None,
+    status_code: int = status.HTTP_200_OK,
+) -> Response:
+    """
+    Standardized success response.
+    """
+
+    payload: dict[str, Any] = {
+        "success": True,
+        "message": message,
+    }
+
+    if data:
+        payload.update(data)
+
+    return Response(
+        payload,
+        status=status_code,
     )
 
+
+def error_response(
+    *,
+    message: str,
+    errors: dict[str, Any] | None = None,
+    status_code: int = status.HTTP_400_BAD_REQUEST,
+) -> Response:
+    """
+    Standardized error response.
+    """
+
+    payload: dict[str, Any] = {
+        "success": False,
+        "message": message,
+    }
+
+    if errors:
+        payload["errors"] = errors
+
+    return Response(
+        payload,
+        status=status_code,
+    )
+
+
+# =========================================================
+# USER HELPERS
+# =========================================================
+def build_user_payload(
+    user: AbstractBaseUser,
+) -> dict[str, Any]:
+    """
+    Build reusable user payload.
+    """
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "first_name": user.first_name,
+        "phone": getattr(user, "phone", None),
+        "alternate_phone": getattr(user, "alternate_phone", None),
+        "gender": getattr(user, "gender", None),
+        "address_line_1": getattr(user, "address_line_1", None),
+        "address_line_2": getattr(user, "address_line_2", None),
+        "city": getattr(user, "city", None),
+        "state": getattr(user, "state", None),
+        "pincode": getattr(user, "pincode", None),
+        "country": getattr(user, "country", None),
+        "role": getattr(user, "role", "user"),
+    }
+
+
+def set_auth_cookies(
+    *,
+    response: Response,
+    access_token: str,
+    refresh_token: str,
+) -> None:
+    """
+    Set JWT cookies.
+    """
+
     response.set_cookie(
-        key="access_token",
+        key=ACCESS_TOKEN_COOKIE,
         value=access_token,
         httponly=True,
         secure=not settings.DEBUG,
         samesite="Lax",
-        max_age=60 * 60,
+        max_age=ACCESS_TOKEN_MAX_AGE,
         path="/",
     )
 
     response.set_cookie(
-        key="refresh_token",
+        key=REFRESH_TOKEN_COOKIE,
         value=refresh_token,
         httponly=True,
         secure=not settings.DEBUG,
         samesite="Lax",
-        max_age=60 * 60 * 24 * 7,
+        max_age=REFRESH_TOKEN_MAX_AGE,
         path="/",
     )
 
-    return response
 
-# --------------- Signup --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def signup(request):
-    try:
-        serializer = SignupSerializer(data=request.data)
+def clear_auth_cookies(
+    response: Response,
+) -> None:
+    """
+    Clear JWT cookies.
+    """
 
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "success": False,
-                    "errors": serializer.errors,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-    
-        user = serializer.save()
-
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-        refresh_token = str(refresh)
-
-        response = Response(
-            {
-                "success": True,
-                "message": "Account created successfully",
-                "user": {
-                    "id": user.id,
-                    "first_name": user.first_name,
-                    "email": user.email,
-                    "role": getattr(user, "role", "user"),
-                },
-            },
-            status=status.HTTP_201_CREATED,
-        )
-
-        response.set_cookie(
-            key="access_token",
-            value=access_token,
-            httponly=True,
-            secure=not settings.DEBUG,
-            samesite="Lax",
-            max_age=60 * 60,
-            path="/",
-        )
-
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            secure=not settings.DEBUG,
-            samesite="Lax",
-            max_age=60 * 60 * 24 * 7,
-            path="/",
-        )
-
-        return response
-    except Exception as e:
-        return Response(
-            {
-                "success": False,
-                "error": "Something went wrong. Please try again."
-            },
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-# -------------- User -------------- #
-@api_view(["GET"])
-@authentication_classes([CookieJWTAuthentication])
-@permission_classes([IsAuthenticated])
-def user_me(request):
-    user = request.user
-
-    return Response(
-        {
-            "id": user.id,
-            "email": user.email,
-            "first_name": user.first_name,
-            "phone": user.phone,
-            "alternate_phone": user.alternate_phone,
-            "gender": user.gender,
-            "address_line_1": user.address_line_1,
-            "address_line_2": user.address_line_2,
-            "city": user.city,
-            "state": user.state,
-            "pincode": user.pincode,
-            "country": user.country,
-            "role": getattr(user, "role", "user"),
-        },
-        status=status.HTTP_200_OK,
+    response.delete_cookie(
+        ACCESS_TOKEN_COOKIE,
+        path="/",
     )
 
-# --------------- Profile -------------- #
-@api_view(["GET"])
-@authentication_classes([CookieJWTAuthentication])
-@permission_classes([IsAuthenticated])
-def profile(request):
-    serializer = ProfileSerializer(request.user)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response.delete_cookie(
+        REFRESH_TOKEN_COOKIE,
+        path="/",
+    )
 
-# --------------- Update Profile --------------- #
-@api_view(["PUT", "PATCH"])
-@authentication_classes([CookieJWTAuthentication])
-@permission_classes([IsAuthenticated])
-def update_profile(request):
-    data = request.data.copy()
 
-    for field in ["phone", "alternate_phone"]:
-        if data.get(field) == "":
-            data[field] = None
-    serializer = ProfileSerializer(
-        request.user,
-        data=data,
-        partial=True
+def get_user_by_phone(
+    phone_number: str,
+) -> AbstractBaseUser | None:
+    """
+    Fetch user by phone number.
+    """
+
+    return User.objects.filter(
+        phone=phone_number,
+    ).first()
+
+
+# =========================================================
+# AUTHENTICATION
+# =========================================================
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def signup(
+    request: Request,
+) -> Response:
+    """
+    Register new user.
+    """
+
+    serializer = SignupSerializer(
+        data=request.data,
     )
 
     if not serializer.is_valid():
-        # serializer.save()
-        return Response(
-            {
-                "success": False,
-                "errors": serializer.errors,
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    
-    try:
-        serializer.save()
 
-        return Response(
-            {
-                "success": True,
-                "message": "Profile updated successfully",
-                "user": serializer.data,
-            },
-            status=status.HTTP_200_OK,
-        )
-    except IntegrityError:
-        return Response(
-            {
-                "success": False,
-                "message": "Phone number or alternate phone number already exists.",
-                "errors": {
-                    "phone": ["Phone number must be unique."],
-                    "alternate_phone": ["Alternate phone number must be unique."],
-                },
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    except Exception as e:
-        return Response(
-            {
-                "success": False,
-                "message": str(e),
-            },
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        return error_response(
+            message="Signup validation failed.",
+            errors=serializer.errors,
         )
 
-# --------------- Password reset OTP --------------- #
-def get_user_by_phone(phone_number: str):
-    return User.objects.filter(phone=phone_number).first()
+    user = serializer.save()
 
-# --------------- Send OTP --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def send_forgot_password_otp(request):
-    try:
-        raw_phone = request.data.get("phoneNumber", "")
-        phone_number = normalize_phone(raw_phone)
+    refresh = RefreshToken.for_user(user)
 
-        user = get_user_by_phone(phone_number)
-        if not user:
-            return Response(
-                {"error": "No account found with this mobile number."},
-                status=404
-            )
-        success, result = send_verification_code(phone_number)
-
-        if not success:
-            return Response(
-                {"error": result.get("error", "Failed to send OTP.")},
-                status=500
-            )
-        
-        expiry_seconds = 30 * 60  # 30 minutes
-
-        return Response(
-            {
-                "message": "OTP sent successfully.",
-                "phoneNumber": phone_number,
-                "maskedPhone": mask_phone(phone_number),
-                "status": result.get("status"),
-                "expiresIn": expiry_seconds,
-            },
-            status=200
-        )
-    except ValueError as exc:
-        return Response({"error": str(exc)}, status=400)
-    except Exception as exc:
-        return Response({"error": "Something went wrong. Please try again."}, status=500)
-
-# --------------- Resend Password --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def resend_forgot_password_otp(request):
-    try:
-        raw_phone = request.data.get("phoneNumber", "")
-        phone_number = normalize_phone(raw_phone)
-
-        user = get_user_by_phone(phone_number)
-        if not user:
-            return Response(
-                {"error": "No account found with this mobile number."},
-                status=404
-            )
-        
-        success, result = send_verification_code(phone_number)
-
-        if not success:
-            return Response(
-                {"error": result.get("error", "Failed to resend OTP.")},
-                status=500
-            )
-        
-        return Response(
-            {
-                "message": "OTP resent successfully.",
-                "phoneNumber": phone_number,
-                "maskedPhone": mask_phone(phone_number),
-                "status": result.get("status"),
-            },
-            status=200
-        )
-
-    except ValueError as exc:
-        return Response({"error": str(exc)}, status=400)
-    except Exception as exc:
-        return Response({"error": "Something went wrong. Please try again."}, status=500)
-
-# --------------- Verify OTP --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def verify_forgot_password_otp(request):
-    try:
-        raw_phone = request.data.get("phoneNumber", "")
-        otp = (request.data.get("otp", "") or "").strip()
-
-        phone_number = normalize_phone(raw_phone)
-
-        if not re.fullmatch(r"^\d{4,10}$", otp):
-            return Response(
-                {"error": "Please enter a valid OTP."},
-                status=400
-            )
-        
-        success, result = check_verification_code(phone_number, otp)
-
-        if not success:
-            return Response(
-                {"error": result.get("error", "OTP verification failed.")},
-                status=500
-            )
-        
-        if not result.get("valid"):
-            return Response(
-                {"error": "Invalid or expired OTP."},
-                status=400
-            )
-        
-        cache_key = f"pwd_reset_verified:{phone_number}"
-        cache.set(cache_key, True, timeout=10 * 60)
-
-        return Response(
-            {
-                "message": "OTP verified successfully.",
-                "phoneNumber": phone_number,
-            },
-            status=200
-        )
-    
-    except ValueError as exc:
-        return Response({"error": str(exc)}, status=400)
-    except Exception as exc:
-        return Response({"error": "Something went wrong. Please try again."}, status=500)
-
-# --------------- Reset Password --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def reset_password_with_otp(request):
-    try:
-        raw_phone = request.data.get("phoneNumber", "")
-        new_password = (request.data.get("newPassword", "") or "").strip()
-        confirm_password = (request.data.get("confirmPassword", "") or "").strip()
-
-        phone_number = normalize_phone(raw_phone)
-
-        if not new_password or len(new_password) < 8:
-            return Response(
-                {"error": "Password must be at least 8 characters long."},
-                status=400
-            )
-        
-        if new_password != confirm_password:
-            return Response(
-                {"error": "Passwords do not match."},
-                status=400
-            )
-        
-        cache_key = f"pwd_reset_verified:{phone_number}"
-        is_verified = cache.get(cache_key)
-
-        if not is_verified:
-            return Response(
-                {"error": "OTP verification required before resetting password."},
-                status=403
-            )
-        
-        user = get_user_by_phone(phone_number)
-        if not user:
-            return Response(
-                {"error": "No account found with this mobile number."},
-                status=404
-            )
-        
-        validate_password(new_password, user=user)
-
-        user.set_password(new_password)
-        user.save()
-
-        cache.delete(cache_key)
-
-        return Response(
-            {"message": "Password reset successfully."},
-            status=200
-        )
-    
-    except ValueError as exc:
-        return Response({"error": str(exc)}, status=400)
-    except Exception as exc:
-        return Response({"error": "Something went wrong. Please try again."}, status=500)
-
-# --------------- Logout --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def logout_view(request):
-    refresh_token = request.COOKIES.get("refresh_token")
-
-    if refresh_token:
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-        except TokenError:
-            pass
-        except Exception:
-            pass
-
-    response = Response(
-        {"message": "Logout successful"},
-        status=status.HTTP_200_OK,
+    response = success_response(
+        message="Account created successfully.",
+        data={
+            "user": build_user_payload(user),
+        },
+        status_code=status.HTTP_201_CREATED,
     )
 
-    response.delete_cookie("access_token", path="/")
-    response.delete_cookie("refresh_token", path="/")
+    set_auth_cookies(
+        response=response,
+        access_token=str(refresh.access_token),
+        refresh_token=str(refresh),
+    )
+
+    logger.info(
+        "New account created for '%s'.",
+        user.username,
+    )
 
     return response
 
-class AdminPasswordChangeView(PasswordChangeView):
-    template_name = "registration/password_change_form.html"
 
-    def form_valid(self, form):
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def login_view(
+    request: Request,
+) -> Response:
+    """
+    Authenticate user.
+    """
+
+    username = str(
+        request.data.get("username", "")
+    ).strip()
+
+    password = str(
+        request.data.get("password", "")
+    )
+
+    if not username or not password:
+
+        return error_response(
+            message="Username and password are required.",
+        )
+
+    user = authenticate(
+        request=request,
+        username=username,
+        password=password,
+    )
+
+    if not user:
+
+        logger.warning(
+            "Failed login attempt for '%s'.",
+            username,
+        )
+
+        return error_response(
+            message="Invalid credentials.",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    refresh = RefreshToken.for_user(user)
+
+    response = success_response(
+        message="Login successful.",
+        data={
+            "user": build_user_payload(user),
+        },
+    )
+
+    set_auth_cookies(
+        response=response,
+        access_token=str(refresh.access_token),
+        refresh_token=str(refresh),
+    )
+
+    return response
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def logout_view(
+    request: Request,
+) -> Response:
+    """
+    Logout user.
+    """
+
+    refresh_token = request.COOKIES.get(
+        REFRESH_TOKEN_COOKIE,
+    )
+
+    if refresh_token:
+
+        try:
+            RefreshToken(refresh_token).blacklist()
+
+        except TokenError:
+
+            logger.warning(
+                "Invalid refresh token during logout."
+            )
+
+    response = success_response(
+        message="Logout successful.",
+    )
+
+    clear_auth_cookies(response)
+
+    return response
+
+
+# =========================================================
+# SESSION
+# =========================================================
+@api_view(["GET"])
+@authentication_classes([
+    CookieJWTAuthentication,
+])
+@permission_classes([AllowAny])
+def session_status(
+    request: Request,
+) -> Response:
+    """
+    Return session status.
+    """
+
+    if request.user and request.user.is_authenticated:
+
+        return success_response(
+            message="Authenticated session.",
+            data={
+                "authenticated": True,
+                "user": build_user_payload(
+                    request.user,
+                ),
+            },
+        )
+
+    return success_response(
+        message="Anonymous session.",
+        data={
+            "authenticated": False,
+            "user": None,
+        },
+    )
+
+
+# =========================================================
+# USER
+# =========================================================
+@api_view(["GET"])
+@authentication_classes([
+    CookieJWTAuthentication,
+])
+@permission_classes([
+    IsAuthenticated,
+])
+def user_me(
+    request: Request,
+) -> Response:
+    """
+    Return authenticated user.
+    """
+
+    return success_response(
+        message="User profile fetched successfully.",
+        data={
+            "user": build_user_payload(
+                request.user,
+            ),
+        },
+    )
+
+
+@api_view(["GET"])
+@authentication_classes([
+    CookieJWTAuthentication,
+])
+@permission_classes([
+    IsAuthenticated,
+])
+def profile(
+    request: Request,
+) -> Response:
+    """
+    Get profile.
+    """
+
+    serializer = ProfileSerializer(
+        request.user,
+    )
+
+    return success_response(
+        message="Profile fetched successfully.",
+        data={
+            "user": serializer.data,
+        },
+    )
+
+
+@api_view(["PUT", "PATCH"])
+@authentication_classes([
+    CookieJWTAuthentication,
+])
+@permission_classes([
+    IsAuthenticated,
+])
+def update_profile(
+    request: Request,
+) -> Response:
+    """
+    Update profile.
+    """
+
+    serializer = ProfileSerializer(
+        request.user,
+        data=request.data,
+        partial=True,
+    )
+
+    if not serializer.is_valid():
+
+        return error_response(
+            message="Profile validation failed.",
+            errors=serializer.errors,
+        )
+
+    try:
+
+        serializer.save()
+
+        return success_response(
+            message="Profile updated successfully.",
+            data={
+                "user": serializer.data,
+            },
+        )
+
+    except IntegrityError:
+
+        return error_response(
+            message="Phone number already exists.",
+        )
+
+
+# =========================================================
+# OTP
+# =========================================================
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def send_forgot_password_otp(
+    request: Request,
+) -> Response:
+    """
+    Send OTP.
+    """
+
+    try:
+
+        raw_phone = request.data.get(
+            "phoneNumber",
+            "",
+        )
+
+        phone_number = normalize_phone(
+            raw_phone,
+        )
+
+        user = get_user_by_phone(
+            phone_number,
+        )
+
+        if not user:
+
+            return error_response(
+                message="Unable to process request.",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        success, result = send_verification_code(
+            phone_number,
+        )
+
+        if not success:
+
+            return error_response(
+                message=result.get(
+                    "error",
+                    "Failed to send OTP.",
+                ),
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return success_response(
+            message="OTP sent successfully.",
+            data={
+                "phoneNumber": phone_number,
+                "maskedPhone": mask_phone(phone_number),
+                "expiresIn": OTP_EXPIRY_SECONDS,
+            },
+        )
+
+    except ValueError as exc:
+
+        return error_response(
+            message=str(exc),
+        )
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def resend_forgot_password_otp(
+    request: Request,
+) -> Response:
+    """
+    Resend OTP.
+    """
+
+    return send_forgot_password_otp(request)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def verify_forgot_password_otp(
+    request: Request,
+) -> Response:
+    """
+    Verify OTP.
+    """
+
+    try:
+
+        raw_phone = request.data.get(
+            "phoneNumber",
+            "",
+        )
+
+        otp = str(
+            request.data.get("otp", "")
+        ).strip()
+
+        if not OTP_REGEX.fullmatch(otp):
+
+            return error_response(
+                message="Invalid OTP format.",
+            )
+
+        phone_number = normalize_phone(
+            raw_phone,
+        )
+
+        success, result = check_verification_code(
+            phone_number,
+            otp,
+        )
+
+        if not success:
+
+            return error_response(
+                message=result.get(
+                    "error",
+                    "OTP verification failed.",
+                ),
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        if not result.get("valid"):
+
+            return error_response(
+                message="Invalid or expired OTP.",
+            )
+
+        cache.set(
+            f"pwd_reset_verified:{phone_number}",
+            True,
+            timeout=OTP_CACHE_TIMEOUT,
+        )
+
+        return success_response(
+            message="OTP verified successfully.",
+        )
+
+    except ValueError as exc:
+
+        return error_response(
+            message=str(exc),
+        )
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+@transaction.atomic
+def reset_password_with_otp(
+    request: Request,
+) -> Response:
+    """
+    Reset password.
+    """
+
+    try:
+
+        phone_number = normalize_phone(
+            request.data.get(
+                "phoneNumber",
+                "",
+            )
+        )
+
+        new_password = str(
+            request.data.get(
+                "newPassword",
+                "",
+            )
+        ).strip()
+
+        confirm_password = str(
+            request.data.get(
+                "confirmPassword",
+                "",
+            )
+        ).strip()
+
+        if new_password != confirm_password:
+
+            return error_response(
+                message="Passwords do not match.",
+            )
+
+        verified = cache.get(
+            f"pwd_reset_verified:{phone_number}"
+        )
+
+        if not verified:
+
+            return error_response(
+                message="OTP verification required.",
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
+
+        user = get_user_by_phone(
+            phone_number,
+        )
+
+        if not user:
+
+            return error_response(
+                message="Unable to process request.",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        validate_password(
+            new_password,
+            user=user,
+        )
+
+        user.set_password(new_password)
+
+        user.save(
+            update_fields=["password"],
+        )
+
+        cache.delete(
+            f"pwd_reset_verified:{phone_number}"
+        )
+
+        return success_response(
+            message="Password reset successfully.",
+        )
+
+    except ValueError as exc:
+
+        return error_response(
+            message=str(exc),
+        )
+
+
+# =========================================================
+# NEWSLETTER
+# =========================================================
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def subscribe_newsletter(
+    request: Request,
+) -> Response:
+    """
+    Subscribe newsletter.
+    """
+
+    serializer = NewsletterSubscribeSerializer(
+        data=request.data,
+    )
+
+    if not serializer.is_valid():
+
+        return error_response(
+            message="Newsletter validation failed.",
+            errors=serializer.errors,
+        )
+
+    email = serializer.validated_data["email"]
+
+    subscriber, created = (
+        NewsletterSubscriber.objects.get_or_create(
+            email=email,
+            defaults={
+                "is_active": True,
+            },
+        )
+    )
+
+    if created:
+
+        return success_response(
+            message="Newsletter subscribed successfully.",
+            data={
+                "email": subscriber.email,
+            },
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    if not subscriber.is_active:
+
+        subscriber.is_active = True
+
+        subscriber.save(
+            update_fields=["is_active"],
+        )
+
+        return success_response(
+            message="Newsletter subscription reactivated.",
+        )
+
+    return error_response(
+        message="Email already subscribed.",
+        status_code=status.HTTP_409_CONFLICT,
+    )
+
+
+# =========================================================
+# ADMIN PASSWORD CHANGE
+# =========================================================
+class AdminPasswordChangeView(
+    PasswordChangeView,
+):
+    template_name = (
+        "registration/password_change_form.html"
+    )
+
+    def form_valid(
+        self,
+        form,
+    ):
+
         response = super().form_valid(form)
 
         messages.success(
             self.request,
-            "Password changed successfully. Please login again."
+            (
+                "Password changed successfully. "
+                "Please login again."
+            ),
         )
 
         logout(self.request)
 
         return response
-    
+
     def get_success_url(self):
+
         return reverse_lazy("admin:login")
-
-# --------------- Session --------------- #
-@api_view(["GET"])
-@authentication_classes([CookieJWTAuthentication])
-@permission_classes([AllowAny])
-def session_status(request):
-    if request.user and request.user.is_authenticated:
-        return Response(
-            {
-                "authenticated": True,
-                "user": {
-                    "id": request.user.id,
-                    "first_name": request.user.first_name,
-                    "email": request.user.email,
-                    "phone": request.user.phone,
-                    "alternate_phone": request.user.alternate_phone,
-                    "gender": request.user.gender,
-                    "address_line_1": request.user.address_line_1,
-                    "address_line_2": request.user.address_line_2,
-                    "city": request.user.city,
-                    "state": request.user.state,
-                    "pincode": request.user.pincode,
-                    "country": request.user.country,
-                    "role": getattr(request.user, "role", "user"),
-                },
-            },
-            status=status.HTTP_200_OK,
-        )
-
-    return Response(
-        {
-            "authenticated": False,
-            "user": None,
-        },
-        status=status.HTTP_200_OK,
-    )
-
-# --------------- Newsletter --------------- #
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def subscribe_newsletter(request):
-    serializer = NewsletterSubscribeSerializer(data=request.data)
-
-    if not serializer.is_valid():
-        return Response(
-            {
-                "success": False,
-                "message": "Please enter a valid email address.",
-                "errors": serializer.errors,
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    
-    email = serializer.validated_data["email"]
-
-    subscriber, created = NewsletterSubscriber.objects.get_or_create(
-        email=email,
-        defaults={"is_active": True},
-    )
-
-    if created:
-        return Response(
-            {
-                "success": True,
-                "message": "You have subscribed successfully.",
-                "data": {
-                    "email": subscriber.email,
-                    "is_active": subscriber.is_active,
-                },
-            },
-            status=status.HTTP_201_CREATED,
-        )
-    
-    if not subscriber.is_active:
-        subscriber.is_active = True
-        subscriber.save(update_fields=["is_active", "updated_at"])
-
-        return Response(
-            {
-                "success": True,
-                "message": "Your newsletter subscription has been reactivated.",
-                "data": {
-                    "email": subscriber.email,
-                    "is_active": subscriber.is_active,
-                },
-            },
-            status=status.HTTP_200_OK,
-        )
-    
-    return Response(
-        {
-            "success": False,
-            "message": "This email is already subscribed.",
-        },
-        status=status.HTTP_409_CONFLICT,
-    )
