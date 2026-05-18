@@ -1,24 +1,28 @@
-# =========================================================
-# backend/apps/core/urls.py
-# =========================================================
+from __future__ import annotations
 
-from django.urls import path
+from django.urls import (
+    path,
+)
 
-from .views import (
+from apps.core.views import (
     DashboardProductListView,
 )
 
+
+# APP CONFIGURATION
 app_name = "core"
+
+
+# =========================================================
+# URL PATTERNS
+# =========================================================
 
 urlpatterns = [
 
-    # =====================================================
-    # DASHBOARD PRODUCTS
-    # =====================================================
-
+    # DASHBOARD API
     path(
-        "products/",
+        "dashboard/products/",
         DashboardProductListView.as_view(),
-        name="dashboard-products",
+        name="dashboard_products",
     ),
 ]

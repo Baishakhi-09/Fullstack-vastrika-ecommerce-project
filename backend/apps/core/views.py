@@ -1,7 +1,3 @@
-# =========================================================
-# backend/apps/core/views.py
-# =========================================================
-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -12,10 +8,6 @@ from vastrika_backend.admin_site import admin_site
 
 
 class AdminContextMixin:
-    """
-    Shared admin context for custom dashboard views.
-    """
-
     @property
     def model_meta(self):
         return self.model._meta
@@ -35,10 +27,7 @@ class DashboardProductListView(AdminContextMixin, ListView):
     context_object_name = "products"
     paginate_by = 20
 
-    # =====================================================
     # QUERYSET
-    # =====================================================
-
     def get_queryset(self):
         return (
             Product.objects
@@ -47,10 +36,7 @@ class DashboardProductListView(AdminContextMixin, ListView):
             .order_by("-created_at", "-id")
         )
 
-    # =====================================================
     # CONTEXT
-    # =====================================================
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
