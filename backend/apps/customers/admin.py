@@ -1,25 +1,147 @@
+from __future__ import annotations
+
 from django.contrib import admin
-from vastrika_backend.admin_site import admin_site
-from .models import Customer, Review
+from django.http import HttpRequest
+
+from apps.customers.models import (
+    Customer,
+    Review,
+)
+
+from vastrika_backend.admin_site import (
+    admin_site,
+)
 
 
-@admin.register(Customer, site=admin_site)
-class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "phone", "created_at")
-    search_fields = ("user__username", "user__email", "phone")
-    list_filter = ("created_at",)
-    ordering = ("-created_at",)
+# =========================================================
+# CUSTOMER ADMIN
+# =========================================================
+@admin.register(
+    Customer,
+    site=admin_site,
+)
+class CustomerAdmin(
+    admin.ModelAdmin,
+):
+    list_display = (
+        "id",
+        "user",
+        "phone",
+        "created_at",
+    )
 
-    list_select_related = ("user",)
-    readonly_fields = ("created_at",)
+    search_fields = (
+        "user__username",
+        "user__email",
+        "phone",
+    )
+
+    list_filter = (
+        "created_at",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    date_hierarchy = (
+        "created_at"
+    )
+
+    list_per_page = 50
+
+    list_select_related = (
+        "user",
+    )
+
+    list_display_links = (
+        "id",
+        "user",
+    )
+
+    autocomplete_fields = (
+        "user",
+    )
+
+    readonly_fields = (
+        "created_at",
+    )
+
+    # PERMISSIONS
+    def has_delete_permission(
+        self,
+        request: HttpRequest,
+        obj=None,
+    ) -> bool:
+        return bool(
+            request.user.is_superuser
+        )
 
 
-@admin.register(Review, site=admin_site)
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ("id", "customer", "product", "rating", "created_at")
-    search_fields = ("customer__username", "customer__email", "product__name")
-    list_filter = ("rating", "created_at")
-    ordering = ("-created_at",)
+# =========================================================
+# REVIEW ADMIN
+# =========================================================
+@admin.register(
+    Review,
+    site=admin_site,
+)
+class ReviewAdmin(
+    admin.ModelAdmin,
+):
+    list_display = (
+        "id",
+        "customer",
+        "product",
+        "rating",
+        "created_at",
+    )
 
-    list_select_related = ("customer", "product")
-    readonly_fields = ("created_at",)
+    search_fields = (
+        "customer__user__username",
+        "customer__user__email",
+        "product__name",
+    )
+
+    list_filter = (
+        "rating",
+        "created_at",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    date_hierarchy = (
+        "created_at"
+    )
+
+    list_per_page = 50
+
+    list_select_related = (
+        "customer",
+        "product",
+    )
+
+    list_display_links = (
+        "id",
+        "product",
+    )
+
+    autocomplete_fields = (
+        "customer",
+        "product",
+    )
+
+    readonly_fields = (
+        "created_at",
+    )
+
+    # PERMISSIONS
+    def has_delete_permission(
+        self,
+        request: HttpRequest,
+        obj=None,
+    ) -> bool:
+        return bool(
+            request.user.is_staff
+        )
