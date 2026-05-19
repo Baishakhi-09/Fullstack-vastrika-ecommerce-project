@@ -6,6 +6,7 @@ from collections import defaultdict
 from typing import Any
 
 from django import template
+import json
 from django.core.cache import cache
 
 from apps.site_settings.models import SettingGroup
@@ -332,7 +333,18 @@ def get_grouped_admin_sidebar(context):
     # CACHE
     # =====================================================
 
-    cache.set(cache_key, final_sections, timeout=300)
+    safe_sections = json.loads(
+        json.dumps(
+            final_sections,
+            default=str,
+        )
+    )
+
+    cache.set(
+        cache_key,
+        safe_sections,
+        timeout=300,
+    )
 
     return final_sections
 

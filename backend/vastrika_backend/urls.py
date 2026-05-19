@@ -69,7 +69,7 @@ urlpatterns = [
     path("api/auth/", include("apps.accounts.urls")), # User
     path("api/products/", include("apps.products.urls")), #Products
     path("api/settings/", include("apps.site_settings.urls")),
-    path("api/admin/notifications/", include("apps.products.notifications.urls")),
+    # path("api/admin/notifications/", include("apps.products.notifications.urls")),
 ]
 
 # =============================================================

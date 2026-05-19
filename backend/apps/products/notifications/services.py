@@ -1,33 +1,117 @@
-from django.db import transaction
-from django.core.exceptions import ValidationError
+from __future__ import annotations
 
-from .models import AdminNotification
-from .utils import broadcast_admin_notification
+import logging
+from functools import partial
 
+from django.core.exceptions import (
+    ValidationError,
+)
+from django.db import (
+    transaction,
+)
+
+from apps.accounts.models import (
+    User,
+)
+
+from apps.products.notifications.models import (
+    AdminNotification,
+)
+
+from apps.products.notifications.utils import (
+    broadcast_admin_notification,
+)
+
+
+logger = logging.getLogger(
+    __name__
+)
+
+
+# =========================================================
+# CREATE ADMIN NOTIFICATION
+# =========================================================
 @transaction.atomic
 def create_admin_notification(
     *,
     title: str,
     message: str,
-    notification_type: str = AdminNotification.Type.SYSTEM.value,
+    notification_type: str = (
+        AdminNotification.Type.SYSTEM
+    ),
     url: str | None = None,
-    user=None,
-):
-    # Validate notification type
-    if notification_type not in AdminNotification.Type.values:
-        raise ValidationError("Invalid notification type")
+    user: User | None = None,
+) -> AdminNotification:
     
-    notification = AdminNotification.objects.create(
-        title=title,
-        message=message,
-        notification_type=notification_type,
-        url=url,
-        created_for=user,
+    # VALIDATE NOTIFICATION TYPE
+    if (
+        notification_type
+        not in AdminNotification.Type.values
+    ):
+        raise ValidationError(
+            (
+                "Invalid notification "
+                f"type: {notification_type}"
+            )
+        )
+
+    # CREATE NOTIFICATION
+    notification = (
+        AdminNotification.objects.create(
+            title=title,
+            message=message,
+            notification_type=(
+                notification_type
+            ),
+            url=url,
+            created_for=user,
+        )
     )
 
-    # Send real-time notification
+    logger.info(
+        (
+            "Admin notification created "
+            "successfully: id=%s type=%s"
+        ),
+        notification.id,
+        notification.notification_type,
+    )
+
+    # REALTIME BROADCAST
+    def send_notification(
+        notification_instance: (
+            AdminNotification
+        ),
+    ) -> None:
+        try:
+            broadcast_admin_notification(
+                notification_instance,
+            )
+
+            logger.info(
+                (
+                    "Admin notification "
+                    "broadcast successfully: "
+                    "id=%s"
+                ),
+                notification_instance.id,
+            )
+
+        except Exception:
+            logger.exception(
+                (
+                    "Failed to broadcast "
+                    "admin notification: "
+                    "id=%s"
+                ),
+                notification_instance.id,
+            )
+
     transaction.on_commit(
-        lambda n=notification: broadcast_admin_notification(n)
+        partial(
+            send_notification,
+            notification,
+        )
     )
 
     return notification
