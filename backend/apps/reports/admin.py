@@ -1,51 +1,255 @@
+from __future__ import annotations
+
 from django.contrib import admin
-from vastrika_backend.admin_site import admin_site
-from .models import SalesReport, ProductReport, CustomerReport
+from django.http import HttpRequest
+from django.utils.html import format_html
+
+from apps.reports.models import (
+    CustomerReport,
+    ProductReport,
+    SalesReport,
+)
+
+from vastrika_backend.admin_site import (
+    admin_site,
+)
 
 
-# -------------------- SALES REPORT -------------------- #
-@admin.register(SalesReport, site=admin_site)
-class SalesReportAdmin(admin.ModelAdmin):
-    list_display = ("id", "total_sales", "total_orders", "report_date")
-    list_filter = ("report_date",)
-    search_fields = ("id",)
-    ordering = ("-report_date",)
-    readonly_fields = [field.name for field in SalesReport._meta.fields]
+# =========================================================
+# BASE REPORT ADMIN
+# =========================================================
+class BaseReportAdmin(
+    admin.ModelAdmin,
+):
+    """
+    Base admin configuration
+    for all report models.
+    """
 
-    def has_add_permission(self, request):
+    list_per_page = 50
+
+    save_on_top = True
+
+    actions = None
+
+    # READONLY FIELDS
+    def get_readonly_fields(
+        self,
+        request: HttpRequest,
+        obj=None,
+    ) -> tuple[str, ...]:
+
+        return tuple(
+            field.name
+            for field
+            in self.model._meta.fields
+        )
+
+    # DISABLE ADD
+    def has_add_permission(
+        self,
+        request: HttpRequest,
+    ) -> bool:
         return False
 
-    def has_delete_permission(self, request, obj=None):
+    # DISABLE DELETE
+    def has_delete_permission(
+        self,
+        request: HttpRequest,
+        obj=None,
+    ) -> bool:
+        return False
+
+    # DISABLE EDITING
+    def has_change_permission(
+        self,
+        request: HttpRequest,
+        obj=None,
+    ) -> bool:
+
+        # ALLOW VIEW PAGE ACCESS
+        if request.method in ["GET", "HEAD"]:
+            return True
+
         return False
 
 
-# -------------------- PRODUCT REPORT -------------------- #
-@admin.register(ProductReport, site=admin_site)
-class ProductReportAdmin(admin.ModelAdmin):
-    list_display = ("id", "product", "total_sales", "total_quantity")
-    list_filter = ("product",)
-    search_fields = ("product__name",)
-    ordering = ("-total_sales",)
-    readonly_fields = [field.name for field in ProductReport._meta.fields]
+# =========================================================
+# SALES REPORT ADMIN
+# =========================================================
+@admin.register(
+    SalesReport,
+    site=admin_site,
+)
+class SalesReportAdmin(
+    BaseReportAdmin,
+):
+    list_display = (
+        "id",
+        "formatted_total_sales",
+        "total_orders",
+        "report_date",
+    )
 
-    def has_add_permission(self, request):
-        return False
+    list_filter = (
+        "report_date",
+    )
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    search_fields = (
+        "id",
+    )
+
+    ordering = (
+        "-report_date",
+    )
+
+    date_hierarchy = (
+        "report_date"
+    )
+
+    # SALES FORMATTER
+    @admin.display(
+        description="Total Sales",
+        ordering="total_sales",
+    )
+    def formatted_total_sales(
+        self,
+        obj: SalesReport,
+    ) -> str:
+
+        return format_html(
+            (
+                "<span "
+                "style='"
+                "font-weight:700;"
+                "color:#16a34a;"
+                "'>"
+                "₹ {}"
+                "</span>"
+            ),
+            obj.total_sales,
+        )
 
 
-# -------------------- CUSTOMER REPORT -------------------- #
-@admin.register(CustomerReport, site=admin_site)
-class CustomerReportAdmin(admin.ModelAdmin):
-    list_display = ("id", "customer", "total_orders", "total_spent")
-    list_filter = ("customer",)
-    search_fields = ("customer__email",)
-    ordering = ("-total_spent",)
-    readonly_fields = [field.name for field in CustomerReport._meta.fields]
+# =========================================================
+# PRODUCT REPORT ADMIN
+# =========================================================
+@admin.register(
+    ProductReport,
+    site=admin_site,
+)
+class ProductReportAdmin(
+    BaseReportAdmin,
+):
+    list_display = (
+        "id",
+        "product",
+        "formatted_total_sales",
+        "total_quantity",
+    )
 
-    def has_add_permission(self, request):
-        return False
+    list_filter = (
+        "product",
+    )
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    search_fields = (
+        "product__name",
+        "product__sku",
+    )
+
+    ordering = (
+        "-total_sales",
+    )
+
+    list_select_related = (
+        "product",
+    )
+
+    autocomplete_fields = (
+        "product",
+    )
+
+    # SALES FORMATTER
+    @admin.display(
+        description="Total Sales",
+        ordering="total_sales",
+    )
+    def formatted_total_sales(
+        self,
+        obj: ProductReport,
+    ) -> str:
+
+        return format_html(
+            (
+                "<span "
+                "style='"
+                "font-weight:700;"
+                "color:#2563eb;"
+                "'>"
+                "₹ {}"
+                "</span>"
+            ),
+            obj.total_sales,
+        )
+
+
+# =========================================================
+# CUSTOMER REPORT ADMIN
+# =========================================================
+@admin.register(
+    CustomerReport,
+    site=admin_site,
+)
+class CustomerReportAdmin(
+    BaseReportAdmin,
+):
+    list_display = (
+        "id",
+        "customer",
+        "total_orders",
+        "formatted_total_spent",
+    )
+
+    list_filter = (
+        "customer",
+    )
+
+    search_fields = (
+        "customer__email",
+        "customer__first_name",
+        "customer__last_name",
+    )
+
+    ordering = (
+        "-total_spent",
+    )
+
+    list_select_related = (
+        "customer",
+    )
+
+    autocomplete_fields = (
+        "customer",
+    )
+
+    # SPENT FORMATTER
+    @admin.display(
+        description="Total Spent",
+        ordering="total_spent",
+    )
+    def formatted_total_spent(
+        self,
+        obj: CustomerReport,
+    ) -> str:
+        return format_html(
+            (
+                "<span "
+                "style='"
+                "font-weight:700;"
+                "color:#dc2626;"
+                "'>"
+                "₹ {}"
+                "</span>"
+            ),
+            obj.total_spent,
+        )
