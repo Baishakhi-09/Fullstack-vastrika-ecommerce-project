@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "apps.core.apps.CoreConfig",
     "channels",
     "django_filters",
+    "apps.reviews",
 ]
 
 ASGI_APPLICATION = "vastrika_backend.asgi.application"

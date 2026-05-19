@@ -5,7 +5,6 @@ from django.http import HttpRequest
 
 from apps.customers.models import (
     Customer,
-    Review,
 )
 
 from vastrika_backend.admin_site import (
@@ -75,73 +74,4 @@ class CustomerAdmin(
     ) -> bool:
         return bool(
             request.user.is_superuser
-        )
-
-
-# =========================================================
-# REVIEW ADMIN
-# =========================================================
-@admin.register(
-    Review,
-    site=admin_site,
-)
-class ReviewAdmin(
-    admin.ModelAdmin,
-):
-    list_display = (
-        "id",
-        "customer",
-        "product",
-        "rating",
-        "created_at",
-    )
-
-    search_fields = (
-        "customer__user__username",
-        "customer__user__email",
-        "product__name",
-    )
-
-    list_filter = (
-        "rating",
-        "created_at",
-    )
-
-    ordering = (
-        "-created_at",
-    )
-
-    date_hierarchy = (
-        "created_at"
-    )
-
-    list_per_page = 50
-
-    list_select_related = (
-        "customer",
-        "product",
-    )
-
-    list_display_links = (
-        "id",
-        "product",
-    )
-
-    autocomplete_fields = (
-        "customer",
-        "product",
-    )
-
-    readonly_fields = (
-        "created_at",
-    )
-
-    # PERMISSIONS
-    def has_delete_permission(
-        self,
-        request: HttpRequest,
-        obj=None,
-    ) -> bool:
-        return bool(
-            request.user.is_staff
         )
