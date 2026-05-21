@@ -1,29 +1,435 @@
 <section class="shipping-dashboard">
+    <div class="shipping-dashboard-header">
+        <div class="shipping-dashboard-header-content">
+            <h1 class="shipping-dashboard-title">
+                Shipping Dashboard
+            </h1>
 
+            <p class="shipping-dashboard-subtitle">
+                Monitor logistics, courier performance,
+                warehouse fulfillment and shipment analytics.
+            </p>
+        </div>
+
+        <!-- HEADER ACTIONS -->
+        <div class="shipping-dashboard-actions">
+            <button
+                type="button"
+                class="primary-btn"
+                aria-label="Create shipment">
+
+                Create Shipment
+            </button>
+
+            <button
+                type="button"
+                class="secondary-btn"
+                aria-label="Export shipping reports">
+
+                Export Reports
+            </button>
+        </div>
+    </div>
+
+    <!-- =====================================================
+        SHIPPING KPI METRICS
+    ====================================================== -->
     <div class="shipping-metrics-grid">
 
-        <div class="metric-card">
+        <!-- TOTAL SHIPMENTS -->
+        <div
+            class="metric-card"
+            aria-label="Total shipments">
+            <div class="metric-card-top">
+                <div class="metric-icon total-icon">
+                    <span class="material-icons">
+                        local_shipping
+                    </span>
+                </div>
+
+                <div
+                    class="metric-trend positive">
+
+                    +12%
+                </div>
+            </div>
+
             <h3>
                 Total Shipments
             </h3>
 
             <strong>
-                {{ total_shipments }}
+                {{ total_shipments|default:"0" }}
             </strong>
 
+            <p class="metric-description">
+                Total processed shipments this month.
+            </p>
         </div>
 
-        <div class="metric-card">
+        <!-- DELIVERED -->
+        <div
+            class="metric-card"
+            aria-label="Delivered shipments">
+
+            <div class="metric-card-top">
+                <div class="metric-icon delivered-icon">
+                    <span class="material-icons">
+                        check_circle
+                    </span>
+                </div>
+
+                <div
+                    class="metric-trend positive">
+
+                    +8%
+                </div>
+            </div>
 
             <h3>
                 Delivered Orders
             </h3>
 
             <strong>
-                {{ delivered_shipments }}
+                {{ delivered_shipments|default:"0" }}
             </strong>
 
+            <p class="metric-description">
+                Successfully delivered customer orders.
+            </p>
+        </div>
+
+        <!-- IN TRANSIT -->
+        <div
+            class="metric-card"
+            aria-label="In transit shipments">
+            <div class="metric-card-top">
+                <div class="metric-icon transit-icon">
+                    <span class="material-icons">
+                        sync
+                    </span>
+                </div>
+
+                <div
+                    class="metric-trend neutral">
+
+                    Live
+                </div>
+            </div>
+
+            <h3>
+                In Transit
+            </h3>
+
+            <strong>
+                {{ in_transit_shipments|default:"0" }}
+            </strong>
+
+            <p class="metric-description">
+                Orders currently moving through logistics.
+            </p>
+        </div>
+
+        <!-- FAILED DELIVERIES -->
+        <div
+            class="metric-card"
+            aria-label="Failed deliveries">
+
+            <div class="metric-card-top">
+                <div class="metric-icon failed-icon">
+                    <span class="material-icons">
+                        error
+                    </span>
+                </div>
+
+                <div
+                    class="metric-trend negative">
+
+                    -2%
+                </div>
+            </div>
+
+            <h3>
+                Failed Deliveries
+            </h3>
+
+            <strong>
+                {{ failed_shipments|default:"0" }}
+            </strong>
+
+            <p class="metric-description">
+                Shipments requiring operational attention.
+            </p>
         </div>
     </div>
+
+    <div class="shipping-dashboard-grid">
+
+        <!-- =================================================
+            COURIER PERFORMANCE
+        ================================================== -->
+        <section class="dashboard-panel courier-performance-panel">
+
+            <!-- PANEL HEADER -->
+            <div class="panel-header">
+                <div>
+                    <h2>
+                        Courier Performance
+                    </h2>
+
+                    <p>
+                        Delivery success and SLA metrics.
+                    </p>
+                </div>
+            </div>
+
+            <!-- COURIER LIST -->
+            <div class="courier-performance-list">
+
+                <!-- FEDEX -->
+                <div class="courier-performance-item">
+                    <div class="courier-left">
+                        <div class="courier-logo">
+                            F
+                        </div>
+
+                        <div class="courier-meta">
+                            <strong>
+                                FedEx
+                            </strong>
+
+                            <span>
+                                96% success rate
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="courier-right">
+                        <span class="status-badge connected">
+                            Connected
+                        </span>
+                    </div>
+                </div>
+
+                <!-- DHL -->
+                <div class="courier-performance-item">
+                    <div class="courier-left">
+                        <div class="courier-logo">
+                            D
+                        </div>
+
+                        <div class="courier-meta">
+                            <strong>
+                                DHL
+                            </strong>
+
+                            <span>
+                                92% success rate
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="courier-right">
+                        <span class="status-badge connected">
+                            Connected
+                        </span>
+                    </div>
+                </div>
+
+                <!-- SHIPROCKET -->
+                <div class="courier-performance-item">
+                    <div class="courier-left">
+                        <div class="courier-logo">
+                            S
+                        </div>
+
+                        <div class="courier-meta">
+                            <strong>
+                                Shiprocket
+                            </strong>
+
+                            <span>
+                                89% success rate
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="courier-right">
+                        <span class="status-badge connected">
+                            Connected
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================
+            SHIPMENT ACTIVITY
+        ================================================== -->
+        <section class="dashboard-panel shipment-activity-panel">
+
+            <!-- PANEL HEADER -->
+            <div class="panel-header">
+                <div>
+                    <h2>
+                        Shipment Activity
+                    </h2>
+
+                    <p>
+                        Latest shipping operations and events.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ACTIVITY TIMELINE -->
+            <div class="shipment-activity-timeline">
+
+                <!-- ITEM -->
+                <div class="activity-item">
+                    <div class="activity-indicator delivered"></div>
+                    <div class="activity-content">
+                        <strong>
+                            Order #1052 delivered
+                        </strong>
+                        <span>
+                            Delivered successfully via DHL.
+                        </span>
+                    </div>
+
+                    <div class="activity-time">
+                        5m ago
+                    </div>
+                </div>
+
+                <!-- ITEM -->
+                <div class="activity-item">
+                    <div class="activity-indicator transit"></div>
+                    <div class="activity-content">
+                        <strong>
+                            Order #1048 shipped
+                        </strong>
+
+                        <span>
+                            Shipment picked up by FedEx.
+                        </span>
+                    </div>
+
+                    <div class="activity-time">
+                        12m ago
+                    </div>
+                </div>
+
+                <!-- ITEM -->
+                <div class="activity-item">
+                    <div class="activity-indicator failed"></div>
+                    <div class="activity-content">
+                        <strong>
+                            Delivery failed for #1039
+                        </strong>
+
+                        <span>
+                            Customer unavailable during delivery.
+                        </span>
+                    </div>
+
+                    <div class="activity-time">
+                        34m ago
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- =====================================================
+        WAREHOUSE FULFILLMENT
+    ====================================================== -->
+    <section class="dashboard-panel warehouse-panel">
+
+        <!-- PANEL HEADER -->
+        <div class="panel-header">
+            <div>
+                <h2>
+                    Warehouse Fulfillment
+                </h2>
+
+                <p>
+                    Regional shipment processing performance.
+                </p>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="warehouse-table-wrapper">
+            <table class="warehouse-table">
+                <thead>
+                    <tr>
+                        <th>
+                            Warehouse
+                        </th>
+
+                        <th>
+                            Shipments
+                        </th>
+
+                        <th>
+                            Delivery SLA
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>
+                            Kolkata Warehouse
+                        </td>
+
+                        <td>
+                            1,248
+                        </td>
+
+                        <td>
+                            98%
+                        </td>
+
+                        <td>
+                            <span class="status-badge operational">
+                                Operational
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Mumbai Warehouse
+                        </td>
+
+                        <td>
+                            986
+                        </td>
+
+                        <td>
+                            94%
+                        </td>
+
+                        <td>
+                            <span class="status-badge operational">
+                                Operational
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
 
 </section>
