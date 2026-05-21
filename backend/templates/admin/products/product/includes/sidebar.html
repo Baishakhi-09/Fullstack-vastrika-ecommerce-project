@@ -1,94 +1,323 @@
 <div class="sidebar-stack">
 
-    <!-- STATUS -->
-    <div class="admin-card sticky-card">
+    <!-- =========================================================
+        PRODUCT STATUS
+    ========================================================== -->
+    <section class="admin-card sticky-card">
 
+        <!-- CARD HEADER -->
         <div class="card-header">
-
-            <h2>Status</h2>
-
+            <div class="card-header-content">
+                <h2>
+                    Product Status
+                </h2>
+            </div>
         </div>
 
+        <!-- CARD BODY -->
         <div class="card-body">
+            <div class="product-status-wrapper">
+                {% if original %}
+                    {% if original.is_active %}
+                        <div
+                            class="status-badge published-status"
+                            aria-label="Published product status">
+                            Published
+                        </div>
+                    {% else %}
 
-            <div class="status-badge draft-status">
-                Draft
+                        <div
+                            class="status-badge draft-status"
+                            aria-label="Draft product status">
+                            Draft
+                        </div>
+
+                    {% endif %}
+                {% else %}
+
+                    <div
+                        class="status-badge new-product-status"
+                        aria-label="New unsaved product">
+                        New Product
+                    </div>
+                {% endif %}
             </div>
 
             <div class="sidebar-meta">
-                Last updated just now.
+                {% if original and original.updated_at %}
+                    Last updated
+                    {{ original.updated_at|timesince }}
+                    ago.
+                {% else %}
+
+                    Product has not been published yet.
+                {% endif %}
             </div>
 
+            {% if original %}
+
+                <div class="sidebar-secondary-meta">
+                    Product ID:
+                    #{{ original.id }}
+                </div>
+
+            {% endif %}
         </div>
+    </section>
 
-    </div>
+    <section class="admin-card">
 
-    <!-- VISIBILITY -->
-    <div class="admin-card">
-
+        <!-- CARD HEADER -->
         <div class="card-header">
+            <div class="card-header-content">
+                <h2>
+                    Visibility
+                </h2>
 
-            <h2>Visibility</h2>
-
+                <p>
+                    Control storefront visibility and promotions.
+                </p>
+            </div>
         </div>
 
+        <!-- CARD BODY -->
         <div class="card-body sidebar-form-list">
+            {% if adminform.form.is_active %}
 
-            <label class="toggle-row">
+                <label
+                    class="toggle-row"
+                    for="{{ adminform.form.is_active.id_for_label }}">
+                    <div class="toggle-control">
+                        {{ adminform.form.is_active }}
+                    </div>
 
-                {{ adminform.form.is_active }}
+                    <div class="toggle-content">
+                        <span class="toggle-title">
+                            Visible on storefront
+                        </span>
 
-                <span>
-                    Visible on storefront
-                </span>
+                        <small class="toggle-description">
+                            Display this product publicly.
+                        </small>
+                    </div>
+                </label>
 
-            </label>
+            {% endif %}
 
-            <label class="toggle-row">
+            {% if adminform.form.is_featured %}
 
-                {{ adminform.form.is_featured }}
+                <label
+                    class="toggle-row"
+                    for="{{ adminform.form.is_featured.id_for_label }}">
 
-                <span>
-                    Featured product
-                </span>
+                    <div class="toggle-control">
+                        {{ adminform.form.is_featured }}
+                    </div>
 
-            </label>
+                    <div class="toggle-content">
+                        <span class="toggle-title">
+                            Featured product
+                        </span>
 
-            <label class="toggle-row">
+                        <small class="toggle-description">
+                            Highlight this product across the store.
+                        </small>
+                    </div>
+                </label>
 
-                {{ adminform.form.is_best_seller }}
+            {% endif %}
 
-                <span>
-                    Best seller
-                </span>
+            {% if adminform.form.is_best_seller %}
 
-            </label>
+                <label
+                    class="toggle-row"
+                    for="{{ adminform.form.is_best_seller.id_for_label }}">
 
+                    <div class="toggle-control">
+                        {{ adminform.form.is_best_seller }}
+                    </div>
+
+                    <div class="toggle-content">
+                        <span class="toggle-title">
+                            Best seller
+                        </span>
+
+                        <small class="toggle-description">
+                            Mark this product as a top-selling item.
+                        </small>
+                    </div>
+                </label>
+
+            {% endif %}
         </div>
+    </section>
 
-    </div>
+    <section class="admin-card">
 
-    <!-- SEO SCORE -->
-    <div class="admin-card">
-
+        <!-- CARD HEADER -->
         <div class="card-header">
-
-            <h2>SEO Score</h2>
-
+            <div class="card-header-content">
+                <h2>
+                    SEO Performance
+                </h2>
+                <p>
+                    Search engine optimization insights.
+                </p>
+            </div>
         </div>
 
+        <!-- CARD BODY -->
         <div class="card-body">
+            <div
+                class="seo-score-circle
+                {% if seo_score >= 80 %}
+                    excellent
+                {% elif seo_score >= 60 %}
+                    good
+                {% elif seo_score >= 40 %}
+                    average
+                {% else %}
+                    poor
+                {% endif %}
+                ">
 
-            <div class="seo-score-circle">
-                82
+                {{ seo_score|default:"0" }}
             </div>
 
             <p class="seo-score-text">
-                Your SEO is looking good.
+                {% if seo_score >= 80 %}
+                    Your SEO performance is excellent.
+                {% elif seo_score >= 60 %}
+                    Your SEO is performing well.
+                {% elif seo_score >= 40 %}
+                    Your SEO can be improved further.
+                {% else %}
+                    SEO optimization is required.
+                {% endif %}
             </p>
 
+            <!-- =============================================
+                SEO METRICS
+            ============================================== -->
+            <div class="sidebar-seo-metrics">
+
+                <!-- CTR -->
+                <div class="seo-metric-item">
+                    <span class="metric-label">
+                        CTR
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ seo_ctr|default:"0" }}%
+                    </strong>
+                </div>
+
+                <!-- IMPRESSIONS -->
+                <div class="seo-metric-item">
+                    <span class="metric-label">
+                        Impressions
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ seo_impressions|default:"0" }}
+                    </strong>
+                </div>
+
+                <!-- RANK -->
+                <div class="seo-metric-item">
+                    <span class="metric-label">
+                        Ranking
+                    </span>
+
+                    <strong class="metric-value">
+                        #{{ seo_ranking|default:"0" }}
+                    </strong>
+                </div>
+            </div>
+
+            <!-- =============================================
+                SEO RECOMMENDATIONS
+            ============================================== -->
+            <div class="sidebar-seo-recommendations">
+                <div class="recommendation-title">
+                    Recommendations
+                </div>
+
+                <ul class="recommendation-list">
+
+                    {% if seo_score < 80 %}
+
+                        <li>
+                            Improve meta title keyword targeting.
+                        </li>
+
+                        <li>
+                            Optimize product description readability.
+                        </li>
+
+                    {% endif %}
+
+                    {% if seo_score < 60 %}
+
+                        <li>
+                            Add more structured data and schema markup.
+                        </li>
+
+                    {% endif %}
+
+                    {% if seo_score >= 80 %}
+
+                        <li>
+                            SEO optimization looks strong.
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+        PUBLISHING ACTIONS
+    ========================================================== -->
+    <section class="admin-card">
+
+        <!-- CARD HEADER -->
+        <div class="card-header">
+            <div class="card-header-content">
+                <h2>
+                    Publishing
+                </h2>
+            </div>
         </div>
 
-    </div>
+        <!-- CARD BODY -->
+        <div class="card-body publishing-actions">
 
+            <!-- SAVE BUTTON -->
+            <button
+                type="submit"
+                class="primary-btn publish-btn"
+                aria-label="Save product">
+
+                Save Product
+            </button>
+
+            <!-- PREVIEW BUTTON -->
+            {% if original and original.slug %}
+
+                <a
+                    href="/products/{{ original.slug }}/"
+                    target="_blank"
+                    class="secondary-btn preview-btn"
+                    aria-label="Preview product page">
+
+                    Preview Product
+                </a>
+
+            {% endif %}
+
+        </div>
+    </section>
 </div>

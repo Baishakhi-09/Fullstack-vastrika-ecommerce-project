@@ -1,7 +1,4 @@
 <section class="admin-card">
-    <!-- =====================================================
-        CARD HEADER
-    ====================================================== -->
     <div class="card-header">
         <div class="card-header-content">
             <h2>Media Gallery</h2>
@@ -9,30 +6,19 @@
         </div>
     </div>
 
-    <!-- =====================================================
-        CARD BODY
-    ====================================================== -->
     <div class="card-body">
-        <!-- =================================================
-            MEDIA UPLOAD FIELD
-        ================================================== -->
         <div class="form-group">
             <label
                 for="{{ adminform.form.images.id_for_label }}"
                 class="{% if adminform.form.images.field.required %}required{% endif %}">
+
                 Product Images
             </label>
 
-            <!-- =============================================
-                FIELD ERRORS
-            ============================================== -->
             <div class="field-errors">
                 {{ adminform.form.images.errors }}
             </div>
 
-            <!-- =============================================
-                MEDIA DROPZONE
-            ============================================== -->
             <div
                 class="media-dropzone"
                 role="button"
@@ -45,22 +31,13 @@
                         or click to browse files.
                     </p>
 
-                    <!-- =====================================
-                        DJANGO FILE INPUT
-                    ====================================== -->
                     {{ adminform.form.images }}
                 </div>
             </div>
         </div>
 
-        <!-- =================================================
-            MEDIA PREVIEW GRID
-        ================================================== -->
         <div class="media-preview-grid">
             {% if original %}
-                <!-- =========================================
-                    FUTURE MEDIA PREVIEW SYSTEM
-                ========================================== -->
                 {% comment %}
                     Example future implementation:
                     {% for image in original.images.all %}
@@ -85,10 +62,9 @@
                     {% endfor %}
                 {% endcomment %}
             {% else %}
-                <!-- =========================================
-                    EMPTY STATE
-                ========================================== -->
+
                 <div class="media-preview-empty">
+
                     <!-- EMPTY STATE ICON -->
                     <div class="media-preview-empty-icon">
                         <svg
@@ -101,6 +77,7 @@
                             stroke-linejoin="round"
                             aria-hidden="true"
                             class="empty-media-icon">
+
                             <!-- IMAGE FRAME -->
                             <rect
                                 x="3"
@@ -110,6 +87,7 @@
                                 rx="2"
                                 ry="2">
                             </rect>
+
                             <!-- SUN -->
                             <circle
                                 cx="9"
@@ -128,6 +106,7 @@
                     <p>
                         No media uploaded yet.
                     </p>
+                    
                     <!-- OPTIONAL CTA -->
                     <button
                         type="button"

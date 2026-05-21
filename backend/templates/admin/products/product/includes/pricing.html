@@ -1,7 +1,4 @@
 <section class="admin-card">
-    <!-- =====================================================
-        CARD HEADER
-    ====================================================== -->
     <div class="card-header">
         <div class="card-header-content">
             <h2>Pricing</h2>
@@ -9,27 +6,13 @@
         </div>
     </div>
 
-    <!-- =====================================================
-        CARD BODY
-    ====================================================== -->
     <div class="card-body">
-
-        <!-- =================================================
-            FIELDSET
-        ================================================== -->
         <fieldset class="form-fieldset">
             <legend>
                 Pricing Configuration
             </legend>
 
-            <!-- =============================================
-                TWO COLUMN GRID
-            ============================================== -->
             <div class="form-grid two-column-grid">
-
-                <!-- =========================================
-                    SELLING PRICE
-                ========================================== -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.selling_price.id_for_label }}"
@@ -57,9 +40,6 @@
                     {% endif %}
                 </div>
 
-                <!-- =========================================
-                    COMPARE PRICE
-                ========================================== -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.mrp.id_for_label }}"

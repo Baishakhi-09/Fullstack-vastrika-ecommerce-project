@@ -1,8 +1,4 @@
 <section class="admin-card">
-    <!-- =====================================================
-        CARD HEADER
-    ====================================================== -->
-
     <div class="card-header">
         <div class="card-header-content">
             <h2>Shipping</h2>
@@ -13,22 +9,12 @@
         </div>
     </div>
 
-    <!-- =====================================================
-        CARD BODY
-    ====================================================== -->
     <div class="card-body">
-
-        <!-- =================================================
-            FIELDSET
-        ================================================== -->
         <fieldset class="form-fieldset">
             <legend>
                 Shipping Configuration
             </legend>
 
-            <!-- =============================================
-                SHIPPING CLASS ICONS
-            ============================================== -->
             <div class="shipping-class-icons">
                 <div class="shipping-class-icon fragile">
                     Fragile
@@ -41,9 +27,6 @@
                 </div>
             </div>
 
-            <!-- =============================================
-                SHIPPING CLASS
-            ============================================== -->
             <div class="shipping-class-selector">
                 <label
                     for="{{ adminform.form.shipping_class.id_for_label }}"
@@ -67,14 +50,8 @@
                 {% endif %}
             </div>
 
-            <!-- =============================================
-                SHIPPING DIMENSIONS GRID
-            ============================================== -->
             <div class="form-grid four-column-grid">
 
-                <!-- =========================================
-                    WEIGHT
-                ========================================== -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.weight.id_for_label }}"
@@ -109,9 +86,6 @@
                     {% endif %}
                 </div>
 
-                <!-- =========================================
-                    LENGTH
-                ========================================== -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.length.id_for_label }}"
@@ -146,9 +120,6 @@
                     {% endif %}
                 </div>
 
-                <!-- =========================================
-                    WIDTH
-                ========================================== -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.width.id_for_label }}"
@@ -183,9 +154,6 @@
                     {% endif %}
                 </div>
 
-                <!-- =========================================
-                    HEIGHT
-                ========================================== -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.height.id_for_label }}"
@@ -221,10 +189,6 @@
                 </div>
             </div>
 
-            <!-- =============================================
-                SHIPPING CALCULATOR
-            ============================================== -->
-
             <div class="shipping-calculator">
                 <div class="shipping-metric">
                     <span class="metric-label">
@@ -238,10 +202,6 @@
                     </span>
                 </div>
             </div>
-
-            <!-- =============================================
-                COURIER INTEGRATION STATUS
-            ============================================== -->
 
             <div class="courier-integration-status">
                 {% if fedex_connected %}
@@ -274,10 +234,6 @@
                     </div>
                 {% endif %}
             </div>
-
-            <!-- =============================================
-                MULTI-COURIER RATE COMPARISON
-            ============================================== -->
 
             <div class="courier-rate-comparison">
 
