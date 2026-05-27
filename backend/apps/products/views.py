@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from openpyxl import Workbook
 
+from django.views.generic import DetailView
+
 from django.contrib.admin.views.decorators import (
     staff_member_required,
 )
@@ -617,6 +619,13 @@ class BrandListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Brand.objects.filter(is_active=True).order_by("name")
+    
+class BrandDetailView(DetailView):
+    model = Brand
+    template_name = "admin/products/brand-detail.html"
+    context_object_name = "brand"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
 
 
 # -------------------- TAG LIST -------------------- #

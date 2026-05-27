@@ -1,189 +1,304 @@
-<section class="admin-card">
-    <div class="card-header">
+{% load i18n %}
 
+<section
+    class="admin-card inventory-card"
+    data-inventory-card>
+
+    <header class="card-header">
         <div class="card-header-content">
+            <div class="card-title-group">
+                <h2 class="card-title">
+                    {% trans "Inventory" %}
+                </h2>
 
-            <h2 class="card-title">
-                Inventory
-            </h2>
-
-            <p class="card-description">
-                Manage product stock, SKU tracking, and inventory status.
-            </p>
-
+                <p class="card-description">
+                    {% trans "Manage stock tracking, warehouse logistics, inventory availability, and fulfillment settings." %}
+                </p>
+            </div>
         </div>
-
-    </div>
+    </header>
 
     <div class="card-body">
-        <fieldset
-            class="form-fieldset"
-            aria-labelledby="inventory-management-heading">
-
-            <legend id="inventory-management-heading">
-                Inventory Management
+        <fieldset class="form-fieldset">
+            <legend class="fieldset-legend">
+                {% trans "Inventory Management" %}
             </legend>
 
-            <div
-                class="inventory-status-badges"
-                data-stock-threshold="5">
+            <div class="form-grid two-column-grid">
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.sku.id_for_label }}"
+                        class="form-label">
 
-                {% if original %}
-
-                    {% if original.stock_quantity <= 0 %}
-
-                        <span
-                            class="status-badge out-of-stock"
-                            aria-label="Product is out of stock">
-
-                            Out of Stock
+                        <span class="label-text">
+                            {{ adminform.form.sku.label }}
                         </span>
 
-                    {% elif original.stock_quantity < 5 %}
+                        {% if adminform.form.sku.field.required %}
 
-                        <span
-                            class="status-badge low-stock"
-                            aria-label="Product stock is running low">
+                            <span
+                                class="required-indicator"
+                                aria-hidden="true">
 
-                            Low Stock
-                        </span>
+                                *
+                            </span>
+                        {% endif %}
+                    </label>
 
-                    {% else %}
+                    {% if adminform.form.sku.help_text %}
 
-                        <span
-                            class="status-badge in-stock"
-                            aria-label="Product is currently in stock">
+                        <div
+                            class="field-help-text"
+                            id="{{ adminform.form.sku.id_for_label }}_help">
 
-                            In Stock
-                        </span>
-
+                            {{ adminform.form.sku.help_text }}
+                        </div>
                     {% endif %}
 
-                {% else %}
+                    {% if adminform.form.sku.errors %}
 
-                    <span
-                        class="status-badge draft-stock"
-                        aria-label="Inventory not available yet">
+                        <div
+                            class="field-errors"
+                            role="alert">
 
-                        Draft Product
-                    </span>
-
-                {% endif %}
-
-            </div>
-
-            <div class="form-grid two-column-grid">
-                {% if adminform.form.sku %}
-
-                    <div class="form-group">
-
-                        <label
-                            for="{{ adminform.form.sku.id_for_label }}"
-                            class="{% if adminform.form.sku.field.required %}required{% endif %}">
-
-                            SKU
-                        </label>
-
-                        <!-- FIELD ERRORS -->
-                        <div class="field-errors">
                             {{ adminform.form.sku.errors }}
                         </div>
+                    {% endif %}
 
-                        <!-- FIELD WRAPPER -->
-                        <div class="field-input-wrapper sku-field-wrapper">
+                    <div class="inventory-input-wrapper">
+                        {{ adminform.form.sku }}
 
-                            {{ adminform.form.sku }}
+                        <button
+                            type="button"
+                            class="inventory-generate-btn"
+                            id="generateSkuBtn"
+                            aria-label="{% trans 'Generate SKU' %}">
 
-                            <!-- GENERATE SKU BUTTON -->
-                            <button
-                                type="button"
-                                class="generate-sku-btn"
-                                id="generate-sku-btn"
-                                aria-label="Generate SKU automatically">
-
-                                Generate SKU
-                            </button>
-
-                        </div>
-
-                        <!-- HELP TEXT -->
-                        {% if adminform.form.sku.help_text %}
-
-                            <p
-                                class="help-text"
-                                id="{{ adminform.form.sku.id_for_label }}-help">
-
-                                {{ adminform.form.sku.help_text|safe }}
-                            </p>
-
-                        {% endif %}
-
+                            {% trans "Generate" %}
+                        </button>
                     </div>
+                </div>
 
-                {% endif %}
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.barcode.id_for_label }}"
+                        class="form-label">
 
-                <!-- =============================================
-                    STOCK QUANTITY
-                ============================================== -->
-                {% if adminform.form.stock_quantity %}
+                        <span class="label-text">
+                            {{ adminform.form.barcode.label }}
+                        </span>
+                    </label>
 
-                    <div class="form-group">
+                    {% if adminform.form.barcode.help_text %}
 
-                        <label
-                            for="{{ adminform.form.stock_quantity.id_for_label }}"
-                            class="{% if adminform.form.stock_quantity.field.required %}required{% endif %}">
+                        <div
+                            class="field-help-text"
+                            id="{{ adminform.form.barcode.id_for_label }}_help">
 
-                            Stock Quantity
-                        </label>
+                            {{ adminform.form.barcode.help_text }}
+                        </div>
+                    {% endif %}
 
-                        <!-- FIELD ERRORS -->
-                        <div class="field-errors">
+                    {% if adminform.form.barcode.errors %}
+
+                        <div
+                            class="field-errors"
+                            role="alert">
+
+                            {{ adminform.form.barcode.errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="inventory-input-wrapper">
+                        {{ adminform.form.barcode }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+
+                    <label
+                        for="{{ adminform.form.stock_quantity.id_for_label }}"
+                        class="form-label">
+
+                        <span class="label-text">
+                            {{ adminform.form.stock_quantity.label }}
+                        </span>
+
+                        {% if adminform.form.stock_quantity.field.required %}
+
+                            <span
+                                class="required-indicator"
+                                aria-hidden="true">
+
+                                *
+                            </span>
+                        {% endif %}
+                    </label>
+
+                    {% if adminform.form.stock_quantity.help_text %}
+
+                        <div
+                            class="field-help-text"
+                            id="{{ adminform.form.stock_quantity.id_for_label }}_help">
+
+                            {{ adminform.form.stock_quantity.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% if adminform.form.stock_quantity.errors %}
+
+                        <div
+                            class="field-errors"
+                            role="alert">
+
                             {{ adminform.form.stock_quantity.errors }}
                         </div>
+                    {% endif %}
 
-                        <!-- FIELD WRAPPER -->
-                        <div class="field-input-wrapper stock-field-wrapper">
-
-                            {{ adminform.form.stock_quantity }}
-
-                        </div>
-
-                        <!-- LOW STOCK WARNING -->
-                        {% if original and original.stock_quantity < 5 %}
-
-                            <div
-                                class="stock-warning low-stock"
-                                role="alert">
-
-                                Low stock alert:
-                                Only
-                                {{ original.stock_quantity }}
-                                item{{ original.stock_quantity|pluralize }}
-                                remaining.
-                            </div>
-
-                        {% endif %}
-
-                        <!-- HELP TEXT -->
-                        {% if adminform.form.stock_quantity.help_text %}
-
-                            <p
-                                class="help-text"
-                                id="{{ adminform.form.stock_quantity.id_for_label }}-help">
-
-                                {{ adminform.form.stock_quantity.help_text|safe }}
-                            </p>
-
-                        {% endif %}
-
+                    <div class="inventory-number-wrapper">
+                        {{ adminform.form.stock_quantity }}
                     </div>
 
-                {% endif %}
+                    <div
+                        class="inventory-status-badge"
+                        id="inventoryStatusBadge"
+                        role="status">
 
+                        {% trans "In Stock" %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.low_stock_threshold.id_for_label }}"
+                        class="form-label">
+
+                        <span class="label-text">
+                            {{ adminform.form.low_stock_threshold.label }}
+                        </span>
+                    </label>
+
+                    {% if adminform.form.low_stock_threshold.help_text %}
+
+                        <div
+                            class="field-help-text"
+                            id="{{ adminform.form.low_stock_threshold.id_for_label }}_help">
+
+                            {{ adminform.form.low_stock_threshold.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% if adminform.form.low_stock_threshold.errors %}
+
+                        <div
+                            class="field-errors"
+                            role="alert">
+
+                            {{ adminform.form.low_stock_threshold.errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="inventory-number-wrapper">
+                        {{ adminform.form.low_stock_threshold }}
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <div class="form-label">
+                        <span class="label-text">
+                            {{ adminform.form.allow_backorders.label }}
+                        </span>
+                    </div>
+
+                    {% if adminform.form.allow_backorders.help_text %}
+
+                        <div
+                            class="field-help-text"
+                            id="{{ adminform.form.allow_backorders.id_for_label }}_help">
+
+                            {{ adminform.form.allow_backorders.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% if adminform.form.allow_backorders.errors %}
+
+                        <div
+                            class="field-errors"
+                            role="alert">
+
+                            {{ adminform.form.allow_backorders.errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="inventory-toggle-wrapper">
+                        <div class="inventory-toggle-control">
+                            <input
+                                type="checkbox"
+                                name="allow_backorders"
+                                id="id_allow_backorders"
+                                class="inventory-toggle-input"
+
+                                {% if adminform.form.allow_backorders.value %}
+                                    checked
+                                {% endif %}>
+                        </div>
+
+                        <div class="inventory-toggle-content">
+                            <label
+                                for="id_allow_backorders"
+                                class="inventory-toggle-label">
+
+                                {% trans "Allow customers to place orders even when stock is unavailable." %}
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </fieldset>
 
-    </div>
+        <div class="inventory-insights-grid">
 
+            <!-- AVAILABLE STOCK -->
+            <div class="inventory-insight-card">
+                <div class="inventory-insight-label">
+                    {% trans "Available Stock" %}
+                </div>
+
+                <div
+                    class="inventory-insight-value"
+                    id="availableStockValue">
+
+                    0 {% trans "Units" %}
+                </div>
+            </div>
+
+            <!-- STOCK HEALTH -->
+            <div class="inventory-insight-card">
+                <div class="inventory-insight-label">
+                    {% trans "Stock Health" %}
+                </div>
+
+                <div
+                    class="inventory-insight-value"
+                    id="stockHealthValue">
+
+                    {% trans "Healthy" %}
+                </div>
+            </div>
+
+            <!-- BACKORDERS -->
+            <div class="inventory-insight-card">
+                <div class="inventory-insight-label">
+                    {% trans "Backorders" %}
+                </div>
+
+                <div
+                    class="inventory-insight-value"
+                    id="backorderValue">
+
+                    {% trans "Disabled" %}
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

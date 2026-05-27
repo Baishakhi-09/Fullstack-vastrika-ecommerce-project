@@ -1,0 +1,160 @@
+{% load i18n %}
+
+<section
+    class="sidebar-card brand-status-sidebar-card"
+    data-brand-status-card>
+
+    <header class="sidebar-card-header">
+        <div class="sidebar-card-title-group">
+            <h3 class="sidebar-card-title">
+                {% trans "Brand Status" %}
+            </h3>
+
+            <p class="sidebar-card-description">
+                {% trans "Manage brand visibility and publishing state." %}
+            </p>
+        </div>
+    </header>
+
+    <div class="sidebar-card-body">
+        <div class="brand-toggle-wrapper">
+            <div class="brand-toggle-control">
+                {{ adminform.form.is_active }}
+            </div>
+
+            <div class="brand-toggle-content">
+                <label
+                    for="{{ adminform.form.is_active.id_for_label }}"
+                    class="brand-toggle-label">
+
+                    {% trans "Display this brand publicly" %}
+                </label>
+
+                <p class="brand-toggle-description">
+                    {% trans "Enable this option to make the brand visible on the storefront and searchable by customers." %}
+                </p>
+            </div>
+        </div>
+
+        {% if original and original.is_active %}
+
+            <div
+                class="status-badge success"
+                role="status">
+
+                <span
+                    class="status-dot"
+                    aria-hidden="true">
+                </span>
+
+                <span class="status-badge-text">
+                    {% trans "Active Brand" %}
+                </span>
+            </div>
+
+            <p class="status-description">
+                {% trans "This brand is currently active and publicly visible on the ecommerce website." %}
+            </p>
+
+        {% elif original %}
+
+            <div
+                class="status-badge danger"
+                role="status">
+
+                <span
+                    class="status-dot"
+                    aria-hidden="true">
+                </span>
+
+                <span class="status-badge-text">
+                    {% trans "Inactive Brand" %}
+                </span>
+            </div>
+
+            <p class="status-description">
+                {% trans "This brand is currently hidden from the storefront and unavailable to customers." %}
+            </p>
+
+        {% else %}
+
+            <div
+                class="status-badge neutral"
+                role="status">
+
+                <span
+                    class="status-dot"
+                    aria-hidden="true">
+                </span>
+
+                <span class="status-badge-text">
+                    {% trans "Draft Brand" %}
+                </span>
+            </div>
+
+            <p class="status-description">
+                {% trans "This brand has not been published yet. Save the brand to activate visibility controls." %}
+            </p>
+        {% endif %}
+    </div>
+</section>
+
+<section
+    class="sidebar-card brand-actions-sidebar-card"
+    data-brand-actions-card>
+
+    <header class="sidebar-card-header">
+        <div class="sidebar-card-title-group">
+            <h3 class="sidebar-card-title">
+                {% trans "Quick Actions" %}
+            </h3>
+
+            <p class="sidebar-card-description">
+                {% trans "Quick shortcuts and brand management actions." %}
+            </p>
+        </div>
+    </header>
+
+    <div class="sidebar-card-body">
+        <div class="sidebar-actions-group">
+            {% if original %}
+                <a
+                    href="#"
+                    class="sidebar-action-btn preview-brand-btn"
+                    aria-label="{% trans 'Preview brand page' %}">
+
+                    <span
+                        class="sidebar-action-icon"
+                        aria-hidden="true">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+
+                            <path
+                                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                            </path>
+
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="3">
+                            </circle>
+                        </svg>
+                    </span>
+
+                    <span class="sidebar-action-text">
+                        {% trans "Preview Brand" %}
+                    </span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>

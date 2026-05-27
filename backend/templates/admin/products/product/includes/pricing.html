@@ -1,10 +1,23 @@
-<section class="admin-card">
+<section class="admin-card pricing-card">
+
+    <!-- =====================================================
+        CARD HEADER
+    ====================================================== -->
+
     <div class="card-header">
         <div class="card-header-content">
-            <h2>Pricing</h2>
-            <p>Configure product pricing and discounts.</p>
+            <h2> Pricing </h2>
+
+            <p>
+                Configure product pricing, discounts,
+                taxation and profitability.
+            </p>
         </div>
     </div>
+
+    <!-- =====================================================
+        CARD BODY
+    ====================================================== -->
 
     <div class="card-body">
         <fieldset class="form-fieldset">
@@ -12,26 +25,30 @@
                 Pricing Configuration
             </legend>
 
+            <!-- =================================================
+                PRICING GRID
+            ================================================== -->
+
             <div class="form-grid two-column-grid">
                 <div class="form-group">
-                    <label
-                        for="{{ adminform.form.selling_price.id_for_label }}"
-                        class="{% if adminform.form.selling_price.field.required %}required{% endif %}">
+                    <label for="id_selling_price">
                         Selling Price
                     </label>
 
-                    <!-- FIELD ERRORS -->
+                    <!-- ERRORS -->
                     <div class="field-errors">
                         {{ adminform.form.selling_price.errors }}
                     </div>
 
-                    <!-- FIELD -->
-                    <div class="input-with-prefix">
-                        <span class="input-prefix">
+                    <!-- INPUT -->
+                    <div class="price-input-wrapper">
+                        <span class="currency-symbol">
                             ₹
                         </span>
+
                         {{ adminform.form.selling_price }}
                     </div>
+
                     <!-- HELP TEXT -->
                     {% if adminform.form.selling_price.help_text %}
                         <p class="help-text">
@@ -41,19 +58,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label
-                        for="{{ adminform.form.mrp.id_for_label }}"
-                        class="{% if adminform.form.mrp.field.required %}required{% endif %}">
-                        Compare Price
+                    <label for="id_mrp">
+                        MRP
                     </label>
 
-                    <!-- FIELD ERRORS -->
+                    <!-- ERRORS -->
                     <div class="field-errors">
                         {{ adminform.form.mrp.errors }}
                     </div>
 
-                    <!-- FIELD -->
-                    {{ adminform.form.mrp }}
+                    <!-- INPUT -->
+                    <div class="price-input-wrapper">
+                        <span class="currency-symbol">
+                            ₹
+                        </span>
+
+                        {{ adminform.form.mrp }}
+                    </div>
 
                     <!-- HELP TEXT -->
                     {% if adminform.form.mrp.help_text %}
@@ -62,7 +83,105 @@
                         </p>
                     {% endif %}
                 </div>
+
+                <!-- <div class="form-group">
+                    <label for="id_cost_price">
+                        Cost Price
+                    </label>
+
+                    <-- ERRORS --
+                    <div class="field-errors">
+                        {{ adminform.form.cost_price.errors }}
+                    </div>
+
+                    <-- INPUT --
+                    <div class="price-input-wrapper">
+                        <span class="currency-symbol">
+                            ₹
+                        </span>
+
+                        {{ adminform.form.cost_price }}
+                    </div>
+
+                    <-- HELP TEXT --
+                    {% if adminform.form.cost_price.help_text %}
+                        <p class="help-text">
+                            {{ adminform.form.cost_price.help_text|safe }}
+                        </p>
+                    {% endif %}
+                </div> -->
+
+                <!-- <div class="form-group">
+                    <label for="id_tax_class">
+                        Tax Class
+                    </label>
+
+                    <-- ERRORS --
+                    <div class="field-errors">
+                        {{ adminform.form.tax_class.errors }}
+                    </div>
+
+                    <-- INPUT --
+                    <div class="admin-select-wrapper">
+                        {{ adminform.form.tax_class }}
+                    </div>
+
+                    <-- HELP TEXT --
+                    {% if adminform.form.tax_class.help_text %}
+                        <p class="help-text">
+                            {{ adminform.form.tax_class.help_text|safe }}
+                        </p>
+                    {% endif %}
+                </div> -->
             </div>
         </fieldset>
+
+        <!-- =================================================
+            PRICING INSIGHTS
+        ================================================== -->
+
+        <div class="pricing-insights-grid">
+
+            <!-- PROFIT MARGIN -->
+            <div class="pricing-insight-card">
+                <div class="pricing-insight-label">
+                    Profit Margin
+                </div>
+
+                <div class="pricing-insight-value"
+                    id="profitMarginValue">
+
+                    0%
+                </div>
+            </div>
+
+            <!-- ESTIMATED PROFIT -->
+            <div class="pricing-insight-card">
+                <div class="pricing-insight-label">
+                    Estimated Profit
+                </div>
+
+                <div
+                    class="pricing-insight-value"
+                    id="estimatedProfitValue">
+
+                    ₹0
+                </div>
+            </div>
+
+            <!-- DISCOUNT -->
+            <div class="pricing-insight-card">
+                <div class="pricing-insight-label">
+                    Discount
+                </div>
+
+                <div
+                    class="pricing-insight-value"
+                    id="discountValue">
+
+                    0%
+                </div>
+            </div>
+        </div>
     </div>
 </section>

@@ -8,6 +8,10 @@
 <link rel="icon" type="image/x-icon" href="{% static 'admin/images/logo/favicon/vastrika-favicon.png' %}">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+<script
+    src="{% static 'admin/js/custom.js' %}"
+    defer>
+</script>
 {% endblock %}
 
 {% block extrastyle %}
@@ -161,9 +165,4 @@
         {{ block.super }}
     {% endblock %}
 </main>
-{% endblock %}
-
-{% block footer %}
-{{ block.super }}
-<script src="{% static 'admin/js/custom.js' %}"></script>
 {% endblock %}

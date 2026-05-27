@@ -1,0 +1,561 @@
+{% load static %}
+{% load i18n %}
+
+<section
+    class="admin-card brand-information-card"
+    data-brand-information-root>
+
+    <!-- HEADER -->
+    <header class="card-header">
+        <div class="card-header-content">
+            <div class="card-title-group">
+                <h2 class="card-title">
+                    {% trans "Brand Information" %}
+                </h2>
+
+                <p class="card-description">
+                    {% trans "Manage brand identity, media assets, and ecommerce presentation details." %}
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- BODY -->
+    <div class="card-body">
+        <div class="form-fieldset">
+
+            <!-- BRAND NAME -->
+            <div class="form-group full-width">
+                <label
+                    for="{{ adminform.form.name.id_for_label }}"
+                    class="form-label">
+
+                    <span class="label-text">
+                        {{ adminform.form.name.label }}
+                    </span>
+
+                    {% if adminform.form.name.field.required %}
+
+                        <span
+                            class="required-indicator"
+                            aria-hidden="true">
+
+                            *
+                        </span>
+
+                    {% endif %}
+                </label>
+
+                {% if adminform.form.name.help_text %}
+
+                    <div class="field-help-text">
+                        {{ adminform.form.name.help_text }}
+                    </div>
+
+                {% endif %}
+
+                {% if adminform.form.name.errors %}
+
+                    <div
+                        class="field-errors"
+                        role="alert">
+
+                        {{ adminform.form.name.errors }}
+                    </div>
+
+                {% endif %}
+
+                <div class="admin-input-wrapper">
+                    {{ adminform.form.name }}
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label
+                    for="{{ adminform.form.slug.id_for_label }}"
+                    class="form-label">
+
+                    <span class="label-text">
+                        {{ adminform.form.slug.label }}
+                    </span>
+
+                    {% if adminform.form.slug.field.required %}
+
+                        <span
+                            class="required-indicator"
+                            aria-hidden="true">
+
+                            *
+                        </span>
+
+                    {% endif %}
+                </label>
+
+                {% if adminform.form.slug.help_text %}
+
+                    <div class="field-help-text">
+                        {{ adminform.form.slug.help_text }}
+                    </div>
+
+                {% endif %}
+
+                {% if adminform.form.slug.errors %}
+
+                    <div
+                        class="field-errors"
+                        role="alert">
+
+                        {{ adminform.form.slug.errors }}
+                    </div>
+
+                {% endif %}
+
+                <div class="admin-input-wrapper">
+                    {{ adminform.form.slug }}
+                </div>
+            </div>
+
+            <div
+                class="form-group full-width"
+                data-brand-upload-component>
+
+
+                <label
+                    for="{{ adminform.form.logo.id_for_label }}"
+                    class="form-label">
+
+                    <span class="label-text">
+                        {{ adminform.form.logo.label }}
+                    </span>
+
+                    {% if adminform.form.logo.field.required %}
+
+                        <span
+                            class="required-indicator"
+                            aria-hidden="true">
+
+                            *
+                        </span>
+
+                    {% endif %}
+                </label>
+
+                {% if adminform.form.logo.help_text %}
+
+                    <div class="field-help-text">
+                        {{ adminform.form.logo.help_text }}
+                    </div>
+
+                {% endif %}
+
+                {% if adminform.form.logo.errors %}
+                    <div
+                        class="field-errors"
+                        role="alert">
+
+                        {{ adminform.form.logo.errors }}
+                    </div>
+
+                {% endif %}
+
+                <div class="brand-upload-wrapper">
+                    <div class="hidden-brand-input">
+                        {{ adminform.form.logo }}
+                    </div>
+
+                    {% if original.logo %}
+
+                        <div class="brand-current-preview">
+                            <div class="brand-preview-header">
+                                <div class="brand-preview-title-group">
+                                    <h5>
+                                        {% trans "Current Brand Logo" %}
+                                    </h5>
+
+                                    <span class="preview-status">
+                                        {% trans "Uploaded" %}
+                                    </span>
+                                </div>
+
+                                <div class="brand-preview-actions">
+                                    <a
+                                        href="{{ original.logo.url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="preview-action-btn">
+
+                                        {% trans "Open" %}
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="brand-preview-image-wrapper">
+                                <img
+                                    src="{{ original.logo.url }}"
+                                    alt="{{ original.name }}"
+                                    class="brand-preview-image"
+                                    loading="lazy">
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+                    <div
+                        class="brand-upload-dropzone"
+                        id="brandLogoDropzone"
+                        tabindex="0"
+                        role="button"
+                        aria-label="{% trans 'Upload brand logo' %}">
+
+                        <div class="brand-upload-icon">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="44"
+                                height="44"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true">
+
+                                <path
+                                    d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
+                                </path>
+
+                                <polyline
+                                    points="17 8 12 3 7 8">
+                                </polyline>
+
+                                <line
+                                    x1="12"
+                                    y1="3"
+                                    x2="12"
+                                    y2="15">
+                                </line>
+                            </svg>
+                        </div>
+
+                        <h4 class="brand-upload-title">
+                            {% trans "Upload Brand Logo" %}
+                        </h4>
+
+                        <p class="brand-upload-description">
+                            {% trans "Drag and drop your logo here or browse from your device." %}
+                        </p>
+
+                        <button
+                            type="button"
+                            id="brandUploadButton"
+                            class="brand-upload-btn">
+
+                            {% trans "Browse Files" %}
+                        </button>
+
+                        <div class="brand-upload-meta">
+                            <span
+                                class="brand-file-name"
+                                id="brandFileName">
+
+                                {% trans "No file selected" %}
+                            </span>
+
+                            <span class="brand-upload-support-text">
+                                PNG · JPG · WEBP · SVG · Max 2MB
+                            </span>
+                        </div>
+
+                        <div
+                            class="brand-live-preview"
+                            id="brandLivePreview"
+                            hidden>
+
+                            <div class="brand-preview-header">
+                                <div class="brand-preview-title-group">
+                                    <h5>
+                                        {% trans "Live Preview" %}
+                                    </h5>
+
+                                    <span class="preview-status is-new">
+                                        {% trans "New Upload" %}
+                                    </span>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="preview-remove-btn"
+                                    id="removePreviewButton">
+
+                                    {% trans "Remove" %}
+                                </button>
+                            </div>
+
+                            <div class="brand-preview-image-wrapper">
+                                <img
+                                    src=""
+                                    alt="{% trans 'Preview image' %}"
+                                    id="brandPreviewImage"
+                                    class="brand-preview-image">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label
+                    for="{{ adminform.form.description.id_for_label }}"
+                    class="form-label">
+
+                    <span class="label-text">
+                        {{ adminform.form.description.label }}
+                    </span>
+
+                    {% if adminform.form.description.field.required %}
+                        <span
+                            class="required-indicator"
+                            aria-hidden="true">
+
+                            *
+                        </span>
+
+                    {% endif %}
+                </label>
+
+                {% if adminform.form.description.help_text %}
+
+                    <div class="field-help-text">
+                        {{ adminform.form.description.help_text }}
+                    </div>
+
+                {% endif %}
+
+                {% if adminform.form.description.errors %}
+
+                    <div
+                        class="field-errors"
+                        role="alert">
+
+                        {{ adminform.form.description.errors }}
+                    </div>
+
+                {% endif %}
+
+                <div class="admin-textarea-wrapper">
+                    {{ adminform.form.description }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- UPLOAD SCRIPT -->
+<!-- ========================================================= -->
+
+<script>
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            const uploadRoot = document.querySelector(
+                "[data-brand-upload-component]"
+            );
+
+            if (!uploadRoot) {
+                return;
+            }
+
+            const input = uploadRoot.querySelector(
+                "#id_logo"
+            );
+
+            const dropzone = uploadRoot.querySelector(
+                "#brandLogoDropzone"
+            );
+
+            const uploadButton = uploadRoot.querySelector(
+                "#brandUploadButton"
+            );
+
+            const fileName = uploadRoot.querySelector(
+                "#brandFileName"
+            );
+
+            const previewWrapper = uploadRoot.querySelector(
+                "#brandLivePreview"
+            );
+
+            const previewImage = uploadRoot.querySelector(
+                "#brandPreviewImage"
+            );
+
+            const removePreviewButton =
+                uploadRoot.querySelector(
+                    "#removePreviewButton"
+                );
+
+            const MAX_FILE_SIZE =
+                2 * 1024 * 1024;
+
+            const ALLOWED_TYPES = [
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/svg+xml"
+            ];
+
+            uploadButton.addEventListener(
+                "click",
+                function (event) {
+                    event.preventDefault();
+
+                    input.click();
+                }
+            );
+
+            input.addEventListener(
+                "change",
+                function (event) {
+                    const file =
+                        event.target.files[0];
+
+                    if (!file) {
+                        return;
+                    }
+
+                    processFile(file);
+                }
+            );
+
+            [
+                "dragenter",
+                "dragover"
+            ].forEach(function (eventName) {
+                dropzone.addEventListener(
+                    eventName,
+                    function (event) {
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+                        dropzone.classList.add(
+                            "is-dragging"
+                        );
+                    }
+                );
+            });
+
+            [
+                "dragleave",
+                "drop"
+            ].forEach(function (eventName) {
+                dropzone.addEventListener(
+                    eventName,
+                    function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        dropzone.classList.remove(
+                            "is-dragging"
+                        );
+                    }
+                );
+            });
+
+            dropzone.addEventListener(
+                "drop",
+                function (event) {
+                    const file =
+                        event.dataTransfer.files[0];
+
+                    if (!file) {
+                        return;
+                    }
+
+                    input.files =
+                        event.dataTransfer.files;
+
+                    processFile(file);
+                }
+            );
+
+            dropzone.addEventListener(
+                "keydown",
+                function (event) {
+                    if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                    ) {
+                        event.preventDefault();
+
+                        input.click();
+                    }
+                }
+            );
+
+            if (removePreviewButton) {
+                removePreviewButton.addEventListener(
+                    "click",
+                    function () {
+                        input.value = "";
+
+                        previewImage.src = "";
+
+                        previewWrapper.hidden = true;
+
+                        fileName.textContent =
+                            "No file selected";
+                    }
+                );
+            }
+
+            function processFile(file) {
+                if (
+                    !ALLOWED_TYPES.includes(
+                        file.type
+                    )
+                ) {
+                    alert(
+                        "Only PNG, JPG, WEBP and SVG files are allowed."
+                    );
+
+                    return;
+                }
+
+                if (
+                    file.size > MAX_FILE_SIZE
+                ) {
+                    alert(
+                        "Maximum file size is 2MB."
+                    );
+
+                    return;
+                }
+
+                renderPreview(file);
+            }
+
+            function renderPreview(file) {
+                fileName.textContent =
+                    file.name;
+
+                const reader =
+                    new FileReader();
+
+                reader.onload = function (
+                    event
+                ) {
+
+                    previewImage.src =
+                        event.target.result;
+
+                    previewWrapper.hidden =
+                        false;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    );
+</script>

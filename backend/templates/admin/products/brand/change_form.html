@@ -1,0 +1,166 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+
+    {{ block.super }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}">
+
+    <script
+        src="{% static 'admin/js/custom.js' %}"
+        defer>
+    </script>
+
+{% endblock %}
+
+{% block content %}
+
+<style>
+    #content > h1,
+    #content > h2 {
+        display: none !important;
+    }
+</style>
+
+<form
+    method="post"
+    enctype="multipart/form-data"
+    id="brand_form">
+
+    {% csrf_token %}
+
+    <div
+        id="product-admin-form"
+        class="product-page brand-editor-page">
+
+        <!-- =========================================
+            PAGE HEADER
+        ========================================== -->
+
+        <section class="brand-page-header">
+
+            <!-- LEFT -->
+            <div class="brand-page-header-left">
+                <h1 class="brand-page-title">
+
+                    {% if original %}
+                        {{ original.name }}
+                    {% else %}
+                        Add Brand
+                    {% endif %}
+
+                </h1>
+                    
+                <div class="brand-breadcrumb">
+                    <a href="/dashboard/">
+                        Dashboard
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="/dashboard/products/brand">
+                        Brands
+                    </a>
+
+                    <span>/</span>
+
+                    <span class="active">
+                        {% if original %}
+                            Edit Brand
+                        {% else %}
+                            Add Brand
+                        {% endif %}
+                    </span>
+                </div>
+
+                <p class="brand-page-subtitle">
+                    Create and manage ecommerce brands professionally.
+                </p>
+
+                {% if original %}
+                    <div class="brand-meta-info">
+                        <span>
+                            Created:
+                            {{ original.created_at|date:"M d, Y" }}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- RIGHT -->
+            <div class="brand-page-header-right">
+                <div class="brand-header-actions">
+                    <button
+                        type="submit"
+                        name="_save"
+                        form="brand_form"
+                        class="brand-header-btn secondary-btn">
+
+                        {% if original %}
+                            Update Brand
+                        {% else %}
+                            Save Brand
+                        {% endif %}
+                    </button>
+
+                    <button
+                        type="submit"
+                        name="_continue"
+                        form="brand_form"
+                        class="brand-header-btn primary-btn">
+
+                        Save & Continue Editing
+                    </button>
+                </div>
+
+                <!-- <div class="brand-status-clone"> -->
+                    <div class="brand-header-status
+                        {% if original %}
+                            is-editing
+                        {% else %}
+                            is-new
+                        {% endif %}">
+
+                        <span class="status-dot"></span>
+
+                        <div>
+                            <small>
+                                Brand Status
+                            </small>
+
+                            <strong>
+                                {% if original %}
+                                    Published Brand
+                                {% else %}
+                                    New Brand
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+            </div>
+        </section>
+
+        <!-- =========================================
+            MAIN GRID
+        ========================================== -->
+
+        <div class="product-editor-layout admin-layout-grid">
+
+            <!-- MAIN -->
+            <div class="editor-main">
+                {% include "admin/products/brand/includes/basic_information.html" %}
+
+                {% include "admin/products/brand/includes/seo.html" %}
+            </div>
+
+            <!-- SIDEBAR -->
+            <aside class="product-sidebar">
+                {% include "admin/products/brand/includes/sidebar.html" %}
+            </aside>
+        </div>
+    </div>
+</form>
+{% endblock %}

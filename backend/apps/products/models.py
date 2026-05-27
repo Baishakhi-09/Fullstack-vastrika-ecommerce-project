@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.db.models.functions import Lower
 from django.db import models
 from django.db.models import F, Q, Sum
 from django.utils.text import slugify
@@ -158,10 +159,21 @@ class ChildCategory(TimeStampedModel):
 
 # -------------------- BRAND -------------------- #
 class Brand(TimeStampedModel):
-    name = models.CharField(max_length=120, unique=True)
+    name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=140, unique=True, blank=True)
     logo = models.ImageField(upload_to="brands/", blank=True, null=True)
     description = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    meta_title = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+
+    meta_description = models.TextField(
         blank=True,
         null=True,
     )
@@ -177,18 +189,33 @@ class Brand(TimeStampedModel):
 
     def __str__(self):
         return self.name
+    
+    def clean(self):
+        existing_brand = Brand.objects.filter(
+            name__iexact=self.name
+        ).exclude(pk=self.pk)
+
+        if existing_brand.exists():
+            raise ValidationError({
+                "name": "A brand with this name already exists."
+            })
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name) or "brand"
+            base_slug = (
+                slugify(self.name)
+                .replace("-", "")
+            ) or "brand"
             slug = base_slug
             counter = 1
 
             while Brand.objects.filter(slug=slug).exclude(pk=self.pk).exists():
-                slug = f"{base_slug}-{counter}"
+                slug = f"{base_slug}{counter}"
                 counter += 1
 
             self.slug = slug
+        
+        self.full_clean()
 
         super().save(*args, **kwargs)
 
@@ -292,6 +319,87 @@ class Product(TimeStampedModel):
         decimal_places=2,
         default=Decimal("0.00"),
         validators=[MinValueValidator(Decimal("0.00"))],
+    )
+
+    cost_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    low_stock_threshold = models.PositiveIntegerField(
+        default=5
+    )
+
+    stock_quantity = models.PositiveIntegerField(
+        default=0
+    )
+
+    allow_backorders = models.BooleanField(
+        default=False
+    )
+
+    barcode = models.CharField(
+        max_length=120,
+        blank=True
+    )
+
+    tax_class = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    # SHIPPING
+    weight = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    length = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    width = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    height = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    SHIPPING_CLASS_CHOICES = (
+        ("standard", "Standard"),
+        ("express", "Express"),
+        ("fragile", "Fragile"),
+    )
+
+    shipping_class = models.CharField(
+        max_length=50,
+        choices=SHIPPING_CLASS_CHOICES,
+        default="standard",
+    )
+
+    DELIVERY_TIME_CHOICES = (
+        ("1-2_days", "1-2 Days"),
+        ("3-5_days", "3-5 Days"),
+        ("5-7_days", "5-7 Days"),
+    )
+
+    delivery_time = models.CharField(
+        max_length=50,
+        choices=DELIVERY_TIME_CHOICES,
+        default="3-5_days",
+    )
+
+    free_shipping = models.BooleanField(
+        default=False
     )
 
     average_rating = models.DecimalField(

@@ -1,0 +1,272 @@
+{% load i18n %}
+
+<section
+    class="admin-card brand-seo-card"
+    data-brand-seo-root>
+
+    <header class="card-header">
+        <div class="card-header-content">
+            <div class="card-title-group">
+                <h2 class="card-title">
+                    {% trans "Brand SEO" %}
+                </h2>
+
+                <p class="card-description">
+                    {% trans "Optimize brand visibility, search discoverability, and ecommerce indexing." %}
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <div class="card-body">
+        <div class="form-fieldset">
+
+            <!-- META TITLE -->
+            <div class="form-group full-width">
+                <label
+                    for="{{ adminform.form.meta_title.id_for_label }}"
+                    class="form-label">
+
+                    <span class="label-text">
+                        {{ adminform.form.meta_title.label }}
+                    </span>
+
+                    {% if adminform.form.meta_title.field.required %}
+
+                        <span
+                            class="required-indicator"
+                            aria-hidden="true">
+
+                            *
+                        </span>
+                    {% endif %}
+                </label>
+
+                {% if adminform.form.meta_title.help_text %}
+
+                    <div
+                        class="field-help-text"
+                        id="{{ adminform.form.meta_title.id_for_label }}_help">
+
+                        {{ adminform.form.meta_title.help_text }}
+                    </div>
+                {% endif %}
+
+                {% if adminform.form.meta_title.errors %}
+
+                    <div
+                        class="field-errors"
+                        role="alert">
+                        {{ adminform.form.meta_title.errors }}
+                    </div>
+                {% endif %}
+
+                <div class="admin-input-wrapper">
+                    {{ adminform.form.meta_title }}
+                </div>
+
+                <div class="seo-meta-footer">
+                    <span class="seo-recommendation">
+                        {% trans "Recommended: 50–60 characters" %}
+                    </span>
+
+                    <span
+                        class="seo-character-count"
+                        data-character-count="meta-title">
+                        0
+                    </span>
+                </div>
+            </div>
+
+            <!-- META DESCRIPTION -->
+            <div class="form-group full-width">
+                <label
+                    for="{{ adminform.form.meta_description.id_for_label }}"
+                    class="form-label">
+
+                    <span class="label-text">
+                        {{ adminform.form.meta_description.label }}
+                    </span>
+
+                    {% if adminform.form.meta_description.field.required %}
+
+                        <span
+                            class="required-indicator"
+                            aria-hidden="true">
+
+                            *
+                        </span>
+                    {% endif %}
+                </label>
+
+                {% if adminform.form.meta_description.help_text %}
+
+                    <div
+                        class="field-help-text"
+                        id="{{ adminform.form.meta_description.id_for_label }}_help">
+
+                        {{ adminform.form.meta_description.help_text }}
+                    </div>
+
+                {% endif %}
+
+                {% if adminform.form.meta_description.errors %}
+
+                    <div
+                        class="field-errors"
+                        role="alert">
+
+                        {{ adminform.form.meta_description.errors }}
+                    </div>
+                {% endif %}
+
+                <div class="admin-textarea-wrapper">
+                    {{ adminform.form.meta_description }}
+                </div>
+
+                <div class="seo-meta-footer">
+                    <span class="seo-recommendation">
+                        {% trans "Recommended: 140–160 characters" %}
+                    </span>
+
+                    <span
+                        class="seo-character-count"
+                        data-character-count="meta-description">
+                        0
+                    </span>
+                </div>
+            </div>
+
+            <div class="seo-preview-card">
+                <div class="seo-preview-header">
+                    <h4 class="seo-preview-title">
+                        Google Search Preview
+                    </h4>
+                </div>
+
+                <div class="seo-preview-content">
+                    <div class="seo-preview-url">
+                        {{ request.scheme }}://{{ request.get_host }}/api/products/brands/<span id="seoSlugPreview">your-brand</span>
+                    </div>
+
+                    <h3
+                        class="seo-preview-meta-title"
+                        id="seoMetaTitlePreview">
+
+                        {% trans "Your SEO Meta Title Preview" %}
+                    </h3>
+
+                    <p
+                        class="seo-preview-meta-description"
+                        id="seoMetaDescriptionPreview">
+
+                        {% trans "Your SEO meta description preview will appear here as users may see it in search engine results." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            const metaTitleInput =
+                document.querySelector(
+                    "#id_meta_title"
+                );
+
+            const metaDescriptionInput =
+                document.querySelector(
+                    "#id_meta_description"
+                );
+
+            const slugInput =
+                document.querySelector(
+                    "#id_slug"
+                );
+
+            const metaTitlePreview =
+                document.querySelector(
+                    "#seoMetaTitlePreview"
+                );
+
+            const metaDescriptionPreview =
+                document.querySelector(
+                    "#seoMetaDescriptionPreview"
+                );
+
+            const slugPreview =
+                document.querySelector(
+                    "#seoSlugPreview"
+                );
+
+            const titleCounter =
+                document.querySelector(
+                    '[data-character-count="meta-title"]'
+                );
+
+            const descriptionCounter =
+                document.querySelector(
+                    '[data-character-count="meta-description"]'
+                );
+
+            if (
+                !metaTitleInput ||
+                !metaDescriptionInput
+            ) {
+                return;
+            }
+
+            function updateSeoPreview() {
+                const title =
+                    metaTitleInput.value.trim();
+
+                metaTitlePreview.textContent =
+                    title ||
+                    "Your SEO Meta Title Preview";
+
+                titleCounter.textContent =
+                    `${title.length}/60`;
+
+                const description =
+                    metaDescriptionInput.value.trim();
+
+                metaDescriptionPreview.textContent =
+                    description ||
+                    "Your SEO meta description preview will appear here as users may see it in search engine results.";
+
+                descriptionCounter.textContent =
+                    `${description.length}/160`;
+
+                if (slugInput) {
+                    const slug =
+                        slugInput.value.trim();
+
+                    slugPreview.textContent =
+                        slug || "your-brand";
+                }
+            }
+
+            metaTitleInput.addEventListener(
+                "input",
+                updateSeoPreview
+            );
+
+            metaDescriptionInput.addEventListener(
+                "input",
+                updateSeoPreview
+            );
+
+            if (slugInput) {
+                slugInput.addEventListener(
+                    "input",
+                    updateSeoPreview
+                );
+            }
+
+            updateSeoPreview();
+        }
+    );
+</script>

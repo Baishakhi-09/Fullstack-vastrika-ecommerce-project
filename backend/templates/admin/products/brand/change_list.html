@@ -1,0 +1,298 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load admin_urls %}
+{% load admin_list %}
+
+{% block extrahead %}
+
+    {{ block.super }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}">
+
+    <script
+        src="{% static 'admin/js/custom.js' %}"
+        defer>
+    </script>
+
+{% endblock %}
+
+{% block content %}
+
+<style>
+    #content > h1,
+    #content > h2 {
+        display: none !important;
+        padding: 0 !important;
+    }
+
+    #container {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    #header {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .main,
+    .content,
+    #content {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+</style>
+
+<div class="brand-list-page">
+    <section class="brand-list-header">
+
+        <!-- LEFT -->
+        <div class="brand-list-header-left">
+            <h1> Brand Management </h1>
+
+            <p>
+                Manage ecommerce brands professionally.
+            </p>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="brand-list-header-right">
+            <a
+                href="{% url 'admin:products_brand_add' %}"
+                class="add-brand-btn">
+
+                + Add Brand
+            </a>
+        </div>
+    </section>
+
+    <div class="brand-dashboard-content">
+        <div class="brand-table-area">
+            <form
+                id="changelist-form"
+                method="post"
+                action=""
+                novalidate>
+
+                {% csrf_token %}
+
+                {% if cl.formset %}
+                    {{ cl.formset.management_form }}
+                {% endif %}
+
+                <section class="brand-table-card">
+                    {% if action_form %}
+
+                        <section class="brand-action-bar">
+                            <div class="brand-action-inner">
+
+                                <!-- LEFT -->
+                                <div class="brand-action-left">
+                                    <label for="action-toggle">
+                                        Action:
+                                    </label>
+
+                                    {{ action_form.action }}
+
+                                    <button
+                                        type="submit"
+                                        class="brand-action-btn"
+                                        title="Run selected action">
+
+                                        Go
+                                    </button>
+                                </div>
+
+                                <!-- RIGHT -->
+                                <div class="brand-selection-counter">
+                                    {{ cl.result_count }}
+                                    brand{{ cl.result_count|pluralize }}
+                                </div>
+                            </div>
+                        </section>
+                    {% endif %}
+
+                    <!-- TABLE -->
+                    <div class="brand-table-wrapper">
+                        <table class="brand-admin-table">
+                            <thead>
+                                <tr>
+
+                                    <!-- CHECKBOX -->
+                                    <th class="checkbox-column">
+                                        <input
+                                            type="checkbox"
+                                            id="action-toggle">
+                                    </th>
+
+                                    <!-- LOGO -->
+                                    <th class="logo-column">
+                                        Brand Logo
+                                    </th>
+
+                                    <!-- NAME -->
+                                    <th class="name-column">
+                                        Brand Name
+                                    </th>
+
+                                    <!-- STATUS -->
+                                    <th class="status-column">
+                                        Status
+                                    </th>
+
+                                    <!-- CREATED -->
+                                    <th class="date-column">
+                                        Created Date
+                                    </th>
+
+                                    <!-- ACTION -->
+                                    <th class="action-column">
+                                        Edit
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for brand in cl.result_list %}
+
+                                <tr>
+
+                                    <!-- CHECKBOX -->
+                                    <td class="checkbox-column">
+                                        <input
+                                            type="checkbox"
+                                            name="_selected_action"
+                                            value="{{ brand.pk }}">
+                                    </td>
+
+                                    <!-- LOGO -->
+                                    <td class="logo-column">
+                                        <div class="brand-table-logo">
+                                            {% if brand.logo %}
+
+                                            <img
+                                                src="{{ brand.logo.url }}"
+                                                alt="{{ brand.name }} logo">
+
+                                            {% else %}
+
+                                            <div class="brand-logo-placeholder">
+                                                {{ brand.name|slice:":1" }}
+                                            </div>
+
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                    <!-- NAME -->
+                                    <td class="name-column">
+                                        <div class="brand-name-cell">
+                                            <strong>
+                                                {{ brand.name }}
+                                            </strong>
+
+                                            <small>
+                                                {{ brand.slug }}
+                                            </small>
+                                        </div>
+                                    </td>
+
+                                    <!-- STATUS -->
+                                    <td class="status-column">
+                                        {% if brand.is_active %}
+
+                                        <span class="brand-status-badge active">
+                                            Active
+                                        </span>
+
+                                        {% else %}
+
+                                        <span class="brand-status-badge inactive">
+                                            Inactive
+                                        </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- DATE -->
+                                    <td class="date-column">
+                                        {{ brand.created_at|date:"M d, Y" }}
+                                    </td>
+
+                                    <!-- EDIT -->
+                                    <td class="action-column">
+                                        <a
+                                            href="{% url 'admin:products_brand_change' brand.pk %}"
+                                            class="brand-edit-btn">
+
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+
+                                <tr>
+                                    <td
+                                        colspan="6"
+                                        class="brand-empty-state">
+
+                                        No brands found.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </form>
+
+            <!-- PAGINATION FOOTER -->
+            {% if cl.result_count %}
+            <section class="brand-pagination-footer">
+                <div class="brand-pagination-info">
+                    Showing
+                    {{ cl.result_count }}
+                    brand{{ cl.result_count|pluralize }}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div
+    id="delete-modal"
+    class="delete-modal">
+
+    <div class="delete-modal-backdrop"></div>
+
+    <div class="delete-modal-content">
+        <h3> Confirm Delete </h3>
+
+        <p>
+            Are you sure you want to delete the selected brands?
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-modal-actions">
+            <button
+                type="button"
+                id="modal-cancel-btn"
+                class="modal-cancel-btn">
+
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="modal-delete-btn"
+                class="modal-delete-btn">
+
+                Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

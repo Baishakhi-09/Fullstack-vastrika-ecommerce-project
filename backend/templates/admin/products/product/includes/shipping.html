@@ -1,13 +1,23 @@
-<section class="admin-card">
+<section class="admin-card shipping-card">
+
+    <!-- =====================================================
+        CARD HEADER
+    ====================================================== -->
+
     <div class="card-header">
         <div class="card-header-content">
-            <h2>Shipping</h2>
+            <h2> Shipping & Fulfillment </h2>
 
             <p>
-                Configure shipping and delivery settings.
+                Configure shipping dimensions, delivery rules,
+                warehouse logistics and fulfillment settings.
             </p>
         </div>
     </div>
+
+    <!-- =====================================================
+        CARD BODY
+    ====================================================== -->
 
     <div class="card-body">
         <fieldset class="form-fieldset">
@@ -15,70 +25,26 @@
                 Shipping Configuration
             </legend>
 
-            <div class="shipping-class-icons">
-                <div class="shipping-class-icon fragile">
-                    Fragile
-                </div>
-                <div class="shipping-class-icon oversized">
-                    Oversized
-                </div>
-                <div class="shipping-class-icon cold-storage">
-                    Cold Storage
-                </div>
-            </div>
-
-            <div class="shipping-class-selector">
-                <label
-                    for="{{ adminform.form.shipping_class.id_for_label }}"
-                    class="{% if adminform.form.shipping_class.field.required %}required{% endif %}">
-                    Shipping Class
-                </label>
-
-                <!-- FIELD ERRORS -->
-                <div class="field-errors">
-                    {{ adminform.form.shipping_class.errors }}
-                </div>
-
-                <!-- FIELD -->
-                {{ adminform.form.shipping_class }}
-
-                <!-- HELP TEXT -->
-                {% if adminform.form.shipping_class.help_text %}
-                    <p class="help-text">
-                        {{ adminform.form.shipping_class.help_text|safe }}
-                    </p>
-                {% endif %}
-            </div>
-
-            <div class="form-grid four-column-grid">
-
+            <div class="form-grid two-column-grid">
                 <div class="form-group">
-                    <label
-                        for="{{ adminform.form.weight.id_for_label }}"
-                        class="{% if adminform.form.weight.field.required %}required{% endif %}">
+                    <label for="id_weight">
                         Weight
                     </label>
 
-                    <!-- FIELD ERRORS -->
+                    <!-- ERRORS -->
                     <div class="field-errors">
                         {{ adminform.form.weight.errors }}
                     </div>
 
-                    <!-- FIELD -->
-                    {{ adminform.form.weight }}
-
-                    <!-- UNIT SELECTOR -->
-                    <div class="unit-selector">
-                        <select class="admin-select" name="weight_unit" id="id_weight_unit">
-                            {% for unit in weight_units %}
-                                <option value="{{ unit.value }}">
-                                    {{ unit.label }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <!-- INPUT -->
+                    <div class="shipping-input-unit-wrapper">
+                        {{ adminform.form.weight }}
+                        <span class="shipping-unit-badge">
+                            KG
+                        </span>
                     </div>
 
-                    <!-- HELP TEXT -->
+                    <!-- HELP -->
                     {% if adminform.form.weight.help_text %}
                         <p class="help-text">
                             {{ adminform.form.weight.help_text|safe }}
@@ -87,186 +53,185 @@
                 </div>
 
                 <div class="form-group">
-                    <label
-                        for="{{ adminform.form.length.id_for_label }}"
-                        class="{% if adminform.form.length.field.required %}required{% endif %}">
+                    <label for="id_shipping_class">
+                        Shipping Class
+                    </label>
+
+                    <!-- ERRORS -->
+                    <div class="field-errors">
+                        {{ adminform.form.shipping_class.errors }}
+                    </div>
+
+                    <!-- INPUT -->
+                    <div class="admin-select-wrapper">
+                        {{ adminform.form.shipping_class }}
+                    </div>
+
+                    <!-- HELP -->
+                    {% if adminform.form.shipping_class.help_text %}
+                        <p class="help-text">
+                            {{ adminform.form.shipping_class.help_text|safe }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_length">
                         Length
                     </label>
 
-                    <!-- FIELD ERRORS -->
+                    <!-- ERRORS -->
                     <div class="field-errors">
                         {{ adminform.form.length.errors }}
                     </div>
 
-                    <!-- FIELD -->
-                    {{ adminform.form.length }}
-
-                    <!-- UNIT SELECTOR -->
-                    <div class="unit-selector">
-                        <select class="admin-select" name="dimension_unit_length" id="id_dimension_unit_length">
-                            {% for unit in dimension_units %}
-                                <option value="{{ unit.value }}">
-                                    {{ unit.label }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <!-- INPUT -->
+                    <div class="shipping-input-unit-wrapper">
+                        {{ adminform.form.length }}
+                        <span class="shipping-unit-badge">
+                            CM
+                        </span>
                     </div>
-
-                    <!-- HELP TEXT -->
-                    {% if adminform.form.length.help_text %}
-                        <p class="help-text">
-                            {{ adminform.form.length.help_text|safe }}
-                        </p>
-                    {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label
-                        for="{{ adminform.form.width.id_for_label }}"
-                        class="{% if adminform.form.width.field.required %}required{% endif %}">
+                    <label for="id_width">
                         Width
                     </label>
 
-                    <!-- FIELD ERRORS -->
+                    <!-- ERRORS -->
                     <div class="field-errors">
                         {{ adminform.form.width.errors }}
                     </div>
 
-                    <!-- FIELD -->
-                    {{ adminform.form.width }}
-
-                    <!-- UNIT SELECTOR -->
-                    <div class="unit-selector">
-                        <select class="admin-select" name="dimension_unit_width" id="id_dimension_unit_width">
-                            {% for unit in dimension_units %}
-                                <option value="{{ unit.value }}">
-                                    {{ unit.label }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <!-- INPUT -->
+                    <div class="shipping-input-unit-wrapper">
+                        {{ adminform.form.width }}
+                        <span class="shipping-unit-badge">
+                            CM
+                        </span>
                     </div>
-
-                    <!-- HELP TEXT -->
-                    {% if adminform.form.width.help_text %}
-                        <p class="help-text">
-                            {{ adminform.form.width.help_text|safe }}
-                        </p>
-                    {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label
-                        for="{{ adminform.form.height.id_for_label }}"
-                        class="{% if adminform.form.height.field.required %}required{% endif %}">
+                    <label for="id_height">
                         Height
                     </label>
 
-                    <!-- FIELD ERRORS -->
+                    <!-- ERRORS -->
                     <div class="field-errors">
                         {{ adminform.form.height.errors }}
                     </div>
 
-                    <!-- FIELD -->
-                    {{ adminform.form.height }}
-
-                    <!-- UNIT SELECTOR -->
-                    <div class="unit-selector">
-                        <select class="admin-select" name="dimension_unit_height" id="id_dimension_unit_height">
-                            {% for unit in dimension_units %}
-                                <option value="{{ unit.value }}">
-                                    {{ unit.label }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <!-- INPUT -->
+                    <div class="shipping-input-unit-wrapper">
+                        {{ adminform.form.height }}
+                        <span class="shipping-unit-badge">
+                            CM
+                        </span>
                     </div>
-
-                    <!-- HELP TEXT -->
-                    {% if adminform.form.height.help_text %}
-                        <p class="help-text">
-                            {{ adminform.form.height.help_text|safe }}
-                        </p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="shipping-calculator">
-                <div class="shipping-metric">
-                    <span class="metric-label">
-                        Volumetric Weight
-                    </span>
-
-                    <span
-                        class="metric-value"
-                        id="volumetric-weight">
-                        0.00 kg
-                    </span>
-                </div>
-            </div>
-
-            <div class="courier-integration-status">
-                {% if fedex_connected %}
-                    <div class="courier-badge connected">
-                        FedEx Connected
-                    </div>
-                {% else %}
-                    <div class="courier-badge disabled">
-                        FedEx Disabled
-                    </div>
-                {% endif %}
-
-                {% if dhl_connected %}
-                    <div class="courier-badge connected">
-                        DHL Connected
-                    </div>
-                {% else %}
-                    <div class="courier-badge error">
-                        DHL Error
-                    </div>
-                {% endif %}
-
-                {% if shiprocket_connected %}
-                    <div class="courier-badge connected">
-                        Shiprocket Connected
-                    </div>
-                {% else %}
-                    <div class="courier-badge syncing">
-                        Shiprocket Syncing
-                    </div>
-                {% endif %}
-            </div>
-
-            <div class="courier-rate-comparison">
-
-                <!-- FEDEX -->
-                <div class="courier-rate-card">
-                    <h4>FedEx</h4>
-
-                    <p>
-                        {{ fedex_rate.price }}
-                        {{ fedex_rate.eta }}
-                    </p>
                 </div>
 
-                <!-- DHL -->
-                <div class="courier-rate-card">
-                    <h4>DHL</h4>
+                <div class="form-group">
+                    <label for="id_delivery_time">
+                        Delivery Time
+                    </label>
 
-                    <p>
-                        ₹150 • 1 Day
-                    </p>
+                    <!-- ERRORS -->
+                    <div class="field-errors">
+                        {{ adminform.form.delivery_time.errors }}
+                    </div>
+
+                    <!-- INPUT -->
+                    <div class="admin-select-wrapper">
+                        {{ adminform.form.delivery_time }}
+                    </div>
                 </div>
 
-                <!-- SHIPROCKET -->
-                <div class="courier-rate-card">
-                    <h4>
-                        Shiprocket
-                    </h4>
+                <div class="form-group full-width">
+                    <div class="form-label">
+                        Free Shipping
+                    </div>
 
-                    <p>
-                        ₹95 • 3 Days
-                    </p>
+                    <!-- TOGGLE -->
+                    <div class="shipping-toggle-wrapper">
+                        <label class="shipping-switch" for="id_free_shipping">
+                            <input
+                                type="checkbox"
+                                name="free_shipping"
+                                id="id_free_shipping"
+
+                                {% if adminform.form.free_shipping.value %}
+                                    checked
+                                {% endif %}>
+
+                            <span class="shipping-slider"></span>
+                        </label>
+
+                        <div class="shipping-toggle-content">
+                            <span class="shipping-toggle-title">
+                                Enable Free Shipping
+                                for this product.
+                            </span>
+
+                            <p class="shipping-toggle-description">
+                                Customers will receive
+                                free shipping for this product.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </fieldset>
+
+        <!-- =================================================
+            SHIPPING INSIGHTS
+        ================================================== -->
+
+        <div class="shipping-insights-grid">
+
+            <!-- PACKAGE SIZE -->
+            <div class="shipping-insight-card">
+                <div class="shipping-insight-label">
+                    Package Size
+                </div>
+
+                <div
+                    class="shipping-insight-value"
+                    id="packageSizeValue">
+
+                    0 cm³
+                </div>
+            </div>
+
+            <!-- SHIPPING STATUS -->
+            <div class="shipping-insight-card">
+                <div class="shipping-insight-label">
+                    Shipping Status
+                </div>
+
+                <div
+                    class="shipping-insight-value"
+                    id="shippingStatusValue">
+
+                    Standard
+                </div>
+
+            </div>
+
+            <!-- DELIVERY -->
+            <div class="shipping-insight-card">
+                <div class="shipping-insight-label">
+                    Delivery Type
+                </div>
+
+                <div
+                    class="shipping-insight-value"
+                    id="deliveryTypeValue">
+
+                    Paid
+                </div>
+            </div>
+        </div>
     </div>
 </section>

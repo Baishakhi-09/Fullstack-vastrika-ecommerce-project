@@ -1,11 +1,14 @@
+from django import forms
+
 from django.contrib import admin
+from django.db import models
 from django.db.models import Count
 from django.utils.html import format_html
 from django.urls import reverse
 
 from vastrika_backend.admin_site import admin_site
 
-from .forms import ProductAdminForm
+from .forms import ProductAdminForm, BrandAdminForm
 
 from .models import (
     Brand,
@@ -288,6 +291,17 @@ class BrandAdmin(
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
+    form = BrandAdminForm
+
+    formfield_overrides = {
+        models.CharField: {
+            "widget": forms.TextInput(
+                attrs={
+                    "autocomplete": "off"
+                }
+            )
+        }
+    }
 
     list_display = (
         "name",
@@ -311,6 +325,42 @@ class BrandAdmin(
     prepopulated_fields = {
         "slug": ("name",)
     }
+
+    change_form_template = (
+        "admin/products/brand/change_form.html"
+    )
+
+    actions = ["delete_selected_brands"]
+
+    @admin.action(
+        description="Delete selected brands"
+    )
+    def delete_selected_brands(
+        self,
+        request,
+        queryset
+    ):
+
+        total_deleted = queryset.count()
+
+        queryset.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} brand(s) deleted successfully."
+        )
+
+    def get_actions(
+        self,
+        request
+    ):
+
+        actions = super().get_actions(request)
+
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+
+        return actions
 
 
 # =========================================================
@@ -348,8 +398,46 @@ class ProductAdmin(
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
+    def formfield_for_foreignkey(
+        self,
+        db_field,
+        request,
+        **kwargs
+    ):
+        formfield = super().formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 
+        if db_field.name == "brand":
+
+            formfield.widget.can_add_related = False
+
+            formfield.widget.can_change_related = False
+
+            formfield.widget.can_delete_related = False
+
+            formfield.widget.can_view_related = False
+
+        return formfield
     form = ProductAdminForm
+
+    def get_form(
+        self,
+        request,
+        obj=None,
+        **kwargs
+    ):
+        form = super().get_form(
+            request,
+            obj,
+            **kwargs
+        )
+
+        form.label_suffix = ""
+
+        return form
 
     change_list_template = (
         "admin/products/change_list.html"
@@ -375,6 +463,10 @@ class ProductAdmin(
     )
 
     list_display_links = None
+
+    autocomplete_fields = [
+        "tags",
+    ]
 
     @admin.display(description="Actions")
     def edit_product(self, obj):
@@ -416,7 +508,6 @@ class ProductAdmin(
 
     readonly_fields = (
         "slug",
-        "sku",
         "discount_badge",
         "stock_badge",
         "created_at",
@@ -446,9 +537,9 @@ class ProductAdmin(
     autocomplete_fields = (
         "brand",
         "tags",
-        "parent_category",
-        "sub_category",
-        "child_category",
+        # "parent_category",
+        # "sub_category",
+        # "child_category",
     )
 
     date_hierarchy = "created_at"
@@ -513,11 +604,26 @@ class ProductAdmin(
 
         ("Stock & Visibility", {
             "fields": (
+                "barcode",
+                "stock_quantity",
+                "low_stock_threshold",
                 "stock_badge",
                 "is_active",
                 "is_featured",
                 "is_new_arrival",
                 "is_best_seller",
+            )
+        }),
+
+        ("Shipping", {
+            "fields": (
+                "weight",
+                "shipping_class",
+                "length",
+                "width",
+                "height",
+                "delivery_time",
+                "free_shipping",
             )
         }),
 

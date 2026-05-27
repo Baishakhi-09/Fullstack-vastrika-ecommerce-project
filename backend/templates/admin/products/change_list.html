@@ -24,15 +24,8 @@
 {% block content %}
 
 <div class="products-dashboard">
-
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
-
     <div class="product-dashboard-header">
-
         <div>
-
             <h1 class="product-dashboard-title">
                 {{ cl.opts.verbose_name_plural|capfirst }}
             </h1>
@@ -40,97 +33,67 @@
             <p class="product-dashboard-subtitle">
                 Manage inventory, stock, pricing and visibility.
             </p>
-
         </div>
 
         <div class="product-dashboard-actions">
-
             {% if has_add_permission %}
 
                 <a
                     href="{% url cl.opts|admin_urlname:'add' %}"
-                    class="primary-btn"
-                >
-                    + Add Product
+                    class="primary-btn">
+                    + Add {{ opts.verbose_name|title }}
                 </a>
 
             {% endif %}
-
         </div>
-
     </div>
 
-
-    <!-- =====================================================
-         KPI CARDS
-    ====================================================== -->
-
     <div class="product-stats-grid">
-
         <div class="product-stat-card">
-
             <span>Total Products</span>
 
             <h2>
                 {{ total_products|default:"0" }}
             </h2>
-
         </div>
 
         <div class="product-stat-card">
-
             <span>Active Products</span>
 
             <h2>
                 {{ active_products|default:"0" }}
             </h2>
-
         </div>
 
         <div class="product-stat-card">
-
             <span>Featured Products</span>
 
             <h2>
                 {{ featured_products|default:"0" }}
             </h2>
-
         </div>
 
         <div class="product-stat-card">
-
             <span>Out Of Stock</span>
 
             <h2>
                 {{ out_of_stock|default:"0" }}
             </h2>
-
         </div>
-
     </div>
-
-
-    <!-- =====================================================
-         TOOLBAR
-    ====================================================== -->
 
     <div class="product-dashboard-toolbar">
 
         <!-- SEARCH -->
-
         <div class="toolbar-left">
-
             <form method="get" class="search-form">
-
                 {% for key, value in request.GET.items %}
-
                     {% if key != "q" %}
 
                         <input
                             type="hidden"
                             name="{{ key }}"
-                            value="{{ value }}"
-                        >
+                            value="{{ value }}">
 
                     {% endif %}
 
@@ -152,8 +115,7 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
-                            d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
+                            d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
 
                     <input
@@ -162,32 +124,25 @@
                         value="{{ cl.query|default_if_none:'' }}"
                         placeholder="Search products..."
                         id="searchbar"
-                        autocomplete="off"
-                    >
+                        autocomplete="off">
 
                     <button
                         type="submit"
                         class="search-submit-btn"
-                        aria-label="Search"
-                    >
+                        aria-label="Search">
                         Search
                     </button>
 
                 </div>
-
             </form>
-
         </div>
 
         <!-- ACTIONS -->
         <div class="toolbar-right">
-
             <div class="export-dropdown">
-
                 <button
                     type="button"
-                    class="toolbar-btn export-toggle-btn"
-                >
+                    class="toolbar-btn export-toggle-btn">
                     <span>Export</span>
                     <span class="material-icons export-arrow">
                         expand_more
@@ -198,8 +153,7 @@
 
                     <a
                         href="{% url 'export_products_csv' %}"
-                        class="export-menu-item"
-                    >
+                        class="export-menu-item">
                         Export CSV
                     </a>
 
@@ -214,9 +168,7 @@
                         class="export-menu-item">
                         Export PDF
                     </a>
-
                 </div>
-
             </div>
 
             {% if cl.has_filters %}
@@ -225,15 +177,13 @@
                     type="button"
                     class="toolbar-btn"
                     id="toggle-filters"
-                    aria-label="Toggle filters"
-                >
+                    aria-label="Toggle filters">
+
                     Filters
                 </button>
 
             {% endif %}
-
         </div>
-
     </div>
 
     <div class="product-dashboard-content product-layout filters-hidden" id="product-layout">

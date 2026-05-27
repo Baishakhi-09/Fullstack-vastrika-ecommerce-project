@@ -1,71 +1,130 @@
-<section class="admin-card">
+<section class="admin-card media-gallery-card">
+
+    <!-- =====================================================
+        CARD HEADER
+    ====================================================== -->
+
     <div class="card-header">
         <div class="card-header-content">
-            <h2>Media Gallery</h2>
-            <p>Upload and manage product media assets.</p>
+            <h2>  Media Gallery </h2>
+
+            <p>
+                Upload and manage product media assets professionally.
+            </p>
         </div>
     </div>
 
-    <div class="card-body">
-        <div class="form-group">
-            <label
-                for="{{ adminform.form.images.id_for_label }}"
-                class="{% if adminform.form.images.field.required %}required{% endif %}">
+    <!-- =====================================================
+        CARD BODY
+    ====================================================== -->
 
+    <div class="card-body">
+
+        <!-- =================================================
+            MEDIA UPLOAD
+        ================================================== -->
+
+        <div class="media-upload-section">
+            <label class="media-upload-label">
                 Product Images
+
+                <!-- HIDDEN INPUT -->
+                <div class="hidden-upload-input">
+                    <input type="file" name="images" id="id_images" multiple hidden>
+                </div>
             </label>
 
+            <!-- <label
+                for="{{ adminform.form.images.id_for_label }}"
+                class="media-upload-label {% if adminform.form.images.field.required %}required{% endif %}">
+
+                Product Images
+            </label> -->
+
+            <!-- ERRORS -->
             <div class="field-errors">
                 {{ adminform.form.images.errors }}
             </div>
 
+            <!-- DROPZONE -->
             <div
                 class="media-dropzone"
+                id="mediaDropzone"
                 role="button"
                 tabindex="0"
                 aria-label="Upload product images">
-                <div class="media-dropzone-content">
-                    <h3>Upload Product Images</h3>
+
+                <!-- INNER -->
+                <div class="media-dropzone-inner">
+
+                    <!-- ICON -->
+                    <div class="media-dropzone-icon">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+
+                            <path
+                                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
+                            </path>
+
+                            <polyline
+                                points="17 8 12 3 7 8">
+                            </polyline>
+
+                            <line
+                                x1="12"
+                                y1="3"
+                                x2="12"
+                                y2="15">
+                            </line>
+                        </svg>
+                    </div>
+
+                    <!-- TITLE -->
+                    <h3> Drag & Drop Product Images </h3>
+
+                    <!-- TEXT -->
                     <p>
-                        Drag and drop product images here,
+                        Upload high-quality product images
                         or click to browse files.
                     </p>
 
-                    {{ adminform.form.images }}
+                    <!-- BUTTON -->
+                    <span class="upload-trigger-btn">
+                        Browse Files
+                    </span>
                 </div>
             </div>
         </div>
 
-        <div class="media-preview-grid">
-            {% if original %}
-                {% comment %}
-                    Example future implementation:
-                    {% for image in original.images.all %}
-                        <div class="media-preview-item">
-                            <img
-                                src="{{ image.image.url }}"
-                                alt="{{ image.alt_text|default:original.name }}">
-                            <div class="media-preview-actions">
-                                <button
-                                    type="button"
-                                    class="delete-image-btn">
-                                    Delete
-                                </button>
+        <!-- =================================================
+            MEDIA PREVIEW
+        ================================================== -->
 
-                                <button
-                                    type="button"
-                                    class="primary-image-btn">
-                                    Set Primary
-                                </button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endcomment %}
-            {% else %}
+        <div class="media-preview-section">
+            <div class="media-preview-header">
+                <h3> Media Preview </h3>
 
+                <span class="media-count-badge">
+                    0 Images
+                </span>
+            </div>
+
+            <!-- GRID -->
+            <div
+                class="media-preview-grid"
+                id="mediaPreviewGrid">
+
+                <!-- EMPTY STATE -->
                 <div class="media-preview-empty">
 
-                    <!-- EMPTY STATE ICON -->
+                    <!-- ICON -->
                     <div class="media-preview-empty-icon">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -74,47 +133,37 @@
                             stroke="currentColor"
                             stroke-width="1.8"
                             stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true"
-                            class="empty-media-icon">
+                            stroke-linejoin="round">
 
-                            <!-- IMAGE FRAME -->
                             <rect
                                 x="3"
                                 y="5"
                                 width="18"
                                 height="14"
-                                rx="2"
-                                ry="2">
+                                rx="2">
                             </rect>
 
-                            <!-- SUN -->
                             <circle
-                                cx="9"
+                                cx="8.5"
                                 cy="10"
                                 r="1.5">
                             </circle>
 
-                            <!-- MOUNTAIN -->
                             <path
                                 d="M21 16l-5-5-4 4-2-2-4 3">
                             </path>
                         </svg>
                     </div>
 
-                    <!-- EMPTY STATE MESSAGE -->
+                    <!-- TITLE -->
+                    <h4> No Images Uploaded </h4>
+
+                    <!-- TEXT -->
                     <p>
-                        No media uploaded yet.
+                        Uploaded product images will appear here.
                     </p>
-                    
-                    <!-- OPTIONAL CTA -->
-                    <button
-                        type="button"
-                        class="upload-media-btn">
-                        Upload Images
-                    </button>
                 </div>
-            {% endif %}
+            </div>
         </div>
     </div>
 </section>

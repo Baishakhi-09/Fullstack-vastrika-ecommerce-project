@@ -1,15 +1,25 @@
 from django import forms
 
-from .models import Product
+from .models import Product, Brand
 
 
+# Product
 class ProductAdminForm(forms.ModelForm):
-
     class Meta:
         model = Product
         fields = "__all__"
 
+        labels = {
+            "name": "Product Name",
+        }
+
         widgets = {
+            "allow_backorders": forms.CheckboxInput(
+                attrs={
+                    "id": "id_allow_backorders"
+                }
+            ),
+            
             "name": forms.TextInput(
                 attrs={
                     "class": "admin-input",
@@ -111,3 +121,39 @@ class ProductAdminForm(forms.ModelForm):
             self.fields["slug"].widget.attrs.update({
                 "data-slug-field": "true"
             })
+
+# Brand
+class BrandAdminForm(forms.ModelForm):
+    class Meta:
+        model = Brand
+
+        fields = "__all__"
+
+        widgets = {
+            "meta_title": forms.TextInput(
+                attrs={
+                    "id": "id_meta_title",
+                    "class": "vTextField",
+                }
+            ),
+
+            "meta_description": forms.Textarea(
+                attrs={
+                    "id": "id_meta_description",
+                    "class": "vLargeTextField",
+                    "rows": 4,
+                }
+            ),
+
+            "name": forms.TextInput(
+                attrs={
+                    "autocomplete": "organization"
+                }
+            ),
+
+            "slug": forms.TextInput(
+                attrs={
+                    "autocomplete": "off"
+                }
+            ),
+        }
