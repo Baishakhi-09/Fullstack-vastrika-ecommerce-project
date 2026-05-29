@@ -637,8 +637,7 @@ function updateNotificationBadge(
     count
 ) {
     badge.textContent = count;
-    badge.style.display =
-        badge.hidden = count <= 0;
+    badge.hidden = count <= 0;
 }
 
 function renderNotifications(
@@ -980,22 +979,17 @@ function initDashboardCharts() {
    DELETE MODAL
 ========================================================= */
 
-/* =========================================================
-   DELETE MODAL
-========================================================= */
-
 function initDeleteModal() {
-    const form = qs("#changelist-form");
+    const form = 
+        qs("#changelist-form");
 
-    const actionSelect = qs(
-        "select[name='action']"
-    );
+    const actionSelect = 
+        qs("select[name='action']");
 
     const modal = qs("#delete-modal");
 
-    const cancelButton = qs(
-        "#modal-cancel-btn"
-    );
+    const cancelButton = 
+        qs("#modal-cancel-btn");
 
     const confirmButton = qs(
         "#modal-delete-btn"
@@ -1018,9 +1012,18 @@ function initDeleteModal() {
                 return;
             }
 
+            const deleteActions = [
+                "delete_selected_brands",
+
+                "delete_selected_product_tags",
+
+                "delete_selected"
+            ];
+
             if (
-                actionSelect.value === "delete_selected" ||
-                actionSelect.value === "delete_selected_brands"
+                deleteActions.includes(
+                    actionSelect.value
+                )
             ) {
                 event.preventDefault();
 

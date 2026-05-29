@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from vastrika_backend.admin_site import admin_site
 
-from .forms import ProductAdminForm, BrandAdminForm
+from .forms import ProductAdminForm, BrandAdminForm, ProductTagAdminForm
 
 from .models import (
     Brand,
@@ -28,6 +28,10 @@ from .models import (
 from .notifications.models import (
     AdminNotification,
     AdminNotificationRead,
+)
+
+from apps.products.ai.seo_engine import (
+    calculate_seo_score,
 )
 
 
@@ -371,6 +375,7 @@ class ProductTagAdmin(
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
+    form = ProductTagAdminForm
 
     list_display = (
         "name",
@@ -388,6 +393,226 @@ class ProductTagAdmin(
     prepopulated_fields = {
         "slug": ("name",)
     }
+
+    change_form_template = (
+        "admin/products/producttag/change_form.html"
+    )
+
+    actions = [ "delete_selected_product_tags" ]
+
+    @admin.action(
+        description="Delete selected product tags"
+    )
+    def delete_selected_product_tags(
+        self,
+        request,
+        queryset,
+    ):
+        total_deleted = queryset.count()
+
+        queryset.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} product tag(s) deleted successfully."
+        )
+
+    def get_actions(
+        self,
+        request
+    ):
+
+        actions = super().get_actions(request)
+
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+
+        return actions
+
+    def changelist_view(
+        self,
+        request,
+        extra_context=None,
+    ):
+
+        extra_context = extra_context or {}
+
+        queryset = self.get_queryset(request)
+
+        extra_context.update({
+
+            "published_count":
+                queryset.filter(
+                    status="published"
+                ).count(),
+
+            "featured_count":
+                queryset.filter(
+                    is_featured=True
+                ).count(),
+
+            "archived_count":
+                queryset.filter(
+                    status="archived"
+                ).count(),
+
+        })
+
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context,
+        )
+
+        if hasattr(response, "context_data"):
+
+            action_form = response.context_data.get(
+                "action_form"
+            )
+
+            if action_form:
+
+                action_form.fields[
+                    "action"
+                ].widget.attrs.update({
+
+                    "id": "id_action"
+
+                })
+
+        return response
+    
+    # =====================================================
+    # CHANGE FORM
+    # =====================================================
+
+    def changeform_view(
+        self,
+        request,
+        object_id=None,
+        form_url="",
+        extra_context=None,
+    ):
+        extra_context = (
+            extra_context or {}
+        )
+
+        seo_score = 0
+
+        optimization_score = 0
+
+        associated_products_count = 0
+
+        search_visibility = (
+            "Low Visibility"
+        )
+
+        visibility_status = (
+            "Needs Improvement"
+        )
+
+        if object_id:
+
+            product_tag = self.get_object(
+                request,
+                object_id,
+            )
+
+            if product_tag:
+
+                seo_score = (
+                    calculate_seo_score(
+
+                        product_tag.name,
+
+                        getattr(
+                            product_tag,
+                            "description",
+                            "",
+                        ),
+
+                    )
+                )
+
+                optimization_score = (
+                    seo_score
+                )
+
+                # =====================================
+                # ASSOCIATED PRODUCTS COUNT
+                # =====================================
+
+                try:
+
+                    associated_products_count = (
+                        Product.objects.filter(
+                            tags=product_tag
+                        ).count()
+                    )
+
+                except Exception:
+
+                    associated_products_count = 0
+
+                # =====================================
+                # VISIBILITY STATUS
+                # =====================================
+
+                if seo_score >= 80:
+
+                    search_visibility = (
+                        "High Visibility"
+                    )
+
+                    visibility_status = (
+                        "Optimized"
+                    )
+
+                elif seo_score >= 50:
+
+                    search_visibility = (
+                        "Medium Visibility"
+                    )
+
+                    visibility_status = (
+                        "Average"
+                    )
+
+                else:
+
+                    search_visibility = (
+                        "Low Visibility"
+                    )
+
+                    visibility_status = (
+                        "Needs Improvement"
+                    )
+
+        extra_context.update({
+
+            "seo_score":
+                seo_score,
+
+            "optimization_score":
+                optimization_score,
+
+            "search_visibility":
+                search_visibility,
+
+            "visibility_status":
+                visibility_status,
+
+            "associated_products_count":
+                associated_products_count,
+
+        })
+
+        return super().changeform_view(
+            request,
+            object_id,
+            form_url,
+            extra_context,
+        )
+            
 
 
 # =========================================================

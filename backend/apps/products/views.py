@@ -19,7 +19,7 @@ from reportlab.platypus import (
 )
 
 from django.db.models import Max, Min, Q
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, permissions, status, serializers
@@ -48,6 +48,9 @@ from .serializers import (
     WishlistItemSerializer,
 )
 from .pagination import ProductPagination
+
+from .ai.slug_engine import ( generate_smart_slug ) 
+from .ai.seo_engine import ( calculate_seo_score )
 
 
 @staff_member_required
@@ -635,6 +638,25 @@ class ProductTagListView(generics.ListAPIView):
 
     def get_queryset(self):
         return ProductTag.objects.all().order_by("name")
+    
+# -------------------- AI TAG ANALYSIS -------------------- #
+def ai_tag_analysis(request):
+    title = request.GET.get("title", "")
+    description = request.GET.get(
+        "description",
+        ""
+    )
+
+    slug = generate_smart_slug(title)
+    seo_score = calculate_seo_score(
+        title,
+        description
+    )
+
+    return JsonResponse({
+        "slug": slug,
+        "seo_score": seo_score,
+    })
 
 
 # -------------------- CART LIST / CREATE -------------------- #

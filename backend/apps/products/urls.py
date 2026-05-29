@@ -19,6 +19,8 @@ from .views import (
     export_products_csv,
     export_products_excel,
     export_products_pdf,
+    
+    ai_tag_analysis,
 )
 
 # =========================================================
@@ -74,6 +76,12 @@ urlpatterns = [
         "tags/",
         ProductTagListView.as_view(),
         name="tag_list",
+    ),
+
+    path(
+        "ai-analysis/",
+        ai_tag_analysis,
+        name="ai_tag_analysis"
     ),
 
     # CART

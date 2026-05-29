@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Product, Brand
+from .models import Product, Brand, ProductTag
 
 
 # Product
@@ -154,6 +154,84 @@ class BrandAdminForm(forms.ModelForm):
             "slug": forms.TextInput(
                 attrs={
                     "autocomplete": "off"
+                }
+            ),
+        }
+
+# Product-tag
+class ProductTagAdminForm(forms.ModelForm):
+    class Meta:
+        model = ProductTag
+
+        fields = "__all__"
+        
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class":
+                        "producttag-input",
+
+                    "placeholder":
+                        "Enter product tag name",
+
+                    "autocomplete":
+                        "off",
+                }
+            ),
+
+            "slug": forms.TextInput(
+                attrs={
+                    "class":
+                        "producttag-input",
+
+                    "placeholder":
+                        "auto-generated-slug",
+
+                    "autocomplete":
+                        "off",
+                }
+            ),
+
+            "description": forms.Textarea(
+                attrs={
+                    "class":
+                        "producttag-textarea",
+
+                    "id":
+                        "id_description",
+
+                    "placeholder":
+                        "Write a short description...",
+
+                    "rows":
+                        5,
+
+                    "autocomplete":
+                        "off",
+                }
+            ),
+
+            "status": forms.Select(
+                attrs={
+                    "class":
+                        "producttag-select",
+                }
+            ),
+
+            "visibility": forms.Select(
+                attrs={
+                    "class":
+                        "producttag-select",
+                }
+            ),
+
+            "display_priority": forms.NumberInput(
+                attrs={
+                    "class":
+                        "producttag-input",
+
+                    "placeholder":
+                        "0",
                 }
             ),
         }

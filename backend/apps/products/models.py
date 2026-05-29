@@ -222,8 +222,44 @@ class Brand(TimeStampedModel):
 
 # -------------------- PRODUCT TAG -------------------- #
 class ProductTag(TimeStampedModel):
-    name = models.CharField(max_length=60, unique=True)
-    slug = models.SlugField(max_length=80, unique=True, blank=True)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField()
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    STATUS_CHOICES = (
+        ("draft", "Draft"),
+        ("published", "Published"),
+        ("archived", "Archived"),
+    )
+
+    VISIBILITY_CHOICES = (
+        ("public", "Public"),
+        ("private", "Private"),
+        ("hidden", "Hidden"),
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="draft"
+    )
+
+    visibility = models.CharField(
+        max_length=20,
+        choices=VISIBILITY_CHOICES,
+        default="public"
+    )
+
+    is_featured = models.BooleanField(
+        default=False
+    )
+
+    display_priority = models.PositiveIntegerField(
+        default=0
+    )
 
     class Meta:
         db_table = "products_tag"

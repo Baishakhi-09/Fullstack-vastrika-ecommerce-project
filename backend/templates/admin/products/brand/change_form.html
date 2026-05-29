@@ -55,13 +55,13 @@
                 </h1>
                     
                 <div class="brand-breadcrumb">
-                    <a href="/dashboard/">
+                    <a href="{% url 'admin:index' %}">
                         Dashboard
                     </a>
 
                     <span>/</span>
 
-                    <a href="/dashboard/products/brand">
+                    <a href="{% url 'admin:products_brand_changelist' %}">
                         Brands
                     </a>
 

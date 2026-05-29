@@ -1,0 +1,162 @@
+<section class="producttag-card producttag-metadata-card">
+    <div class="producttag-card-header">
+        <div class="producttag-card-header-content">
+            <h2 class="producttag-card-title">
+                Metadata
+            </h2>
+
+            <p class="producttag-card-subtitle">
+                Configure publishing, visibility, and display preferences.
+            </p>
+        </div>
+
+        <div class="producttag-card-badge">
+            <span class="badge-dot"></span>
+
+            <span>
+                Active Settings
+            </span>
+        </div>
+    </div>
+
+    <div class="producttag-card-body">
+        <div class="producttag-form-group">
+            <div class="producttag-label-wrapper">
+                <label for="id_status">
+                    Status
+                </label>
+
+                <span class="field-tag">
+                    Publishing
+                </span>
+            </div>
+
+            <div class="producttag-select-wrapper">
+                {{ adminform.form.status }}
+            </div>
+
+            <div class="producttag-help-row">
+                <small class="producttag-help-text">
+                    Control whether this product tag is published or archived.
+                </small>
+            </div>
+
+            <div
+                class="producttag-status-preview"
+                id="status-preview">
+
+                {% if adminform.form.status.value == "published" %}
+
+                    <span
+                        class="status-badge status-published">
+
+                        <span
+                            class="badge-dot-small">
+                        </span>
+
+                        Published
+
+                    </span>
+
+                {% elif adminform.form.status.value == "archived" %}
+
+                    <span
+                        class="status-badge status-archived">
+
+                        <span
+                            class="badge-dot-small">
+                        </span>
+
+                        Archived
+
+                    </span>
+
+                {% else %}
+
+                    <span
+                        class="status-badge status-draft">
+
+                        <span
+                            class="badge-dot-small">
+                        </span>
+
+                        Draft
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+        <div class="producttag-form-group">
+            <div class="producttag-label-wrapper">
+                <label for="id_visibility">
+                    Visibility
+                </label>
+
+                <span class="field-tag">
+                    Access
+                </span>
+            </div>
+
+            <div class="producttag-select-wrapper">
+                {{ adminform.form.visibility }}
+            </div>
+
+            <div class="producttag-help-row">
+                <small class="producttag-help-text">
+                    Choose who can view and access this product tag.
+                </small>
+            </div>
+        </div>
+
+        <div class="producttag-featured-card">
+            <div class="producttag-featured-left">
+                {{ adminform.form.is_featured }}
+            </div>
+
+            <div class="producttag-featured-content">
+                <div class="producttag-featured-header">
+                    <label for="id_is_featured">
+                        Featured Product Tag
+                    </label>
+
+                    <span class="featured-badge">
+                        Featured
+                    </span>
+                </div>
+
+                <p>
+                    Highlight this tag in product collections, filters, and promotional sections.
+                </p>
+            </div>
+        </div>
+
+        <div class="producttag-form-group">
+            <div class="producttag-label-wrapper">
+                <label for="id_display_priority">
+                    Display Priority
+                </label>
+
+                <span class="field-tag">
+                    Sorting
+                </span>
+            </div>
+
+            <div class="producttag-priority-wrapper">
+                {{ adminform.form.display_priority }}
+
+                <span class="priority-helper">
+                    Lower appears first
+                </span>
+            </div>
+
+            <div class="producttag-help-row">
+                <small class="producttag-help-text">
+                    Use priority to control sorting order across filters and listings.
+                </small>
+            </div>
+        </div>
+    </div>
+</section>

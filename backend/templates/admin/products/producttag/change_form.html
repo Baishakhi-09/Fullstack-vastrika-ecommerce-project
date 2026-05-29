@@ -1,0 +1,142 @@
+{% extends "admin/change_form.html" %}
+{% load static i18n admin_urls %}
+
+{% block extrahead %}
+
+    {{ block.super }}
+    {{ media }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}">
+
+    <script
+        src="{% static 'admin/js/autoslug.js' %}"
+        defer>
+    </script>
+
+{% endblock %}
+
+{% block bodyclass %} 
+    {{ block.super }} producttag-admin-page 
+{% endblock %}
+
+{% block content %}
+
+<form
+    method="post"
+    enctype="multipart/form-data"
+    id="producttag_form"
+    novalidate>
+
+    {% csrf_token %}
+
+    {% for hidden in adminform.form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+
+    <div
+        id="product-admin-form"
+        class="product-page producttag-editor-page">
+
+        <section class="producttag-page-header">
+            <div class="producttag-page-header-left">
+                <h1 class="producttag-page-title">
+                    {% if original %}
+                        {{ original.name }}
+                    {% else %}
+                        Add Product Tag
+                    {% endif %}
+                </h1>
+
+                <div class="producttag-breadcrumb">
+                    <a href="{% url 'admin:index' %}">
+                        {% trans "Dashboard" %}
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="{% url 'admin:products_producttag_changelist' %}">
+                        {% trans "Product Tags" %}
+                    </a>
+
+                    <span>/</span>
+
+                    <span class="active">
+                        {% if original %}
+                            {% trans "Edit Product Tag" %}
+                        {% else %}
+                            {% trans "Create Product Tag" %}
+                        {% endif %}
+                    </span>
+                </div>
+
+                <p class="producttag-page-subtitle">
+                    {% trans "Create and manage searchable product labels professionally." %}
+                </p>
+            </div>
+
+            <div class="producttag-page-header-right">
+                <div class="producttag-header-actions">
+
+                    <button
+                        type="submit"
+                        name="_save"
+                        form="producttag_form"
+                        class="producttag-btn producttag-btn-primary">
+
+                        {% trans "Publish" %}
+                    </button>
+
+                    <button
+                        type="submit"
+                        name="_continue"
+                        form="producttag_form"
+                        class="producttag-btn producttag-btn-secondary">
+
+                        {% trans "Save & Continue" %}
+                    </button>
+                </div>
+
+                <div class="producttag-status-card">
+                    <div class="status-dot"
+                        aria-hidden="true">
+                    </div>
+
+                    <div class="producttag-status-content">
+                        <small>
+                            {% trans "Product Tag Status" %}
+                        </small>
+
+                        <strong>
+                            {% if original %}
+                                {% trans "Published Tag" %}
+                            {% else %}
+                                {% trans "New Product Tag" %}
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% if adminform.form.non_field_errors %}
+            <div class="producttag-form-errors">
+                {{ adminform.form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="producttag-grid-layout">
+            <main class="producttag-main-content">
+                {% include "admin/products/producttag/includes/basic_information.html" %}
+            </main>
+
+            <aside class="producttag-sidebar">
+                {% include "admin/products/producttag/includes/metadata.html" %}
+
+                {% include "admin/products/producttag/includes/performance_preview.html" %}
+            </aside>
+        </div>
+    </div>
+</form>
+{% endblock %}

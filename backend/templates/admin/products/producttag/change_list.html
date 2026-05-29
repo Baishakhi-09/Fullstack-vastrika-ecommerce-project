@@ -1,0 +1,290 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load admin_urls %}
+{% load admin_list %}
+
+{% block extrahead %}
+
+    {{ block.super }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}">
+
+    <script
+        src="{% static 'admin/js/custom.js' %}"
+        defer>
+    </script>
+{% endblock %}
+
+{% block content %}
+
+<div class="producttag-dashboard-page">
+    <section class="producttag-dashboard-header">
+        <div class="producttag-dashboard-header-left">
+            <h1 class="dashboard-page-title">
+                Product Tags
+            </h1>
+
+            <p class="dashboard-page-subtitle">
+                Manage inventory, metadata, visibility, and product tag organization.
+            </p>
+        </div>
+
+        <div class="producttag-dashboard-header-right">
+            <a
+                href="{% url 'admin:products_producttag_add' %}"
+                class="producttag-add-btn">
+
+                + Add Product Tag
+            </a>
+        </div>
+    </section>
+
+    <section class="producttag-analytics-grid">
+        <div class="analytics-card">
+            <span>
+                Total Product Tags
+            </span>
+
+            <h2>
+                {{ cl.result_count }}
+            </h2>
+        </div>
+
+        <div class="analytics-card">
+            <span>
+                Published Tags
+            </span>
+
+            <h2>
+                {{ published_count }}
+            </h2>
+        </div>
+
+        <div class="analytics-card">
+            <span>
+                Featured Tags
+            </span>
+
+            <h2>
+                {{ featured_count }}
+            </h2>
+        </div>
+
+        <div class="analytics-card">
+            <span>
+                Archived Tags
+            </span>
+
+            <h2>
+                {{ archived_count }}
+            </h2>
+        </div>
+    </section>
+
+    <section class="producttag-table-wrapper">
+        <form
+            id="changelist-form"
+            method="post"
+            novalidate>
+
+            {% csrf_token %}
+
+            {% if cl.formset %}
+                {{ cl.formset.management_form }}
+            {% endif %}
+
+            <section class="producttag-toolbar">
+                {% if action_form %}
+
+                    <div class="producttag-toolbar-left">
+                        <label for="{{ action_form.action.id_for_label }}">
+                            Action
+                        </label>
+
+                        {{ action_form.action }}
+
+                        <button
+                            type="submit"
+                            name="index"
+                            value="0"
+                            class="toolbar-go-btn"
+                            title="Run selected action">
+
+                            Go
+                        </button>
+                    </div>
+
+                    <div class="producttag-toolbar-right">
+                        <div class="toolbar-count-badge">
+                            {{ cl.result_count }}
+                            Product Tag{{ cl.result_count|pluralize }}
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+
+            <div class="producttag-table-container">
+                <table 
+                id="result_list"
+                class="producttag-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column">
+                                <input 
+                                    type="checkbox"
+                                    id="action-toggle"
+                                    class="action-select"
+                                    aria-label="Select all product tags">
+                            </th>
+
+                            <th class="name-column">
+                                Tag Name
+                            </th>
+
+                            <th class="slug-column">
+                                Slug
+                            </th>
+
+                            <th class="status-column">
+                                Status
+                            </th>
+
+                            <th class="action-column">
+                                Edit
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for obj in cl.result_list %}
+
+                        <tr>
+                            <td class="checkbox-column">
+                                <input
+                                    type="checkbox"
+                                    name="_selected_action"
+                                    value="{{ obj.pk }}"
+                                    class="action-select">
+                            </td>
+
+                            <td class="name-column">
+                                <div class="producttag-name-cell">
+                                    <div>
+                                        <h2>
+                                            {{ obj.name }}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="slug-column">
+                                <span class="slug-badge">
+                                    {{ obj.slug }}
+                                </span>
+                            </td>
+
+                            <td class="status-column">
+                                {% if obj.status == "published" %}
+
+                                    <span class="status-pill status-active">
+                                        Published
+                                    </span>
+                                
+                                {% elif obj.status == "draft" %}
+                                    <span class="status-pill status-draft">
+                                        Draft
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-pill status-archived">
+                                        Archived
+                                    </span>
+
+                                {% endif %}
+                            </td>
+
+                            <td class="action-column">
+                                <a
+                                    href="{% url 'admin:products_producttag_change' obj.id %}"
+                                    class="producttag-edit-btn">
+
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-table-state">
+                                    <h3>
+                                        No Product Tags Found
+                                    </h3>
+
+                                    <p>
+                                        Create your first product tag to organize products professionally.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </section>
+
+    <!-- PAGINATION FOOTER -->
+    {% if cl.result_count %}
+
+        <section class="producttag-pagination-footer">
+            <div class="producttag-pagination-info">
+                Showing
+                {{ cl.result_count }}
+                Product Tag{{ cl.result_count|pluralize }}
+            </div>
+        </section>
+
+    {% endif %}
+</div>
+
+<!-- DELETE MODAL -->
+<div
+    id="delete-modal"
+    class="delete-modal">
+
+    <div class="delete-modal-backdrop"></div>
+
+    <div class="delete-modal-content">
+        <h3> Confirm Delete </h3>
+
+        <p>
+            Are you sure you want to delete the selected brands?
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-modal-actions">
+            <button
+                type="button"
+                id="modal-cancel-btn"
+                class="modal-cancel-btn">
+
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="modal-delete-btn"
+                class="modal-delete-btn">
+
+                Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+<section class="producttag-card basic-information-card">
+    <div class="producttag-card-header">
+        <div class="producttag-card-header-left">
+            <h2 class="producttag-card-title">
+                Basic Information
+            </h2>
+
+            <p class="producttag-card-subtitle">
+                Manage the core identity and structure of your product tag.
+            </p>
+        </div>
+
+        <div class="producttag-card-status">
+            <span class="status-indicator"></span>
+
+            <span>
+                Auto Save Active
+            </span>
+        </div>
+    </div>
+
+    <div class="producttag-card-body">
+        <div class="producttag-form-group">
+            <div class="producttag-label-wrapper">
+                <label for="id_name">
+                    Product Tag Name
+                </label>
+
+                <span class="required-mark">
+                    *
+                </span>
+            </div>
+
+            <div class="producttag-input-wrapper">
+                {{ adminform.form.name }}
+
+                <div
+                    class="producttag-character-counter"
+                    id="name-character-counter">
+
+                    0 / 100
+                </div>
+            </div>
+
+            <div class="producttag-help-row">
+                <small class="producttag-help-text">
+                    Enter a clear and searchable product tag name.
+                </small>
+
+                <div
+                    class="producttag-validation-feedback"
+                    id="name-validation-feedback">
+
+                    Ready
+                </div>
+            </div>
+
+            {% if adminform.form.name.errors %}
+
+                <div class="producttag-field-error">
+                    {{ adminform.form.name.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="producttag-form-group">
+            <div class="producttag-label-wrapper">
+                <label for="id_slug">
+                    Auto Slug Generator
+                </label>
+            </div>
+
+            <div class="producttag-input-wrapper slug-wrapper">
+                <div class="slug-prefix">
+                    /tag/
+                </div>
+
+                {{ adminform.form.slug }}
+            </div>
+
+            <div class="producttag-help-row">
+                <small class="producttag-help-text">
+                    URL-friendly version generated automatically from the tag name.
+                </small>
+
+                <div
+                    class="producttag-slug-status"
+                    id="slug-status">
+
+                    Auto Generated
+                </div>
+            </div>
+
+            <div
+                class="producttag-smart-suggestion"
+                id="smart-slug-suggestion">
+
+                Suggested:
+
+                <strong id="suggested-slug-text">
+
+                    product-tag
+                </strong>
+            </div>
+
+            {% if adminform.form.slug.errors %}
+
+                <div class="producttag-field-error">
+                    {{ adminform.form.slug.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="producttag-form-group">
+            <div class="producttag-label-wrapper">
+                <label for="id_description">
+                    Description
+                </label>
+            </div>
+
+            <div class="producttag-textarea-wrapper">
+                {{ adminform.form.description }}
+
+                <div
+                    class="producttag-character-counter textarea-counter"
+                    id="description-character-counter">
+
+                    0 / 500
+                </div>
+            </div>
+
+            <div class="producttag-help-row">
+                <small class="producttag-help-text">
+                    Add a short explanation to improve SEO and organization.
+                </small>
+            </div>
+
+            {% if adminform.form.description.errors %}
+
+                <div class="producttag-field-error">
+                    {{ adminform.form.description.errors }}
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+</section>
