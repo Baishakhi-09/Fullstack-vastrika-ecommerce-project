@@ -1,0 +1,104 @@
+<div class="admin-card sticky-card">
+    <div class="card-header">
+        <h3>Category Insights</h3>
+
+        <p>
+            Performance and engagement metrics for this category.
+        </p>
+    </div>
+
+    {% if original %}
+
+        <div class="stats-list">
+            <div class="stat-row">
+                <div class="stat-info">
+                    <span class="stat-label">
+                        Products
+                    </span>
+
+                    <small class="stat-description">
+                        Total products assigned
+                    </small>
+                </div>
+
+                <strong class="stat-value">
+                    {{ products_count|default:"0" }}
+                </strong>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat-info">
+                    <span class="stat-label">
+                        Child Categories
+                    </span>
+
+                    <small class="stat-description">
+                        Subcategories available
+                    </small>
+                </div>
+
+                <strong class="stat-value">
+                    {{ child_categories_count|default:"0" }}
+                </strong>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat-info">
+                    <span class="stat-label">
+                        Created
+                    </span>
+
+                    <small class="stat-description">
+                        Category creation date
+                    </small>
+                </div>
+
+                <strong class="stat-value">
+                    {{ original.created_at|date:"M d, Y" }}
+                </strong>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat-info">
+                    <span class="stat-label">
+                        Last Updated
+                    </span>
+
+                    <small class="stat-description">
+                        Most recent modification
+                    </small>
+                </div>
+
+                <strong class="stat-value">
+                    {{ original.updated_at|date:"M d, Y" }}
+                </strong>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+
+                    <path d="M3 3v18h18"/>
+
+                    <path d="M7 14l4-4 3 3 5-7"/>
+                </svg>
+            </div>
+
+            <h4> Insights Unavailable </h4>
+
+            <p>
+                Save this category to start tracking
+                products, views, and performance metrics.
+            </p>
+        </div>
+    {% endif %}
+</div>

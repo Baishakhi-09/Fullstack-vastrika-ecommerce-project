@@ -1,0 +1,68 @@
+<div class="admin-card sticky-card">
+    <div class="card-header">
+        <h3>Publishing</h3>
+    </div>
+
+    <div class="card-body">
+        <div class="form-group">
+            
+            {{ adminform.form.status.label_tag }}
+
+            {{ adminform.form.status }}
+
+            {% for error in adminform.form.status.errors %}
+                <div class="field-error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="checkbox-group">
+            {{ adminform.form.is_featured }}
+
+            {{ adminform.form.is_featured.label_tag }}
+
+            {% for error in adminform.form.is_featured.errors %}
+                <div class="field-error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if adminform.form.show_in_menu %}
+            <div class="checkbox-group">
+                {{ adminform.form.show_in_menu }}
+
+                {{ adminform.form.show_in_menu.label_tag }}
+
+                {% for error in adminform.form.show_in_menu.errors %}
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            {{ adminform.form.sort_order.label_tag }}
+
+            {{ adminform.form.sort_order }}
+
+            {% if adminform.form.sort_order.errors %}
+                <div class="field-error">
+                    {{ adminform.form.sort_order.errors }}
+                </div>
+            {% endif %}
+
+            {% if adminform.form.sort_order.help_text %}
+                <small class="field-help">
+                    {{ adminform.form.sort_order.help_text }}
+                </small>
+            {% else %}
+                <small class="field-help">
+                    Lower values appear first.
+                </small>
+            {% endif %}
+        </div>
+    </div>
+</div>

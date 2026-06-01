@@ -8,7 +8,13 @@ from django.urls import reverse
 
 from vastrika_backend.admin_site import admin_site
 
-from .forms import ProductAdminForm, BrandAdminForm, ProductTagAdminForm
+from .forms import (
+    ProductAdminForm, 
+    BrandAdminForm, 
+    ProductTagAdminForm, 
+    ParentCategoryForm,
+    SubCategoryForm,
+)
 
 from .models import (
     Brand,
@@ -40,7 +46,6 @@ from apps.products.ai.seo_engine import (
 # =========================================================
 
 class RoleBasedAdminMixin:
-
     def _has_admin_access(self, request):
 
         return (
@@ -168,27 +173,51 @@ class ProductVariantInline(admin.TabularInline):
             return obj.available_stock
 
         return 0
+    
+class AuditAdminMixin:
 
+    def save_model(
+        self,
+        request,
+        obj,
+        form,
+        change
+    ):
+        if not obj.pk:
+            obj.created_by = request.user
+
+        obj.updated_by = request.user
+
+        super().save_model(
+            request,
+            obj,
+            form,
+            change
+        )
 
 # =========================================================
 # CATEGORY ADMINS
 # =========================================================
 
 class ParentCategoryAdmin(
+    AuditAdminMixin,
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
+    form = ParentCategoryForm
 
     list_display = (
         "name",
-        "is_active",
+        "status",
+        "is_featured",
+        "view_count",
         "sort_order",
         "created_at",
     )
 
     list_filter = (
-        "is_active",
-        "created_at",
+        "status",
+        "is_featured",
     )
 
     search_fields = (
@@ -204,11 +233,102 @@ class ParentCategoryAdmin(
         "slug": ("name",)
     }
 
+    change_form_template = (
+        "admin/products/parentcategory/parentcategory_form.html"
+    )
+
+    actions = [
+        "delete_selected_parentcategories"
+    ]
+
+    def get_actions(
+        self,
+        request
+    ):
+        actions = super().get_actions(request)
+
+        # Remove Django default delete action
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+
+        return actions
+
+    @admin.action(
+        description="Delete selected categories"
+    )
+    def delete_selected_parentcategories(
+        self,
+        request,
+        queryset
+    ):
+        total_deleted = queryset.count()
+
+        queryset.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} category(s) deleted successfully."
+        )
+
+    def changelist_view(
+        self,
+        request,
+        extra_context=None
+    ):
+        extra_context = extra_context or {}
+
+        extra_context["total_categories"] = (
+            ParentCategory.objects.count()
+        )
+
+        extra_context["published_categories"] = (
+            ParentCategory.objects.filter(
+                status="published"
+            ).count()
+        )
+
+        extra_context["featured_categories"] = (
+            ParentCategory.objects.filter(
+                is_featured=True
+            ).count()
+        )
+
+        extra_context["draft_categories"] = (
+            ParentCategory.objects.filter(
+                status="draft"
+            ).count()
+        )
+
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context
+        )
+
+        if hasattr(response, "context_data"):
+
+            action_form = response.context_data.get(
+                "action_form"
+            )
+
+            if action_form:
+
+                action_form.fields[
+                    "action"
+                ].widget.attrs.update({
+
+                    "id": "id_action"
+
+                })
+
+        return response
 
 class SubCategoryAdmin(
+    AuditAdminMixin,
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
+
+    form = SubCategoryForm
 
     list_display = (
         "name",
@@ -238,6 +358,10 @@ class SubCategoryAdmin(
     prepopulated_fields = {
         "slug": ("name",)
     }
+
+    change_form_template = (
+        "admin/products/subcategory/subcategory_form.html"
+    )
 
 
 class ChildCategoryAdmin(
@@ -292,6 +416,7 @@ class ChildCategoryAdmin(
 # =========================================================
 
 class BrandAdmin(
+    AuditAdminMixin,
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
@@ -372,6 +497,7 @@ class BrandAdmin(
 # =========================================================
 
 class ProductTagAdmin(
+    AuditAdminMixin,
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
@@ -380,6 +506,12 @@ class ProductTagAdmin(
     list_display = (
         "name",
         "slug",
+    )
+
+    list_filter = (
+        "status",
+        "visibility",
+        "is_featured",
     )
 
     search_fields = (
@@ -620,6 +752,7 @@ class ProductTagAdmin(
 # =========================================================
 
 class ProductAdmin(
+    AuditAdminMixin,
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
@@ -829,14 +962,10 @@ class ProductAdmin(
 
         ("Stock & Visibility", {
             "fields": (
-                "barcode",
-                "stock_quantity",
-                "low_stock_threshold",
-                "stock_badge",
-                "is_active",
-                "is_featured",
-                "is_new_arrival",
-                "is_best_seller",
+            "barcode",
+            "low_stock_threshold",
+            "allow_backorders",
+            "stock_badge",
             )
         }),
 
@@ -1111,9 +1240,11 @@ class ProductImageAdmin(
         "id",
         "product",
         "image_preview",
+        "image",
+        "image_type",
+        "alt_text",
         "is_primary",
         "sort_order",
-        "created_at",
     )
 
     list_filter = (

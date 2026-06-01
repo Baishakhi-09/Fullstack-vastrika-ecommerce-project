@@ -1,0 +1,198 @@
+<div class="admin-card">
+    <div class="card-header">
+        <h2>SEO Metadata</h2>
+
+        <p>
+            Optimize how this category appears in search engines and social previews.
+        </p>
+    </div>
+
+    <div class="form-grid">
+
+        <!-- Meta Title -->
+        <div class="form-group">
+            {{ adminform.form.meta_title.label_tag }}
+
+            {{ adminform.form.meta_title }}
+
+            {% if adminform.form.meta_title.help_text %}
+                <small class="field-help">
+                    {{ adminform.form.meta_title.help_text }}
+                </small>
+            {% endif %}
+
+            {% for error in adminform.form.meta_title.errors %}
+                <div class="field-error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Meta Description -->
+        <div class="form-group full-width">
+            {{ adminform.form.meta_description.label_tag }}
+
+            {{ adminform.form.meta_description }}
+
+            {% if adminform.form.meta_description.help_text %}
+                <small class="field-help">
+                    {{ adminform.form.meta_description.help_text }}
+                </small>
+            {% endif %}
+
+            {% for error in adminform.form.meta_description.errors %}
+                <div class="field-error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- SEO Preview -->
+        <div class="seo-preview">
+            <div class="seo-preview-label">
+                Search Preview
+            </div>
+
+            <div
+                id="seo-title-preview"
+                class="seo-title-preview">
+
+                {{ adminform.form.meta_title.value|default:"Category Title Preview" }}
+            </div>
+
+            <!-- <div class="seo-url">
+                {{ request.scheme }}://{{ request.get_host }}/category/<span id="slug-preview">{{ adminform.form.slug.value|default:"category-slug" }}</span>
+            </div> -->
+
+            <div
+                id="seo-description-preview"
+                class="seo-description-preview">
+
+                {{ adminform.form.meta_description.value|default:"Your category meta description will appear here and help users understand the content before visiting your page." }}
+            </div>
+        </div>
+
+        <!-- SEO Insights -->
+        <div class="seo-insights">
+            <div class="seo-stat">
+                <span class="seo-stat-label">
+                    Title Length
+                </span>
+
+                <span
+                    id="title-count"
+                    class="seo-stat-value">
+
+                    0
+                </span>
+            </div>
+
+            <div class="seo-stat">
+                <span class="seo-stat-label">
+                    Description Length
+                </span>
+
+                <span
+                    id="description-count"
+                    class="seo-stat-value">
+
+                    0
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        const titleField =
+            document.querySelector(
+                "#id_meta_title"
+            );
+
+        const descriptionField =
+            document.querySelector(
+                "#id_meta_description"
+            );
+
+        const slugField =
+            document.querySelector(
+                "#id_slug"
+            );
+
+        const titlePreview =
+            document.querySelector(
+                "#seo-title-preview"
+            );
+
+        const descriptionPreview =
+            document.querySelector(
+                "#seo-description-preview"
+            );
+
+        const slugPreview =
+            document.querySelector(
+                "#slug-preview"
+            );
+
+        const titleCount =
+            document.querySelector(
+                "#title-count"
+            );
+
+        const descriptionCount =
+            document.querySelector(
+                "#description-count"
+            );
+
+        function updatePreview() {
+            if (titleField && titlePreview) {
+                titlePreview.textContent =
+                    titleField.value ||
+                    "Category Title Preview";
+            }
+
+            if (titleField && titleCount) {
+                titleCount.textContent =
+                    `${titleField.value.length} / 60`;
+            }
+
+            if (descriptionField && descriptionPreview) {
+                descriptionPreview.textContent =
+                    descriptionField.value ||
+                    "Your category meta description will appear here and help users understand the content before visiting your page.";
+            }
+
+            if ( descriptionField && descriptionCount
+            ) {
+                descriptionCount.textContent =
+                    `${descriptionField.value.length} / 160`;
+            }
+
+            if (slugField && slugPreview) {
+                slugPreview.textContent =
+                    slugField.value ||
+                    "category-slug";
+            }
+        }
+
+        updatePreview();
+
+        [
+            titleField,
+            descriptionField,
+            slugField
+        ].forEach(field => {
+            if (!field) return;
+
+            field.addEventListener(
+                "input",
+                updatePreview
+            );
+        });
+    }
+);
+</script>

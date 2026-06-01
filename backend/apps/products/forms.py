@@ -1,6 +1,12 @@
 from django import forms
 
-from .models import Product, Brand, ProductTag
+from .models import(
+    Product, 
+    Brand, 
+    ProductTag,
+    ParentCategory,
+    SubCategory,
+)
 
 
 # Product
@@ -82,8 +88,8 @@ class ProductAdminForm(forms.ModelForm):
 
             # Decimal fields
             if field_name in [
-                "price",
-                "compare_price",
+                "mrp",
+                "selling_price",
             ]:
                 field.widget.attrs[
                     "inputmode"
@@ -92,8 +98,8 @@ class ProductAdminForm(forms.ModelForm):
             # Disable autocomplete
             if field_name in [
                 "slug",
-                "price",
-                "compare_price",
+                "mrp",
+                "selling_price",
             ]:
                 field.widget.attrs[
                     "autocomplete"
@@ -121,6 +127,23 @@ class ProductAdminForm(forms.ModelForm):
             self.fields["slug"].widget.attrs.update({
                 "data-slug-field": "true"
             })
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        mrp = cleaned_data.get("mrp")
+        selling_price = cleaned_data.get("selling_price")
+
+        if (
+            mrp
+            and selling_price
+            and selling_price > mrp
+        ):
+            raise forms.ValidationError(
+                "Selling price cannot exceed MRP."
+            )
+
+        return cleaned_data
 
 # Brand
 class BrandAdminForm(forms.ModelForm):
@@ -235,3 +258,222 @@ class ProductTagAdminForm(forms.ModelForm):
                 }
             ),
         }
+
+    def clean_name(self):
+        return self.cleaned_data[
+            "name"
+        ].strip()
+
+# PARENT CATEGORY
+class ParentCategoryForm(forms.ModelForm):
+    brands = forms.ModelMultipleChoiceField(
+        queryset=Brand.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    tags = forms.ModelMultipleChoiceField(
+        queryset=ProductTag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    class Meta:
+        model = ParentCategory
+        fields = "__all__"
+
+        widgets = {
+
+            "name": forms.TextInput(
+                attrs={
+                    "class": "saas-input",
+                    "placeholder": "Enter category name",
+                    "autocomplete": "off",
+                }
+            ),
+
+            "slug": forms.TextInput(
+                attrs={
+                    "class": "saas-input",
+                    "autocomplete": "off",
+                }
+            ),
+
+            "short_description": forms.TextInput(
+                attrs={
+                    "class": "saas-input",
+                    "maxlength": 255,
+                }
+            ),
+
+            "description": forms.Textarea(
+                attrs={
+                    "class": "saas-textarea",
+                    "rows": 5,
+                }
+            ),
+
+            "brands": forms.SelectMultiple(),
+            "tags": forms.SelectMultiple(),
+
+            "meta_title": forms.TextInput(
+                attrs={
+                    "class": "saas-input",
+                    "maxlength": 60,
+                    "data-counter": "true",
+                }
+            ),
+
+            "meta_description": forms.Textarea(
+                attrs={
+                    "class": "saas-textarea",
+                    "rows": 4,
+                    "maxlength": 160,
+                    "data-counter": "true",
+                }
+            ),
+
+            "seo_keywords": forms.TextInput(
+                attrs={
+                    "class": "saas-input",
+                }
+            ),
+
+            "canonical_url": forms.URLInput(
+                attrs={
+                    "class": "saas-input",
+                }
+            ),
+
+            "sort_order": forms.NumberInput(
+                attrs={
+                    "class": "saas-input",
+                    "min": 0,
+                }
+            ),
+
+            "image": forms.ClearableFileInput(
+                attrs={
+                    "class": "saas-file-input",
+                }
+            ),
+
+            "banner": forms.ClearableFileInput(
+                attrs={
+                    "class": "saas-file-input",
+                }
+            ),
+
+            "icon": forms.ClearableFileInput(
+                attrs={
+                    "class": "saas-file-input",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field_name in ["brands", "tags"]:
+            if field_name in self.fields:
+                widget = self.fields[field_name].widget
+
+                if hasattr(widget, "can_add_related"):
+                    widget.can_add_related = False
+
+                if hasattr(widget, "can_change_related"):
+                    widget.can_change_related = False
+
+                if hasattr(widget, "can_delete_related"):
+                    widget.can_delete_related = False
+
+                if hasattr(widget, "can_view_related"):
+                    widget.can_view_related = False
+
+    def clean_name(self):
+        return self.cleaned_data[
+            "name"
+        ].strip()
+    
+class SubCategoryForm(forms.ModelForm):
+    class Meta:
+        model = SubCategory
+
+        fields = "__all__"
+
+    def __init__(
+        self,
+        *args,
+        **kwargs
+    ):
+        super().__init__(
+            *args,
+            **kwargs
+        )
+
+        for field_name, field in self.fields.items():
+            existing_class = (
+                field.widget.attrs.get(
+                    "class",
+                    ""
+                )
+            )
+
+            field.widget.attrs.update({
+                "autocomplete": "off",
+
+                "class": (
+                    f"{existing_class} form-control"
+                ).strip()
+            })
+
+        if "name" in self.fields:
+            self.fields["name"].widget.attrs.update({
+                "placeholder":
+                    "Enter sub category name"
+            })
+
+        if "slug" in self.fields:
+            self.fields["slug"].widget.attrs.update({
+                "placeholder":
+                    "category-slug"
+            })
+
+        if "description" in self.fields:
+            self.fields["description"].widget.attrs.update({
+                "placeholder":
+                    "Write a short description about this sub category",
+
+                "rows": 5
+            })
+
+        if "sort_order" in self.fields:
+            self.fields["sort_order"].widget.attrs.update({
+                "placeholder":
+                    "0"
+            })
+
+        if "parent_category" in self.fields:
+            self.fields[
+                "parent_category"
+            ].label = "Parent Category"
+
+        if "name" in self.fields:
+            self.fields[
+                "name"
+            ].label = "Category Name"
+
+        if "slug" in self.fields:
+            self.fields[
+                "slug"
+            ].label = "URL Slug"
+
+        if "description" in self.fields:
+            self.fields[
+                "description"
+            ].label = "Description"
+
+        if "sort_order" in self.fields:
+            self.fields[
+                "sort_order"
+            ].label = "Sort Order"

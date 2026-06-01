@@ -1,0 +1,1094 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet"
+      href="{% static 'admin/css/custom.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<form method="post"
+      enctype="multipart/form-data"
+      novalidate>
+
+    {% csrf_token %}
+
+    <div class="subcategory-page">
+
+        <!-- Header -->
+        <div class="subcategory-header">
+
+            <div class="header-left">
+
+                <h1>
+                    {% if original %}
+                        Edit Sub Category
+                    {% else %}
+                        Create Sub Category
+                    {% endif %}
+                </h1>
+
+                <div class="subcategory-breadcrumbs">
+
+                    <a href="{% url 'admin:index' %}">
+                        Dashboard
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="{% url 'admin:products_subcategory_changelist' %}">
+                        Sub Categories
+                    </a>
+
+                    <span>/</span>
+
+                    <strong>
+                        {% if original %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
+                    </strong>
+
+                </div>
+
+                <p>
+                    Organize and manage product category structures.
+                </p>
+
+            </div>
+
+            <div class="header-right">
+
+                <button type="submit"
+                        name="_addanother"
+                        class="btn-secondary">
+
+                    Save & Add Another
+
+                </button>
+
+                <button type="submit"
+                        name="_save"
+                        class="btn-primary">
+
+                    Save Category
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="subcategory-layout">
+
+            <!-- Main Content -->
+            <div class="subcategory-main">
+                
+                <!-- category information -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-header-content">
+                            <h2> Category Details </h2>
+
+                            <p>
+                                Define the basic information and hierarchy for this sub category.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="form-grid">
+
+                            <!-- Parent Category -->
+                            <div class="form-group full-width">
+                                <label
+                                    class="form-label"
+                                    for="{{ adminform.form.parent_category.id_for_label }}">
+
+                                    Parent Category
+
+                                    <span class="required">*</span>
+                                </label>
+
+                                <div class="field-wrapper">
+                                    {{ adminform.form.parent_category }}
+                                </div>
+                            </div>
+
+                            <!-- Category Name -->
+                            <div class="form-group">
+                                <label
+                                    class="form-label"
+                                    for="{{ adminform.form.name.id_for_label }}">
+
+                                    Category Name
+
+                                    <span class="required">*</span>
+                                </label>
+
+                                {{ adminform.form.name }}
+
+                                {% if adminform.form.name.help_text %}
+                                    <div class="field-help">
+                                        {{ adminform.form.name.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% for error in adminform.form.name.errors %}
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Slug -->
+                            <div class="form-group">
+                                <label
+                                    class="form-label"
+                                    for="{{ adminform.form.slug.id_for_label }}">
+
+                                    URL Slug
+                                </label>
+
+                                {{ adminform.form.slug }}
+
+                                {% if adminform.form.slug.help_text %}
+                                    <div class="field-help">
+                                        {{ adminform.form.slug.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% for error in adminform.form.slug.errors %}
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group full-width">
+                                <div class="field-header">
+                                    {{ adminform.form.description.label_tag }}
+
+                                    <span class="character-counter">
+                                        <span id="description-count">
+                                            0
+                                        </span>
+
+                                        / 500
+                                    </span>
+                                </div>
+
+                                {{ adminform.form.description }}
+
+                                {% if adminform.form.description.help_text %}
+                                    <div class="field-help">
+                                        {{ adminform.form.description.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% for error in adminform.form.description.errors %}
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Category Summary -->
+                        <div class="category-info-footer">
+                            <div class="info-item">
+                                <strong>
+                                    Category Type
+                                </strong>
+
+                                <span>
+                                    Sub Category
+                                </span>
+                            </div>
+
+                            <div class="info-item">
+                                <strong>
+                                    Visibility
+                                </strong>
+
+                                <span>
+                                    Controlled from Publishing Settings
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- category media -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div>
+                            <h2> Media Management </h2>
+
+                            <p>
+                                Upload and manage category images.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="upload-zone" id="upload-zone">
+                            <div class="upload-content">
+                                <div class="upload-icon">
+                                    <svg
+                                        width="60"
+                                        height="60"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+
+                                        <polyline points="17 8 12 3 7 8"/>
+
+                                        <line x1="12" y1="3" x2="12" y2="15"/>
+                                    </svg>
+                                </div>
+
+                                <h4> Upload Category Image </h4>
+
+                                <p>
+                                    Drag & drop an image here or click below to browse files.
+                                </p>
+
+                                {{ adminform.form.image }}
+
+                                <label
+                                    for="id_image"
+                                    class="upload-btn">
+
+                                    Choose Image
+                                </label>
+
+                                <div class="upload-guidelines">
+
+                                    <span>
+                                        Recommended: 1200 × 800 px
+                                    </span>
+
+                                    <span>
+                                        PNG • JPG • WEBP • Max 5MB
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        {% for error in adminform.form.image.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
+                        <div class="image-preview-wrapper">
+                            {% if original and original.image %}
+
+                                <div class="image-preview-card">
+                                    <span class="preview-label">
+                                        Selected Image
+                                    </span>
+
+                                    <img
+                                        id="image-preview"
+                                        src="{{ original.image.url }}"
+                                        alt="{{ original.name }}">
+
+                                    <div class="preview-actions">
+                                        <label
+                                            for="id_image"
+                                            class="btn-secondary">
+
+                                            Replace Image
+                                        </label>
+                                    </div>
+                                </div>
+
+                            {% else %}
+
+                                <div
+                                    class="image-preview-card empty"
+                                    id="preview-placeholder">
+
+                                    <img
+                                        id="image-preview"
+                                        style="display:none;"
+                                        alt="Preview">
+
+                                    <div class="empty-preview">
+                                        <span class="material-symbols-outlined">
+                                            image
+                                        </span>
+
+                                        <p>
+                                            Image preview will appear here
+                                        </p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- seo metadata -->
+                 <div class="admin-card">
+                    <div class="card-header">
+                        <h2> SEO Settings </h2>
+
+                        <p>
+                            Optimize how this category appears in search engines.
+                        </p>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="form-grid">
+
+                            <!-- Meta Title -->
+                            <div class="form-group full-width">
+                                <div class="field-header">
+                                    {{ adminform.form.meta_title.label_tag }}
+
+                                    <span class="character-counter">
+                                        <span id="meta-title-count">
+                                            0
+                                        </span>
+
+                                        / 60
+                                    </span>
+                                </div>
+
+                                {{ adminform.form.meta_title }}
+
+                                {% for error in adminform.form.meta_title.errors %}
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Meta Description -->
+                            <div class="form-group full-width">
+                                <div class="field-header">
+                                    {{ adminform.form.meta_description.label_tag }}
+
+                                    <span class="character-counter">
+                                        <span id="meta-description-count">
+                                            0
+                                        </span>
+
+                                        / 160
+                                    </span>
+                                </div>
+
+                                {{ adminform.form.meta_description }}
+                                {% for error in adminform.form.meta_description.errors %}
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- SEO Preview -->
+                        <div class="seo-preview">
+                            <div class="seo-preview-label">
+                                Search Preview
+                            </div>
+
+                            <div
+                                id="seo-title-preview"
+                                class="seo-title">
+
+                                Category Title Preview
+                            </div>
+
+                            <div
+                                id="seo-description-preview"
+                                class="seo-description">
+
+                                Meta description preview appears here.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="editor-sidebar">
+                <div class="subcategory-sidebar">
+
+                    <!-- publishing card -->
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <h3> Publishing </h3>
+
+                                <p>
+                                    Control category visibility, ordering, and publication details.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="sidebar-fields">
+
+                                <!-- Active Status -->
+                                <div class="form-group">
+                                    <label class="status-toggle">
+                                        {{ adminform.form.is_active }}
+
+                                        <span>
+                                            Active Category
+                                        </span>
+                                    </label>
+
+                                    <div class="status-toggle">
+                                        {{ adminform.form.is_active }}
+
+                                        <span>
+                                            {% if original and original.is_active %}
+                                                Active
+                                            {% else %}
+                                                Inactive
+                                            {% endif %}
+                                        </span>
+                                    </div>
+
+                                    {% for error in adminform.form.is_active.errors %}
+                                        <div class="field-error">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Sort Order -->
+                                <div class="form-group">
+                                    {{ adminform.form.sort_order.label_tag }}
+
+                                    {{ adminform.form.sort_order }}
+
+                                    <small class="field-help">
+                                        Lower numbers appear first in category listings.
+                                    </small>
+
+                                    {% for error in adminform.form.sort_order.errors %}
+                                        <div class="field-error">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="sidebar-divider"></div>
+
+                            <!-- Publishing Information -->
+                            <div class="publish-information">
+                                <h4> Publication Details </h4>
+
+                                <div class="publish-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-label">
+                                            Created
+                                        </span>
+
+                                        <span class="meta-value">
+                                            {% if original %}
+                                                {{ original.created_at|date:"M d, Y" }}
+                                            {% else %}
+                                                Not yet created
+                                            {% endif %}
+                                        </span>
+                                    </div>
+
+                                    <div class="meta-item">
+                                        <span class="meta-label">
+                                            Last Updated
+                                        </span>
+
+                                        <span class="meta-value">
+                                            {% if original %}
+                                                {{ original.updated_at|date:"M d, Y H:i" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </span>
+                                    </div>
+
+                                    <div class="meta-item">
+                                        <span class="meta-label">
+                                            Visibility
+                                        </span>
+
+                                        <span class="meta-value">
+                                            {% if original and original.is_active %}
+                                                Public
+                                            {% else %}
+                                                Hidden
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Summary -->
+                            <div class="publish-summary">
+                                <div class="summary-badge">
+                                    {% if original and original.is_active %}
+                                        Active Category
+                                    {% else %}
+                                        Draft Category
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- performance card -->
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <h3>
+                                    Performance Insights
+                                </h3>
+
+                                <p>
+                                    Monitor category activity, visibility, and engagement.
+                                </p>
+
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            {% if original %}
+
+                                <div class="stats-grid">
+
+                                    <!-- Products -->
+                                    <div class="stat-card">
+                                        <div class="stat-label">
+                                            Products
+                                        </div>
+
+                                        <div class="stat-value">
+                                            {% if product_count %}
+                                                {{ product_count }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="stat-meta">
+                                            Total products assigned
+                                        </div>
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="stat-card">
+                                        <div class="stat-label">
+                                            Status
+                                        </div>
+
+                                        <div class="stat-value">
+                                            {% if original.is_active %}
+                                                Active
+                                            {% else %}
+                                                Inactive
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="stat-meta">
+                                            Current visibility
+                                        </div>
+                                    </div>
+
+                                    <!-- Sort Order -->
+                                    <div class="stat-card">
+                                        <div class="stat-label">
+                                            Sort Order
+                                        </div>
+
+                                        <div class="stat-value">
+                                            {{ original.sort_order }}
+                                        </div>
+
+                                        <div class="stat-meta">
+                                            Display priority
+                                        </div>
+                                    </div>
+
+                                    <!-- Created -->
+                                    <div class="stat-card">
+                                        <div class="stat-label">
+                                            Created
+                                        </div>
+
+                                        <div class="stat-value">
+                                            {{ original.created_at|date:"M d" }}
+                                        </div>
+
+                                        <div class="stat-meta">
+                                            {{ original.created_at|date:"Y" }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="performance-summary">
+                                    <div class="summary-row">
+                                        <span>
+                                            Last Updated
+                                        </span>
+
+                                        <strong>
+                                            {{ original.updated_at|date:"M d, Y H:i" }}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                            {% else %}
+                                <div class="empty-performance">
+                                    <div class="empty-icon">
+                                        <svg
+                                            width="48"
+                                            height="48"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2">
+
+                                            <path d="M3 3v18h18"/>
+
+                                            <path d="M7 14l4-4 3 3 5-7"/>
+                                        </svg>
+                                    </div>
+
+                                    <h4>
+                                        Performance Data Unavailable
+                                    </h4>
+
+                                    <p>
+                                        Save the category first to view performance insights and activity metrics.
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- activity card -->
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <h3>
+                                    Quick Actions
+                                </h3>
+
+                                <p>
+                                    Save, update, and manage this category.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="quick-actions">
+
+                                <!-- Save & Continue -->
+                                <button
+                                    type="submit"
+                                    name="_continue"
+                                    class="btn-secondary">
+
+                                    <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+
+                                        <polyline points="17 21 17 13 7 13 7 21"/>
+
+                                        <polyline points="7 3 7 8 15 8"/>
+                                    </svg>
+
+                                    Save & Continue
+                                </button>
+
+                                <!-- Save -->
+                                <button
+                                    type="submit"
+                                    name="_save"
+                                    class="btn-primary">
+
+                                    <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+
+                                        <polyline points="17 21 17 13 7 13 7 21"/>
+                                    </svg>
+
+                                    {% if original %}
+                                        Update Category
+                                    {% else %}
+                                        Create Category
+                                    {% endif %}
+                                </button>
+                            </div>
+
+                            {% if original %}
+
+                            <div class="action-divider"></div>
+
+                            <div class="category-information">
+                                <h4>
+                                    Category Information
+                                </h4>
+
+                                <div class="info-list">
+                                    <div class="info-row">
+                                        <span>
+                                            Category ID
+                                        </span>
+
+                                        <strong>
+                                            #{{ original.pk }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="info-row">
+                                        <span>
+                                            Created
+                                        </span>
+
+                                        <strong>
+                                            {{ original.created_at|date:"M d, Y" }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="info-row">
+                                        <span>
+                                            Updated
+                                        </span>
+
+                                        <strong>
+                                            {{ original.updated_at|date:"M d, Y" }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="info-row">
+                                        <span>
+                                            Status
+                                        </span>
+
+                                        <strong>
+                                            {% if original.is_active %}
+                                                Active
+                                            {% else %}
+                                                Inactive
+                                            {% endif %}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% else %}
+
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <svg
+                                        width="48"
+                                        height="48"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="10">
+                                        </circle>
+
+                                        <line
+                                            x1="12"
+                                            y1="8"
+                                            x2="12"
+                                            y2="12">
+                                        </line>
+
+                                        <line
+                                            x1="12"
+                                            y1="16"
+                                            x2="12.01"
+                                            y2="16">
+                                        </line>
+                                    </svg>
+                                </div>
+
+                                <p>
+                                    Save the category to view activity information.
+                                </p>
+                            </div>
+
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            const descriptionField =
+                document.querySelector(
+                    "#id_description"
+                );
+
+            const descriptionCount =
+                document.querySelector(
+                    "#description-count"
+                );
+
+            if (
+                !descriptionField ||
+                !descriptionCount
+            ) {
+                return;
+            }
+
+            function updateCount() {
+                descriptionCount.textContent =
+                    descriptionField.value.length;
+            }
+
+            updateCount();
+
+            descriptionField.addEventListener(
+                "input",
+                updateCount
+            );
+        }
+    );
+
+</script>
+
+<script>
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            const imageInput =
+                document.getElementById(
+                    "id_image"
+                );
+
+            const preview =
+                document.getElementById(
+                    "image-preview"
+                );
+
+            const placeholder =
+                document.getElementById(
+                    "preview-placeholder"
+                );
+
+            if (!imageInput) {
+                return;
+            }
+
+            imageInput.addEventListener(
+                "change",
+                function (event) {
+                    const file =
+                        event.target.files[0];
+
+                    if (!file) {
+                        return;
+                    }
+
+                    const reader =
+                        new FileReader();
+
+                    reader.onload =
+                        function (e) {
+                            if (preview) {
+                                preview.src =
+                                    e.target.result;
+
+                                preview.style.display =
+                                    "block";
+                            }
+
+                            if (placeholder) {
+                                placeholder.classList.remove(
+                                    "empty"
+                                );
+
+                                const emptyBlock =
+                                    placeholder.querySelector(
+                                        ".empty-preview"
+                                    );
+
+                                if (emptyBlock) {
+                                    emptyBlock.style.display =
+                                        "none";
+                                }
+                            }
+                        };
+
+                    reader.readAsDataURL(
+                        file
+                    );
+                }
+            );
+        }
+    );
+</script>
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const titleField =
+            document.querySelector(
+                "#id_meta_title"
+            );
+
+        const descriptionField =
+            document.querySelector(
+                "#id_meta_description"
+            );
+
+        const slugField =
+            document.querySelector(
+                "#id_slug"
+            );
+
+        const titlePreview =
+            document.querySelector(
+                "#seo-title-preview"
+            );
+
+        const descriptionPreview =
+            document.querySelector(
+                "#seo-description-preview"
+            );
+
+        const slugPreview =
+            document.querySelector(
+                "#seo-slug-preview"
+            );
+
+        const titleCount =
+            document.querySelector(
+                "#meta-title-count"
+            );
+
+        const descriptionCount =
+            document.querySelector(
+                "#meta-description-count"
+            );
+
+        function updatePreview() {
+
+            if (
+                titleField &&
+                titlePreview
+            ) {
+
+                titlePreview.textContent =
+                    titleField.value ||
+                    "Category Title Preview";
+
+            }
+
+            if (
+                titleField &&
+                titleCount
+            ) {
+
+                titleCount.textContent =
+                    titleField.value.length;
+
+            }
+
+            if (
+                descriptionField &&
+                descriptionPreview
+            ) {
+
+                descriptionPreview.textContent =
+                    descriptionField.value ||
+                    "Meta description preview appears here.";
+
+            }
+
+            if (
+                descriptionField &&
+                descriptionCount
+            ) {
+
+                descriptionCount.textContent =
+                    descriptionField.value.length;
+
+            }
+
+            if (
+                slugField &&
+                slugPreview
+            ) {
+
+                slugPreview.textContent =
+                    slugField.value ||
+                    "category-slug";
+
+            }
+
+        }
+
+        updatePreview();
+
+        [
+            titleField,
+            descriptionField,
+            slugField
+        ].forEach(field => {
+
+            if (!field) {
+                return;
+            }
+
+            field.addEventListener(
+                "input",
+                updatePreview
+            );
+
+        });
+
+    }
+);
+
+</script>
+{% endblock %}

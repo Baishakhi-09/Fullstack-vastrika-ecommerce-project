@@ -1,0 +1,119 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet"
+      href="{% static 'admin/css/custom.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<form method="post"
+      enctype="multipart/form-data"
+      novalidate>
+
+    {% csrf_token %}
+
+    {% if adminform.form.errors %}
+        <div>
+            {{ adminform.form.errors }}
+        </div>
+    {% endif %}
+
+    <div class="category-page">
+
+        <!-- Header -->
+        <div class="category-header">
+            <div class="category-header-left">
+                <h1>
+                    {% if original %}
+                        {{ original.name }}
+                    {% else %}
+                        Create Parent Category
+                    {% endif %}
+                </h1>
+
+                <div class="parentcategory-breadcrumbs">
+                    <a href="{% url 'admin:index' %}">
+                        Dashboard
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="{% url 'admin:products_parentcategory_changelist' %}">
+                        Parent Category
+                    </a>
+
+                    <span>/</span>
+
+                    <strong>
+                        {% if original %}
+                            Edit
+                        {% else %}
+                            Add Parent Category
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <p>
+                    Organize products into high-level category groups.
+                </p>
+            </div>
+
+            <div class="category-header-right">
+                <div class="header-bottom-actions">
+                    <button type="submit"
+                        name="_addanother"
+                        class="btn-secondary js-submit-btn">
+
+                        Save & Add Another
+                    </button>
+
+                    <button type="submit"
+                        name="_save"
+                        class="btn-primary js-submit-btn">
+
+                        Save Category
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-layout">
+            <div class="category-main">
+                {% include "admin/products/parentcategory/components/category_information.html" %}
+
+                {% include "admin/products/parentcategory/components/category_media.html" %}
+
+                {% include "admin/products/parentcategory/components/category_relationships.html" %}
+
+                {% include "admin/products/parentcategory/components/seo_metadata.html" %}
+            </div>
+
+            <div class="editor-sidebar">
+                <div class="category-sidebar">
+                    {% include "admin/products/parentcategory/components/publishing_card.html" %}
+
+                    {% include "admin/products/parentcategory/components/insights_card.html" %}
+
+                    {% include "admin/products/parentcategory/components/activity_card.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ adminform.form.management_form }}
+
+    {% for hidden in adminform.form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+</form>
+
+{% endblock %}

@@ -1,0 +1,148 @@
+<div class="admin-card sticky-card">
+    <div class="card-header">
+        <h3>Activity Timeline</h3>
+
+        <p>
+            Track recent actions and lifecycle events for this category.
+        </p>
+    </div>
+
+    {% if original %}
+
+        <div class="timeline-set">
+            <ul class="timeline">
+
+                <!-- Created -->
+                <li class="timeline-item">
+                    <div class="timeline-icon"></div>
+
+                    <div class="timeline-content">
+                        <strong>
+                            Category Created
+                        </strong>
+
+                        <small>
+                            {{ original.created_at|date:"M d, Y, g:i A" }}
+                        </small>
+
+                        {% if original.created_by %}
+                            <span class="timeline-meta">
+                                by {{ original.created_by }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </li>
+
+                <!-- Updated -->
+                <li class="timeline-item">
+                    <div class="timeline-icon"></div>
+
+                    <div class="timeline-content">
+                        <strong>
+                            Last Updated
+                        </strong>
+
+                        <small>
+                            {{ original.updated_at|timesince }} ago
+                        </small>
+
+                        {% if original.updated_by %}
+                            <span class="timeline-meta">
+                                by {{ original.updated_by }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </li>
+
+                <!-- Status -->
+                <li class="timeline-item">
+                    <div class="timeline-icon"></div>
+
+                    <div class="timeline-content">
+                        <strong>
+                            Current Status
+                        </strong>
+
+                        <small>
+                            {% if original.status %}
+                                {{ original.get_status_display }}
+                            {% else %}
+                                Draft
+                            {% endif %}
+                        </small>
+                    </div>
+                </li>
+
+                <!-- Featured -->
+                {% if original.is_featured %}
+
+                    <li class="timeline-item">
+                        <div class="timeline-icon"></div>
+
+                        <div class="timeline-content">
+                            <strong>
+                                Featured Category
+                            </strong>
+
+                            <small>
+                                This category is highlighted across the storefront.
+                            </small>
+                        </div>
+                    </li>
+
+                {% endif %}
+
+                <!-- Navigation Menu -->
+                {% if original.show_in_menu %}
+
+                    <li class="timeline-item">
+                        <div class="timeline-icon"></div>
+
+                        <div class="timeline-content">
+                            <strong>
+                                Added To Navigation
+                            </strong>
+
+                            <small>
+                                Visible in the storefront navigation menu.
+                            </small>
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8">
+
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="10">
+                    </circle>
+
+                    <polyline
+                        points="12 6 12 12 16 14">
+                    </polyline>
+                </svg>
+            </div>
+
+            <h4> No Activity Yet </h4>
+
+            <p>
+                Save this category to start tracking
+                creation history, updates, and publishing events.
+            </p>
+        </div>
+    {% endif %}
+</div>

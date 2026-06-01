@@ -1017,6 +1017,8 @@ function initDeleteModal() {
 
                 "delete_selected_product_tags",
 
+                "delete_selected_parentcategories",
+
                 "delete_selected"
             ];
 

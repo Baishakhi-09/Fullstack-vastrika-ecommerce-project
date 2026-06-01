@@ -1,0 +1,70 @@
+<div class="admin-card">
+
+    <div class="card-header">
+        <h2>Category Information</h2>
+
+        <p>
+            Basic information about this category.
+        </p>
+    </div>
+
+    <div class="form-grid">
+
+        <!-- Category Name -->
+        <div class="form-group">
+            {{ adminform.form.name.label_tag }}
+
+            {{ adminform.form.name }}
+
+            {% if adminform.form.name.help_text %}
+                <small class="field-help">
+                    {{ adminform.form.name.help_text }}
+                </small>
+            {% endif %}
+
+            {% if adminform.form.name.errors %}
+                <div class="field-error">
+                    {{ adminform.form.name.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Slug -->
+        <div class="form-group">
+            {{ adminform.form.slug.label_tag }}
+
+            {{ adminform.form.slug }}
+
+            {% if adminform.form.slug.help_text %}
+                <small class="field-help">
+                    {{ adminform.form.slug.help_text }}
+                </small>
+            {% endif %}
+
+            {% if adminform.form.slug.errors %}
+                <div class="field-error">
+                    {{ adminform.form.slug.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Description -->
+        <div class="form-group full-width">
+            {{ adminform.form.description.label_tag }}
+
+            {{ adminform.form.description }}
+
+            {% if adminform.form.description.help_text %}
+                <small class="field-help">
+                    {{ adminform.form.description.help_text }}
+                </small>
+            {% endif %}
+
+            {% if adminform.form.description.errors %}
+                <div class="field-error">
+                    {{ adminform.form.description.errors }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

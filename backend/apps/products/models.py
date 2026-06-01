@@ -11,9 +11,48 @@ from django.utils.text import slugify
 
 
 # -------------------- ABSTRACT BASE MODEL -------------------- #
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            is_deleted=False
+        )
+    
 class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="%(class)s_created"
+    )
+
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="%(class)s_updated"
+    )
+
+    is_deleted = models.BooleanField(
+        default=False
+    )
+
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    objects = ActiveManager()
+    all_objects = models.Manager()
 
     class Meta:
         abstract = True
@@ -21,11 +60,105 @@ class TimeStampedModel(models.Model):
 
 # -------------------- CATEGORY -------------------- #
 class ParentCategory(TimeStampedModel):
-    name = models.CharField(max_length=120, unique=True)
-    slug = models.SlugField(max_length=140, unique=True, blank=True)
-    image = models.ImageField(upload_to="categories/parent/", blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    sort_order = models.PositiveIntegerField(default=0)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    STATUS_CHOICES = (
+        ("draft", "Draft"),
+        ("published", "Published"),
+        ("archived", "Archived"),
+    )
+
+    name = models.CharField(
+        max_length=120
+    )
+
+    slug = models.SlugField(
+        unique=True
+    )
+
+    short_description = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    description = models.TextField(
+        blank=True
+    )
+
+    icon = models.ImageField(
+        upload_to="categories/icons/",
+        blank=True,
+        null=True
+    )
+
+    image = models.ImageField(
+        upload_to="categories/images/", 
+        blank=True, 
+        null=True
+    )
+
+    banner = models.ImageField(
+        upload_to="categories/banners/",
+        blank=True,
+        null=True
+    )
+
+    brands = models.ManyToManyField(
+        "Brand",
+        blank=True,
+        related_name="parent_categories"
+    )
+
+    tags = models.ManyToManyField(
+        "ProductTag",
+        blank=True,
+        related_name="parent_categories"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="draft"
+    )
+
+    is_featured = models.BooleanField(
+        default=False
+    )
+
+    show_in_menu = models.BooleanField(
+        default=True
+    )
+
+    sort_order = models.PositiveIntegerField(
+        default=0
+    )
+
+    view_count = models.PositiveIntegerField(
+        default=0,
+        editable=False
+    )
+
+    meta_title = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    meta_description = models.TextField(
+        blank=True
+    )
+
+    seo_keywords = models.CharField(
+        max_length=500,
+        blank=True
+    )
+
+    canonical_url = models.URLField(
+        blank=True
+    )
 
     class Meta:
         db_table = "products_parent_category"
@@ -33,8 +166,9 @@ class ParentCategory(TimeStampedModel):
         verbose_name_plural = "Parent Categories"
         ordering = ["sort_order", "name"]
         indexes = [
-            models.Index(fields=["slug"]),
-            models.Index(fields=["is_active"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["is_featured"]),
+            models.Index(fields=["show_in_menu"]),
         ]
 
     def __str__(self):
@@ -63,6 +197,20 @@ class SubCategory(TimeStampedModel):
     )
     name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=140, blank=True)
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    meta_title = models.CharField(
+        max_length=60,
+        blank=True
+    )
+
+    meta_description = models.TextField(
+        blank=True
+    )
+    
     image = models.ImageField(upload_to="categories/sub/", blank=True, null=True)
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)
@@ -79,7 +227,6 @@ class SubCategory(TimeStampedModel):
             ),
         ]
         indexes = [
-            models.Index(fields=["slug"]),
             models.Index(fields=["is_active"]),
             models.Index(fields=["parent_category"]),
         ]
@@ -131,7 +278,6 @@ class ChildCategory(TimeStampedModel):
             ),
         ]
         indexes = [
-            models.Index(fields=["slug"]),
             models.Index(fields=["is_active"]),
             models.Index(fields=["sub_category"]),
         ]
@@ -183,7 +329,6 @@ class Brand(TimeStampedModel):
         db_table = "products_brand"
         ordering = ["name"]
         indexes = [
-            models.Index(fields=["slug"]),
             models.Index(fields=["is_active"]),
         ]
 
@@ -223,7 +368,10 @@ class Brand(TimeStampedModel):
 # -------------------- PRODUCT TAG -------------------- #
 class ProductTag(TimeStampedModel):
     name = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(
+        unique=True
+    )
+
     description = models.TextField(
         blank=True,
         null=True
@@ -285,6 +433,18 @@ class ProductTag(TimeStampedModel):
 
 # -------------------- PRODUCT -------------------- #
 class Product(TimeStampedModel):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    STATUS_CHOICES = (
+        ("draft", "Draft"),
+        ("published", "Published"),
+        ("archived", "Archived"),
+    )
+    
     GENDER_CHOICES = (
         ("men", "Men"),
         ("women", "Women"),
@@ -367,10 +527,6 @@ class Product(TimeStampedModel):
         default=5
     )
 
-    stock_quantity = models.PositiveIntegerField(
-        default=0
-    )
-
     allow_backorders = models.BooleanField(
         default=False
     )
@@ -444,6 +600,30 @@ class Product(TimeStampedModel):
         default=Decimal("0.00"),
         validators=[MinValueValidator(Decimal("0.00"))],
     )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="draft"
+    )
+
+    seo_keywords = models.CharField(
+        max_length=500,
+        blank=True
+    )
+
+    canonical_url = models.URLField(
+        blank=True
+    )
+
+    view_count = models.PositiveIntegerField(
+        default=0
+    )
+
+    wishlist_count = models.PositiveIntegerField(
+        default=0
+    )
+
     review_count = models.PositiveIntegerField(default=0)
 
     is_active = models.BooleanField(default=True)
@@ -462,7 +642,6 @@ class Product(TimeStampedModel):
         db_table = "products_product"
         ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=["slug"]),
             models.Index(fields=["sku"]),
             models.Index(fields=["is_active"]),
             models.Index(fields=["is_featured"]),
@@ -572,6 +751,17 @@ class ProductImage(TimeStampedModel):
         related_name="images",
     )
     image = models.ImageField(upload_to="products/")
+
+    image_type = models.CharField(
+        max_length=30,
+        choices=(
+            ("thumbnail", "Thumbnail"),
+            ("gallery", "Gallery"),
+            ("zoom", "Zoom"),
+        ),
+        default="gallery"
+    )
+
     alt_text = models.CharField(max_length=255, blank=True)
     is_primary = models.BooleanField(default=False)
     sort_order = models.PositiveIntegerField(default=0)
@@ -618,6 +808,17 @@ class ProductVariant(TimeStampedModel):
     color = models.CharField(max_length=50)
     size = models.CharField(max_length=20, choices=SIZE_CHOICES, default="M")
     variant_sku = models.CharField(max_length=80, unique=True, blank=True)
+
+    barcode = models.CharField(
+        max_length=120,
+        blank=True
+    )
+
+    weight = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
 
     stock = models.PositiveIntegerField(default=0)
     reserved_stock = models.PositiveIntegerField(default=0)
@@ -671,6 +872,20 @@ class Warehouse(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
     location = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
+
+    code = models.CharField(
+        max_length=30,
+        unique=True
+    )
+
+    email = models.EmailField(
+        blank=True
+    )
+
+    phone = models.CharField(
+        max_length=20,
+        blank=True
+    )
 
     class Meta:
         db_table = "products_warehouse"

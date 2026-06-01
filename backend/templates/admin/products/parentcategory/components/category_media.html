@@ -1,0 +1,220 @@
+<div class="admin-card">
+    <div class="card-header">
+        <h2>Category Media</h2>
+
+        <p>
+            Upload and manage category imagery.
+        </p>
+    </div>
+
+    <div class="media-section">
+
+        {% if original and original.image %}
+            <div class="image-preview-card">
+                <div class="preview-header">
+                    <span class="preview-label">
+                        Current Image
+                    </span>
+                </div>
+
+                <img
+                    src="{{ original.image.url }}"
+                    alt="{{ original.name }}"
+                    class="preview-image">
+            </div>
+
+        {% else %}
+            <div class="empty-image-state">
+                No image uploaded yet.
+            </div>
+        {% endif %}
+
+        <div class="upload-zone"
+             id="image-upload-zone">
+
+            <div class="upload-icon">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round">
+
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+
+                    <polyline points="17 8 12 3 7 8"/>
+
+                    <line x1="12"
+                        y1="3"
+                        x2="12"
+                        y2="15"/>
+                </svg>
+            </div>
+
+            <h4> Upload Category Image </h4>
+
+            <p>
+                Drag & drop your image here or click to browse.
+            </p>
+
+            <div class="upload-input-wrapper">
+                {{ adminform.form.image }}
+
+                <label
+                    for="id_image"
+                    class="upload-btn">
+
+                    Choose File
+                </label>
+            </div>
+
+            <span class="upload-meta">
+                PNG, JPG, WEBP • Max 5MB
+            </span>
+
+            {% if adminform.form.image.help_text %}
+                <small class="field-help">
+                    {{ adminform.form.image.help_text }}
+                </small>
+            {% endif %}
+
+            {% for error in adminform.form.image.errors %}
+                <div class="field-error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div
+            id="image-preview-container"
+            class="live-preview-container"
+            style="display:none;">
+
+            <span class="preview-label">
+                Selected Image
+            </span>
+
+            <img
+                id="live-preview-image"
+                src=""
+                alt="Preview"
+                class="preview-image">
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+        const uploadZone =
+            document.getElementById('image-upload-zone');
+
+        const input =
+            document.querySelector(
+                "#id_image"
+            );
+
+        const previewContainer =
+            document.querySelector(
+                "#image-preview-container"
+            );
+
+        const previewImage =
+            document.querySelector(
+                "#live-preview-image"
+            );
+
+        if (!input) return;
+
+        if (uploadZone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, () => uploadZone.classList.add('drag-over'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, () => uploadZone.classList.remove('drag-over'), false);
+            });
+
+            uploadZone.addEventListener('drop', function(e) {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    // Assign dropped file to input and trigger preview validation
+                    input.files = files;
+                    processFile(files[0]);
+                }
+            }, false);
+        }
+
+        input.addEventListener(
+            "change",
+            function(event) {
+
+                const file =
+                    event.target.files[0];
+
+                if (!file) return;
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+                if (!allowedTypes.includes(file.type)) {
+
+                    alert(
+                        "Only JPG, PNG and WEBP files are allowed."
+                    );
+
+                    input.value = "";
+
+                    return;
+                }
+
+                if (
+                    file.size >
+                    5 * 1024 * 1024
+                ) {
+
+                    alert(
+                        "Maximum file size is 5MB."
+                    );
+
+                    input.value = "";
+
+                    return;
+                }
+
+                const reader =
+                    new FileReader();
+
+                reader.onload =
+                    function(e) {
+
+                        previewImage.src =
+                            e.target.result;
+
+                        previewContainer.style.display =
+                            "block";
+                    };
+
+                reader.readAsDataURL(
+                    file
+                );
+            }
+        );
+    }
+);
+</script>

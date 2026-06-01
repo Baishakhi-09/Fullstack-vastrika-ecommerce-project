@@ -1,0 +1,42 @@
+<div class="admin-card">
+    <div class="card-header">
+        <h2>Category Relationships</h2>
+
+        <p>
+            Associate brands and tags with this category.
+        </p>
+    </div>
+
+    <div class="form-grid">
+
+        <fieldset class="relationship-group">
+
+            <legend>
+                Brands
+            </legend>
+
+            {{ adminform.form.brands }}
+
+            {% for error in adminform.form.brands.errors %}
+                <div class="field-error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </fieldset>
+
+        <fieldset class="relationship-group">
+            <legend>
+                Tags
+            </legend>
+
+            {{ adminform.form.tags }}
+
+            {% for error in adminform.form.tags.errors %}
+                <div class="field-error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </fieldset>
+
+    </div>
+</div>

@@ -1,0 +1,283 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load admin_urls %}
+{% load admin_list %}
+
+{% block extrahead %}
+
+    {{ block.super }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}">
+
+    <script
+        src="{% static 'admin/js/custom.js' %}"
+        defer>
+    </script>
+{% endblock %}
+
+{% block content %}
+
+<section class="parentcategory-dashboard">
+    <section class="parentcategory-page-header">
+        <div class="parentcategory-page-header-left">
+            <h1> Parent Category Management </h1>
+
+            <p>
+                Manage ecommerce parent categories professionally.
+            </p>
+
+        </div>
+
+        <div class="parentcategory-page-header-right">
+
+            <a
+                href="{% url 'admin:products_parentcategory_add' %}"
+                class="parentcategory-add-btn">
+
+                + Add Parent Category
+            </a>
+        </div>
+    </section>
+
+    <section class="parentcategory-stats-grid">
+        <div class="parentcategory-stat-card">
+            <span>Total Categories</span>
+            <h2>{{ total_categories|default:"0" }}</h2>
+        </div>
+
+        <div class="parentcategory-stat-card">
+            <span>Published</span>
+            <h2>{{ published_categories|default:"0" }}</h2>
+        </div>
+
+        <div class="parentcategory-stat-card">
+            <span>Featured</span>
+            <h2>{{ featured_categories|default:"0" }}</h2>
+        </div>
+
+        <div class="parentcategory-stat-card">
+            <span>Draft</span>
+            <h2>{{ draft_categories|default:"0" }}</h2>
+        </div>
+    </section>
+
+    <section class="parentcategory-table-wrapper">
+        <form
+            id="changelist-form"
+            method="post"
+            novalidate>
+
+            {% csrf_token %}
+
+            {% if cl.formset %}
+                {{ cl.formset.management_form }}
+            {% endif %}
+
+            <section class="parentcategory-toolbar">
+                {% if action_form %}
+
+                    <div class="parentcategory-toolbar-left">
+                        <label
+                            for="id_action"
+                            class="toolbar-label">
+                            
+                            Action
+                        </label>
+
+                        <select
+                            id="id_action"
+                            name="action"
+                            required>
+
+                            {% for choice in action_form.action.field.choices %}
+                                <option value="{{ choice.0 }}">
+                                    {{ choice.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <button
+                            type="submit"
+                            name="index"
+                            value="0"
+                            class="toolbar-go-btn"
+                            title="Run selected action">
+
+                            Go
+                        </button>
+                    </div>
+
+                    <div class="parentcategory-toolbar-right">
+                        <div class="toolbar-count-badge">
+                            {{ cl.result_count }}
+                            Parent Categories{{ cl.result_count|pluralize }}
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="parentcategory-table-container">
+                <table 
+                    id="result_list"
+                    class="parentcategory-table">
+
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column">
+                                <input type="checkbox">
+                            </th>
+
+                            <th class="logo-column">
+                                Category Logo
+                            </th>
+
+                            <th class="name-column">
+                                Category Name
+                            </th>
+
+                            <th class="featured_column">
+                                Featured
+                            </th>
+
+                            <th class="status_column">
+                                Status
+                            </th>
+
+                            <th class="order_column">
+                                Sort Order
+                            </th>
+
+                            <th class="created_column">
+                                Created Date
+                            </th>
+
+                            <th class="action-column">
+                                Edit
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for result in cl.result_list %}
+
+                            <tr>
+                                <td class="checkbox-column">
+                                    <input type="checkbox"
+                                        name="_selected_action"
+                                        value="{{ result.pk }}">
+                                </td>
+
+                                <td class="logo-column">
+                                    <div class="parentcategory-table-logo">
+                                        {% if result.image %}
+                                            <img
+                                                src="{{ result.image.url }}"
+                                                class="category-logo">
+
+                                        {% else %}
+
+                                            <div class="logo-placeholder">
+                                                PC
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <td class="name-column">
+                                    <strong>
+                                        {{ result.name }}
+                                    </strong>
+                                </td>
+
+                                <td class="featured_column">
+                                    {% if result.is_featured %} 
+                                        <span class="badge-featured">
+                                            Yes
+                                        </span>
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+
+                                <td class="status-column">
+                                    <span class="parentcategory-badge-status">
+                                        {{ result.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td class="order_column">
+                                    {{ result.sort_order }}
+                                </td>
+
+                                <td class="created_column">
+                                    {{ result.created_at|date:"M d, Y" }}
+                                </td>
+
+                                <td class="action-column">
+                                    <a
+                                        href="{% url 'admin:products_parentcategory_change' result.pk %}"
+                                        class="edit-btn">
+
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    
+                </table>
+            </section>
+        </form>
+    </section>
+
+    <!-- PAGINATION FOOTER -->
+    {% if cl.result_count %}
+
+        <section class="parentcategory-pagination-footer">
+            <div class="parentcategory-pagination-info">
+                Showing
+                {{ cl.result_count }}
+                Parent Categories{{ cl.result_count|pluralize }}
+            </div>
+        </section>
+
+    {% endif %}
+</section>
+
+<!-- DELETE MODAL -->
+<div
+    id="delete-modal"
+    class="delete-modal">
+
+    <div class="delete-modal-backdrop"></div>
+
+    <div class="delete-modal-content">
+        <h3> Confirm Delete </h3>
+
+        <p>
+            Are you sure you want to delete the selected brands?
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-modal-actions">
+            <button
+                type="button"
+                id="modal-cancel-btn"
+                class="modal-cancel-btn">
+
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="modal-delete-btn"
+                class="modal-delete-btn">
+
+                Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
