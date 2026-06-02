@@ -247,7 +247,7 @@ class ParentCategoryAdmin(
     ):
         actions = super().get_actions(request)
 
-        # Remove Django default delete action
+        # Remove delete action
         if "delete_selected" in actions:
             del actions["delete_selected"]
 
@@ -311,13 +311,10 @@ class ParentCategoryAdmin(
             )
 
             if action_form:
-
                 action_form.fields[
                     "action"
                 ].widget.attrs.update({
-
                     "id": "id_action"
-
                 })
 
         return response
@@ -362,6 +359,89 @@ class SubCategoryAdmin(
     change_form_template = (
         "admin/products/subcategory/subcategory_form.html"
     )
+
+    change_list_template = (
+        "admin/products/subcategory/subcategory_list.html"
+    )
+
+    actions = [
+        "delete_selected_subcategories"
+    ]
+
+    def get_actions(
+        self,
+        request
+    ):
+        actions = super().get_actions(request)
+
+        # Remove delete action
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+
+        return actions
+
+    @admin.action(
+        description="Delete selected categories"
+    )
+    def delete_selected_subcategories(
+        self,
+        request,
+        queryset
+    ):
+        total_deleted = queryset.count()
+
+        queryset.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} category(s) deleted successfully."
+        )
+
+    def changelist_view(
+        self,
+        request,
+        extra_context=None
+    ):
+        extra_context = extra_context or {}
+
+        extra_context["total_subcategories"] = (
+            SubCategory.objects.count()
+        )
+
+        extra_context["active_subcategories"] = (
+            SubCategory.objects.filter(
+                is_active=True
+            ).count()
+        )
+
+        extra_context["inactive_subcategories"] = (
+            SubCategory.objects.filter(
+                is_active=False
+            ).count()
+        )
+
+        extra_context["total_parents"] = (
+            ParentCategory.objects.count()
+        )
+
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context
+        )
+
+        if hasattr(response, "context_data"):
+            action_form = response.context_data.get(
+                "action_form"
+            )
+
+            if action_form:
+                action_form.fields[
+                    "action"
+                ].widget.attrs.update({
+                    "id": "id_action"
+                })
+
+        return response
 
 
 class ChildCategoryAdmin(

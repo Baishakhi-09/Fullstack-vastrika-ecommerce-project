@@ -1,0 +1,403 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load admin_urls %}
+{% load admin_list %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}">
+
+    <script
+        src="{% static 'admin/js/custom.js' %}"
+        defer>
+    </script>
+{% endblock %}
+
+{% block content %}
+
+<section class="subcategory-dashboard">
+
+    <!-- Header -->
+    <section class="subcategory-page-header">
+        <div class="subcategory-page-header-left">
+            <h1>
+                Sub Categories
+            </h1>
+
+            <p>
+                Manage and organize product sub categories.
+            </p>
+        </div>
+
+        <div class="subcategory-page-header-right">
+            <a href="{% url 'admin:products_subcategory_add' %}"
+            class="subcategory-add-btn">
+
+                + Add Sub Category
+            </a>
+        </div>
+    </section>
+
+    <section class="subcategory-stats-grid">
+
+        <div class="subcategory-stat-card">
+            <span>Total</span>
+
+            <h2>
+                {{ total_subcategories }}
+            </h2>
+        </div>
+
+        <div class="subcategory-stat-card">
+            <span>Active</span>
+
+            <h2>
+                {{ active_subcategories }}
+            </h2>
+        </div>
+
+        <div class="subcategory-stat-card">
+            <span>Inactive</span>
+
+            <h2>
+                {{ inactive_subcategories }}
+            </h2>
+        </div>
+
+        <div class="subcategory-stat-card">
+            <span>Parent Categories</span>
+
+            <h2>
+                {{ total_parents }}
+            </h2>
+        </div>
+    </section>
+
+    <section class="subcategory-table-wrapper">
+        <form
+            id="changelist-form"
+            method="post"
+            novalidate>
+
+            {% csrf_token %}
+
+            {% if cl.formset %}
+                {{ cl.formset.management_form }}
+            {% endif %}
+
+            <section class="subcategory-toolbar">
+                {% if action_form %}
+
+                    <div class="subcategory-toolbar-left">
+                        <label
+                            for="id_action"
+                            class="toolbar-label">
+                            
+                            Action
+                        </label>
+
+                        <select
+                            id="id_action"
+                            name="action"
+                            required>
+
+                            {% for choice in action_form.action.field.choices %}
+                                <option value="{{ choice.0 }}">
+                                    {{ choice.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <button
+                            type="submit"
+                            name="index"
+                            value="0"
+                            class="toolbar-go-btn"
+                            title="Run selected action">
+
+                            Go
+                        </button>
+                    </div>
+
+                    <div class="subcategory-toolbar-right">
+                        <div class="toolbar-count-badge">
+                            {{ cl.result_count }}
+                            Sub Categories{{ cl.result_count|pluralize }}
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="subcategory-table-container">
+                <table class="subcategory-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column">
+                                <input
+                                    type="checkbox"
+                                    id="action-toggle">
+                            </th>
+
+                            <th class="logo-column">
+                                Category Logo
+                            </th>
+
+                            <th class="name-column">
+                                Category Name
+                            </th>
+
+                            <th class="parent-column">
+                                Parent Category
+                            </th>
+
+                            <th class="status-column">
+                                Status
+                            </th>
+
+                            <th class="order_column">
+                                Sort Order
+                            </th>
+
+                            <th class="created_column">
+                                Created
+                            </th>
+
+                            <th class="actions-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for category in cl.result_list %}
+
+                        <tr>
+                            <td class="checkbox-column">
+                                <input
+                                    type="checkbox"
+                                    name="_selected_action"
+                                    value="{{ category.pk }}"
+                                    class="action-select">
+                            </td>
+
+                            <td class="logo-column">
+                                <div class="category-info">
+                                    {% if category.image %}
+
+                                        <img
+                                            src="{{ category.image.url }}"
+                                            alt="{{ category.name }}"
+                                            class="table-image">
+
+                                    {% else %}
+
+                                        <div class="image-placeholder">
+                                            <svg
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2">
+
+                                                <rect
+                                                    x="3"
+                                                    y="3"
+                                                    width="18"
+                                                    height="18"
+                                                    rx="2">
+                                                </rect>
+
+                                                <circle
+                                                    cx="8.5"
+                                                    cy="8.5"
+                                                    r="1.5">
+                                                </circle>
+
+                                                <path
+                                                    d="M21 15l-5-5L5 21">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <td class="name-column">
+                                <div class="category-meta">
+                                    <strong>
+                                        {{ category.name }}
+                                    </strong>
+
+                                    <span class="category-slug">
+                                        {{ category.slug }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td class="parent-column">
+                                <span class="parent-badge">
+                                    {{ category.parent_category.name }}
+                                </span>
+                            </td>
+
+                            <td class="status-column">
+                                {% if category.is_active %}
+
+                                    <span class="status-badge active">
+                                        Active
+                                    </span>
+                                {% else %}
+
+                                    <span class="status-badge inactive">
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="order_column">
+                                <span class="sort-badge">
+                                    {{ category.sort_order }}
+                                </span>
+                            </td>
+
+                            <td class="created_column">
+                                {{ category.created_at|date:"M d, Y" }}
+                            </td>
+
+                            <td class="action-column">
+                                <div class="table-actions">
+                                    <a
+                                        href="{% url 'admin:products_subcategory_change' category.pk %}"
+                                        class="action-btn">
+                                    
+                                        Edit
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <svg
+                                            width="48"
+                                            height="48"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2">
+
+                                            <rect
+                                                x="3"
+                                                y="3"
+                                                width="18"
+                                                height="18"
+                                                rx="2">
+                                            </rect>
+                                        </svg>
+                                    </div>
+
+                                    <h3>
+                                        No Sub Categories Found
+                                    </h3>
+
+                                    <p>
+                                        Create your first sub category to get started.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </form>
+    </section>
+
+    <!-- PAGINATION FOOTER -->
+    {% if cl.result_count %}
+
+        <section class="subcategory-pagination-footer">
+            <div class="subcategory-pagination-info">
+                Showing
+                {{ cl.result_count }}
+                Sub Categories{{ cl.result_count|pluralize }}
+            </div>
+        </section>
+    {% endif %}
+</section>
+
+<!-- DELETE MODAL -->
+<div
+    id="delete-modal"
+    class="delete-modal">
+
+    <div class="delete-modal-backdrop"></div>
+
+    <div class="delete-modal-content">
+        <h3> Confirm Delete </h3>
+
+        <p>
+            Are you sure you want to delete the selected sub categories?
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-modal-actions">
+            <button
+                type="button"
+                id="modal-cancel-btn"
+                class="modal-cancel-btn">
+
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="modal-delete-btn"
+                class="modal-delete-btn">
+
+                Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            const selectAll =
+                document.getElementById(
+                    "action-toggle"
+                );
+
+            if (!selectAll) {
+                return;
+            }
+
+            selectAll.addEventListener(
+                "change",
+                function () {
+                    document
+                        .querySelectorAll(
+                            "input[name='_selected_action']"
+                        )
+                        .forEach(
+                            checkbox => {
+                                checkbox.checked =
+                                    this.checked;
+                            }
+                        );
+                }
+            );
+        }
+    );
+</script>
+{% endblock %}
