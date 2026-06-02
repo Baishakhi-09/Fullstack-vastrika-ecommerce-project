@@ -257,6 +257,20 @@ class ChildCategory(TimeStampedModel):
     )
     name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=140, blank=True)
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    meta_title = models.CharField(
+        max_length=60,
+        blank=True
+    )
+
+    meta_description = models.TextField(
+        blank=True
+    )
+    
     image = models.ImageField(upload_to="categories/child/", blank=True, null=True)
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)

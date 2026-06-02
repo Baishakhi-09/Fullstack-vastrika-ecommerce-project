@@ -1,0 +1,1153 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<link
+    rel="stylesheet"
+    href="{% static 'admin/css/custom.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<form method="post"
+      enctype="multipart/form-data"
+      novalidate>
+
+    {% csrf_token %}
+
+    <div class="childcategory-page">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1>
+                    {% if original %}
+                        Edit Child Category
+                    {% else %}
+                        Create Child Category
+                    {% endif %}
+                </h1>
+
+                <div class="childcategory-breadcrumbs">
+                    <a href="{% url 'admin:index' %}">
+                        Dashboard
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="{% url 'admin:products_childcategory_changelist' %}">
+                        Child Category
+                    </a>
+
+                    <span>/</span>
+
+                    <strong>
+                        {% if original %}
+                            Edit
+                        {% else %}
+                            Add Child Category
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <p>
+                    Organize products with a detailed category hierarchy.
+                </p>
+            </div>
+
+            <div class="page-header-right">
+                <div class="header-bottom-actions">
+                    <button type="submit"
+                        name="_addanother"
+                        class="btn-secondary">
+
+                        Save & Add Another
+                    </button>
+
+                    <button type="submit"
+                        name="_save"
+                        class="btn-primary">
+
+                        Save Category
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="childcategory-layout">
+            <div class="childcategory-main">
+
+                <!-- category_information -->
+                <div class="admin-card">
+                    <div class="card-header">
+
+                        <div class="card-header-content">
+
+                            <h2>
+                                Category Information
+                            </h2>
+
+                            <p>
+                                Define the hierarchy, identity, and description for this child category.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-body">
+                        <div class="form-grid">
+
+                            <!-- Sub Category -->
+                            <div class="form-group">
+                                <label
+                                    for="{{ adminform.form.sub_category.id_for_label }}"
+                                    class="form-label">
+
+                                    Sub Category
+
+                                    <span class="required">*</span>
+                                </label>
+
+                                {{ adminform.form.sub_category }}
+
+                                {% if adminform.form.sub_category.help_text %}
+
+                                    <div class="field-help">
+                                        {{ adminform.form.sub_category.help_text }}
+                                    </div>
+
+                                {% endif %}
+
+                                {% for error in adminform.form.sub_category.errors %}
+
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Child Category Name -->
+                            <div class="form-group">
+                                <label
+                                    for="{{ adminform.form.name.id_for_label }}"
+                                    class="form-label">
+
+                                    Child Category Name
+
+                                    <span class="required">*</span>
+                                </label>
+
+                                {{ adminform.form.name }}
+
+                                <div class="field-help">
+                                    Enter a unique and descriptive category name.
+                                </div>
+
+                                {% for error in adminform.form.name.errors %}
+
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Slug -->
+                            <div class="form-group">
+                                <label
+                                    for="{{ adminform.form.slug.id_for_label }}"
+                                    class="form-label">
+
+                                    URL Slug
+                                </label>
+
+                                {{ adminform.form.slug }}
+
+                                <div class="field-help">
+                                    Auto-generated from the category name.
+                                </div>
+
+                                {% for error in adminform.form.slug.errors %}
+
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group full-width">
+                                <div class="field-header">
+                                    <label
+                                        for="{{ adminform.form.description.id_for_label }}"
+                                        class="form-label">
+
+                                        Description
+                                    </label>
+
+                                    <span class="character-counter">
+                                        <span id="description-count">
+                                            0
+                                        </span>
+
+                                        / 500
+                                    </span>
+                                </div>
+
+                                {{ adminform.form.description }}
+
+                                <div class="field-help">
+                                    Briefly describe this child category for administrators and SEO purposes.
+                                </div>
+
+                                {% if adminform.form.description.help_text %}
+
+                                    <div class="field-help">
+                                        {{ adminform.form.description.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% for error in adminform.form.description.errors %}
+
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Category Summary -->
+                        <div class="category-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">
+                                    Category Type
+                                </span>
+
+                                <strong>
+                                    Child Category
+                                </strong>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="summary-label">
+                                    Hierarchy
+                                </span>
+
+                                <strong>
+                                    Parent → Sub → Child
+                                </strong>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="summary-label">
+                                    Visibility
+                                </span>
+
+                                <strong>
+                                    Controlled from Publishing Settings
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- category_media -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-header-content">
+                            <h2>
+                                Category Media
+                            </h2>
+
+                            <p>
+                                Upload and manage the primary image for this child category.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="upload-zone">
+                            <div class="upload-icon">
+                                <svg
+                                    width="60"
+                                    height="60"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2">
+
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+
+                                    <polyline points="17 8 12 3 7 8"/>
+
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                            </div>
+
+                            <h4>
+                                Upload Child Category Image
+                            </h4>
+
+                            <p class="upload-description">
+                                Drag and drop an image here or browse from your device.
+                            </p>
+
+                            <span class="upload-meta">
+
+                                PNG • JPG • JPEG • WEBP • Maximum 5MB
+                            </span>
+
+                            <div class="file-input-wrapper">
+                                {{ adminform.form.image }}
+                            </div>
+
+                            <label
+                                for="{{ adminform.form.image.id_for_label }}"
+                                class="upload-btn">
+
+                                Choose Image
+                            </label>
+
+                            <div class="upload-help">
+                                Recommended size:
+                                1200 × 1200 pixels
+                            </div>
+                        </div>
+
+                        <div
+                            id="preview-placeholder"
+                            class="preview-placeholder">
+
+                            {% if original and original.image %}
+
+                                <img
+                                    id="image-preview"
+                                    src="{{ original.image.url }}"
+                                    alt="{{ original.name }}"
+                                    class="preview-image">
+
+                                <div class="image-status">
+                                    Current Category Image
+                                </div>
+
+                            {% else %}
+
+                                <div
+                                    id="empty-preview"
+                                    class="empty-preview">
+
+                                    <span class="material-symbols-outlined">
+                                        image
+                                    </span>
+
+                                    <p>
+                                        No image selected
+                                    </p>
+                                </div>
+
+                                <img
+                                    id="image-preview"
+                                    class="preview-image"
+                                    style="display:none;">
+
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- seo_metadata -->
+                <div class="admin-card">
+
+                    <!-- Card Header -->
+                    <div class="card-header">
+
+                        <div class="card-header-content">
+
+                            <h2>
+                                SEO Settings
+                            </h2>
+
+                            <p>
+                                Optimize how this child category appears in search engines.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="form-grid">
+
+                            <!-- Meta Title -->
+                            <div class="form-group">
+                                <div class="field-header">
+                                    <label
+                                        for="id_meta_title"
+                                        class="form-label">
+
+                                        SEO Title
+                                    </label>
+
+                                    <span class="character-counter">
+                                        <span id="meta-title-count">
+                                            0
+                                        </span>
+
+                                        / 60
+                                    </span>
+                                </div>
+
+                                <div class="field-wrapper">
+                                    {{ adminform.form.meta_title }}
+                                </div>
+
+                                <div class="field-help">
+                                    Recommended length: 50–60 characters.
+                                </div>
+
+                                {% if adminform.form.meta_title.help_text %}
+
+                                    <div class="field-help">
+                                        {{ adminform.form.meta_title.help_text }}
+                                    </div>
+
+                                {% endif %}
+
+                                {% for error in adminform.form.meta_title.errors %}
+
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+                            </div>
+
+                            <!-- Meta Description -->
+                            <div class="form-group full-width">
+                                <div class="field-header">
+                                    <label
+                                        for="id_meta_description"
+                                        class="form-label">
+
+                                        SEO Description
+                                    </label>
+
+                                    <span class="character-counter">
+                                        <span id="meta-description-count">
+                                            0
+                                        </span>
+
+                                        / 160
+                                    </span>
+                                </div>
+
+                                <div class="field-wrapper">
+                                    {{ adminform.form.meta_description }}
+                                </div>
+
+                                <div class="field-help">
+                                    Recommended length: 140–160 characters.
+                                </div>
+
+                                {% if adminform.form.meta_description.help_text %}
+
+                                    <div class="field-help">
+                                        {{ adminform.form.meta_description.help_text }}
+                                    </div>
+
+                                {% endif %}
+
+                                {% for error in adminform.form.meta_description.errors %}
+
+                                    <div class="field-error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- SEO Preview -->
+                        <div class="seo-preview-wrapper">
+                            <div class="preview-header">
+                                Search Engine Preview
+                            </div>
+
+                            <div class="seo-preview">
+
+                                <!-- Title -->
+                                <div
+                                    id="seo-title-preview"
+                                    class="seo-title">
+
+                                    Child Category Title Preview
+                                </div>
+
+                                <!-- Description -->
+                                <div
+                                    id="seo-description-preview"
+                                    class="seo-description">
+
+                                    Your meta description preview will appear here and help users understand your category before visiting.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-sidebar">
+                <div class="childcategory-sidebar">
+
+                    <!-- publishing_card -->
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <h3>
+                                    Publishing
+                                </h3>
+
+                                <p>
+                                    Control category visibility, ordering, and publication details.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="sidebar-fields">
+
+                                <!-- Active Status -->
+                                <div class="status-section">
+                                    <label class="status-toggle">
+                                        {{ adminform.form.is_active }}
+
+                                        <span>
+                                            Active Category
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <!-- Status Badge -->
+                                <div class="publish-status">
+                                    {% if original and original.is_active %}
+
+                                        <span class="status-badge active">
+                                            Active
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status-badge draft">
+                                            Draft
+                                        </span>
+
+                                    {% endif %}
+                                </div>
+
+                                <!-- Sort Order -->
+                                <div class="form-group">
+                                    {{ adminform.form.sort_order.label_tag }}
+
+                                    {{ adminform.form.sort_order }}
+
+                                    <div class="field-help">
+                                        Lower numbers appear first in category listings.
+                                    </div>
+                                </div>
+
+                                <!-- Publication Information -->
+                                <div class="publish-meta">
+
+                                    <h4>
+                                        Publication Details
+                                    </h4>
+
+                                    <div class="meta-item">
+                                        <span class="meta-label">
+                                            Created
+                                        </span>
+
+                                        <strong class="meta-value">
+                                            {% if original %}
+
+                                                {{ original.created_at|date:"M d, Y" }}
+
+                                            {% else %}
+
+                                                Not yet created
+
+                                            {% endif %}
+
+                                        </strong>
+                                    </div>
+
+                                    <div class="meta-item">
+                                        <span class="meta-label">
+                                            Last Updated
+                                        </span>
+
+                                        <strong class="meta-value">
+                                            {% if original %}
+
+                                                {{ original.updated_at|date:"M d, Y" }}
+
+                                            {% else %}
+                                                -
+
+                                            {% endif %}
+                                        </strong>
+                                    </div>
+
+                                    <div class="meta-item">
+                                        <span class="meta-label">
+                                            Visibility
+                                        </span>
+
+                                        <strong class="meta-value">
+                                            {% if original and original.is_active %}
+                                                Visible
+
+                                            {% else %}
+                                                Hidden
+                                            {% endif %}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- performance_card -->
+                    <div class="admin-card">
+                        <div class="card-header">
+
+                            <div class="card-header-content">
+
+                                <h3>
+                                    Performance
+                                </h3>
+
+                                <p>
+                                    Monitor category performance, activity, and usage metrics.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-body">
+                            {% if original %}
+
+                                <div class="stats-grid">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2">
+
+                                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+
+                                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                            </svg>
+                                        </div>
+
+                                        <div class="stat-content">
+                                            <span class="stat-label">
+                                                Products
+                                            </span>
+
+                                            <strong class="stat-value">
+                                                {{ product_count|default:"0" }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="stat-card">
+                                        <div class="stat-icon">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2">
+
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10">
+                                                </circle>
+
+                                                <path
+                                                    d="M9 12l2 2 4-4">
+                                                </path>
+                                            </svg>
+                                        </div>
+
+                                        <div class="stat-content">
+                                            <span class="stat-label">
+                                                Status
+                                            </span>
+
+                                            <strong class="stat-value">
+                                                {% if original.is_active %}
+                                                    Active
+
+                                                {% else %}
+                                                    Draft
+
+                                                {% endif %}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="stat-card">
+                                        <div class="stat-icon">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2">
+
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10">
+                                                </circle>
+
+                                                <polyline
+                                                    points="12 6 12 12 16 14">
+                                                </polyline>
+                                            </svg>
+                                        </div>
+
+                                        <div class="stat-content">
+                                            <span class="stat-label">
+                                                Updated
+                                            </span>
+
+                                            <strong class="stat-value">
+                                                {{ original.updated_at|date:"M d, Y" }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="stat-card">
+                                        <div class="stat-icon">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2">
+
+                                                <path
+                                                    d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z">
+                                                </path>
+
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="3">
+                                                </circle>
+                                            </svg>
+                                        </div>
+
+                                        <div class="stat-content">
+                                            <span class="stat-label">
+                                                Visibility
+                                            </span>
+
+                                            <strong class="stat-value">
+                                                {% if original.is_active %}
+                                                    Visible
+
+                                                {% else %}
+                                                    Hidden
+
+                                                {% endif %}
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {% else %}
+
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="48"
+                                            height="48"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5">
+
+                                            <path
+                                                d="M3 3v18h18">
+                                            </path>
+
+                                            <path
+                                                d="M7 14l4-4 3 3 5-5">
+                                            </path>
+                                        </svg>
+                                    </div>
+
+                                    <h4>
+                                        No Performance Data Yet
+                                    </h4>
+
+                                    <p>
+                                        Statistics and analytics will become available after this child category is created and linked to products.
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- activity_card -->
+                    <div class="admin-card">
+                        <div class="card-header">
+
+                            <div class="card-header-content">
+
+                                <h3>
+                                    Quick Actions
+                                </h3>
+
+                                <p>
+                                    Save changes, continue editing, and manage the current category status.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="publish-summary">
+                                {% if original and original.is_active %}
+
+                                    <div class="summary-badge active">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2">
+
+                                            <path
+                                                d="M20 6L9 17l-5-5">
+                                            </path>
+                                        </svg>
+
+                                        Active Category
+                                    </div>
+
+                                {% else %}
+
+                                    <div class="summary-badge draft">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2">
+
+                                            <circle
+                                                cx="12"
+                                                cy="12"
+                                                r="10">
+                                            </circle>
+
+                                            <path
+                                                d="M12 8v4">
+                                            </path>
+
+                                            <path
+                                                d="M12 16h.01">
+                                            </path>
+                                        </svg>
+
+                                        Draft Category
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="action-meta">
+                                <div class="meta-item">
+                                    <span>
+                                        Mode
+                                    </span>
+
+                                    <strong>
+                                        {% if original %}
+                                            Edit
+
+                                        {% else %}
+                                            Create
+
+                                        {% endif %}
+                                    </strong>
+                                </div>
+
+                                <div class="meta-item">
+                                    <span>
+                                        Visibility
+                                    </span>
+
+                                    <strong>
+                                        {% if original and original.is_active %}
+                                            Visible
+
+                                        {% else %}
+                                            Hidden
+
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            initDescriptionCounter();
+            initImagePreview();
+            initSeoPreview();
+        }
+    );
+
+    function initDescriptionCounter() {
+        const descriptionField =
+            document.querySelector(
+                "#id_description"
+            );
+
+        const descriptionCount =
+            document.querySelector(
+                "#description-count"
+            );
+
+        if (
+            !descriptionField ||
+            !descriptionCount
+        ) {
+            return;
+        }
+
+        function updateCount() {
+            descriptionCount.textContent =
+                descriptionField.value.length;
+        }
+
+        updateCount();
+
+        descriptionField.addEventListener(
+            "input",
+            updateCount
+        );
+    }
+
+    /* IMAGE PREVIEW */
+
+    function initImagePreview() {
+        const imageInput =
+            document.getElementById(
+                "id_image"
+            );
+
+        const preview =
+            document.getElementById(
+                "image-preview"
+            );
+
+        const placeholder =
+            document.getElementById(
+                "preview-placeholder"
+            );
+
+        if (!imageInput) {
+            return;
+        }
+
+        imageInput.addEventListener(
+            "change",
+            function (event) {
+                const file =
+                    event.target.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                const reader =
+                    new FileReader();
+
+                reader.onload =
+                    function (e) {
+                        if (preview) {
+                            preview.src =
+                                e.target.result;
+
+                            preview.style.display =
+                                "block";
+                        }
+
+                        if (placeholder) {
+                            placeholder.classList.remove(
+                                "empty"
+                            );
+
+                            const emptyBlock =
+                                placeholder.querySelector(
+                                    ".empty-preview"
+                                );
+
+                            if (emptyBlock) {
+                                emptyBlock.style.display =
+                                    "none";
+                            }
+                        }
+                    };
+
+                reader.readAsDataURL(
+                    file
+                );
+            }
+        );
+    }
+
+    /* SEO PREVIEW */
+    function initSeoPreview() {
+        const titleField =
+            document.querySelector(
+                "#id_meta_title"
+            );
+
+        const descriptionField =
+            document.querySelector(
+                "#id_meta_description"
+            );
+
+        const slugField =
+            document.querySelector(
+                "#id_slug"
+            );
+
+        const titlePreview =
+            document.querySelector(
+                "#seo-title-preview"
+            );
+
+        const descriptionPreview =
+            document.querySelector(
+                "#seo-description-preview"
+            );
+
+        const slugPreview =
+            document.querySelector(
+                "#seo-slug-preview"
+            );
+
+        const titleCount =
+            document.querySelector(
+                "#meta-title-count"
+            );
+
+        const descriptionCount =
+            document.querySelector(
+                "#meta-description-count"
+            );
+
+        function updatePreview() {
+            if (
+                titleField &&
+                titlePreview
+            ) {
+                titlePreview.textContent =
+                    titleField.value ||
+                    "Category Title Preview";
+            }
+
+            if (
+                titleField &&
+                titleCount
+            ) {
+                titleCount.textContent =
+                    titleField.value.length;
+            }
+
+            if (
+                descriptionField &&
+                descriptionPreview
+            ) {
+                descriptionPreview.textContent =
+                    descriptionField.value ||
+                    "Meta description preview appears here.";
+            }
+
+            if (
+                descriptionField &&
+                descriptionCount
+            ) {
+                descriptionCount.textContent =
+                    descriptionField.value.length;
+            }
+
+            if (
+                slugField &&
+                slugPreview
+            ) {
+                slugPreview.textContent =
+                    slugField.value ||
+                    "category-slug";
+            }
+        }
+
+        updatePreview();
+
+        [
+            titleField,
+            descriptionField,
+            slugField
+        ].forEach(field => {
+            if (!field) {
+                return;
+            }
+
+            field.addEventListener(
+                "input",
+                updatePreview
+            );
+        });
+    }
+</script>
+{% endblock %}

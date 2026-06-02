@@ -6,6 +6,7 @@ from .models import(
     ProductTag,
     ParentCategory,
     SubCategory,
+    ChildCategory,
 )
 
 
@@ -477,3 +478,41 @@ class SubCategoryForm(forms.ModelForm):
             self.fields[
                 "sort_order"
             ].label = "Sort Order"
+
+class ChildCategoryForm(forms.ModelForm):
+
+    class Meta:
+        model = ChildCategory
+
+        fields = "__all__"
+
+        widgets = {
+
+            "name": forms.TextInput(
+                attrs={
+                    "autocomplete": "off",
+                    "placeholder": "Enter child category name",
+                }
+            ),
+
+            "description": forms.Textarea(
+                attrs={
+                    "rows": 5,
+                    "placeholder":
+                    "Write a short description"
+                }
+            ),
+
+            "meta_title": forms.TextInput(
+                attrs={
+                    "maxlength": 60
+                }
+            ),
+
+            "meta_description": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "maxlength": 160
+                }
+            ),
+        }

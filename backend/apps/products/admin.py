@@ -14,6 +14,7 @@ from .forms import (
     ProductTagAdminForm, 
     ParentCategoryForm,
     SubCategoryForm,
+    ChildCategoryForm,
 )
 
 from .models import (
@@ -319,6 +320,7 @@ class ParentCategoryAdmin(
 
         return response
 
+
 class SubCategoryAdmin(
     AuditAdminMixin,
     RoleBasedAdminMixin,
@@ -445,42 +447,28 @@ class SubCategoryAdmin(
 
 
 class ChildCategoryAdmin(
+    AuditAdminMixin,
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
+    form = ChildCategoryForm
+    
+    change_form_template = (
+        "admin/products/childcategory/childcategory_form.html"
+    )
 
     list_display = (
         "name",
         "sub_category",
-        "get_parent_category",
-        "is_active",
         "sort_order",
-        "created_at",
-    )
-
-    list_filter = (
         "is_active",
-        "sub_category",
-        "sub_category__parent_category",
-        "created_at",
-    )
-
-    search_fields = (
-        "name",
-        "sub_category__name",
-        "sub_category__parent_category__name",
-    )
-
-    ordering = (
-        "sub_category__parent_category__name",
-        "sub_category__name",
-        "sort_order",
-        "name",
     )
 
     prepopulated_fields = {
         "slug": ("name",)
     }
+
+    fieldsets = ()
 
     @admin.display(description="Parent Category")
     def get_parent_category(self, obj):
