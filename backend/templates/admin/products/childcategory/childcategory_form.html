@@ -142,10 +142,6 @@
 
                                 {{ adminform.form.name }}
 
-                                <div class="field-help">
-                                    Enter a unique and descriptive category name.
-                                </div>
-
                                 {% for error in adminform.form.name.errors %}
 
                                     <div class="field-error">
@@ -164,10 +160,6 @@
                                 </label>
 
                                 {{ adminform.form.slug }}
-
-                                <div class="field-help">
-                                    Auto-generated from the category name.
-                                </div>
 
                                 {% for error in adminform.form.slug.errors %}
 
@@ -197,10 +189,6 @@
                                 </div>
 
                                 {{ adminform.form.description }}
-
-                                <div class="field-help">
-                                    Briefly describe this child category for administrators and SEO purposes.
-                                </div>
 
                                 {% if adminform.form.description.help_text %}
 
@@ -405,10 +393,6 @@
                                     {{ adminform.form.meta_title }}
                                 </div>
 
-                                <div class="field-help">
-                                    Recommended length: 50–60 characters.
-                                </div>
-
                                 {% if adminform.form.meta_title.help_text %}
 
                                     <div class="field-help">
@@ -447,10 +431,6 @@
 
                                 <div class="field-wrapper">
                                     {{ adminform.form.meta_description }}
-                                </div>
-
-                                <div class="field-help">
-                                    Recommended length: 140–160 characters.
                                 </div>
 
                                 {% if adminform.form.meta_description.help_text %}

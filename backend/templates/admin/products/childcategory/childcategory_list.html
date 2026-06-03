@@ -14,69 +14,69 @@
         src="{% static 'admin/js/custom.js' %}"
         defer>
     </script>
+
 {% endblock %}
 
 {% block content %}
 
-<section class="subcategory-dashboard">
+<section class="childcategory-dashboard">
 
     <!-- Header -->
-    <section class="subcategory-page-header">
-        <div class="subcategory-page-header-left">
+    <section class="childcategory-page-header">
+        <div class="childcategory-page-header-left">
             <h1>
-                Sub Categories
+                child Categories
             </h1>
 
             <p>
-                Manage and organize product sub categories.
+                Manage child categories, hierarchy, visibility, and product organization.
             </p>
         </div>
 
-        <div class="subcategory-page-header-right">
-            <a href="{% url 'admin:products_subcategory_add' %}"
-            class="subcategory-add-btn">
+        <div class="childcategory-page-header-right">
+            <a href="{% url 'admin:products_childcategory_add' %}"
+            class="childcategory-add-btn">
 
-                + Add Sub Category
+                + Add Child Category
             </a>
         </div>
     </section>
 
-    <section class="subcategory-stats-grid">
+    <section class="stats-grid">
+        <div class="stat-card">
+            <span>Total Categories</span>
 
-        <div class="subcategory-stat-card">
-            <span>Total</span>
-
-            <h2>
-                {{ total_subcategories }}
-            </h2>
+            <strong>
+                {{ total_categories|default:"0" }}
+            </strong>
         </div>
 
-        <div class="subcategory-stat-card">
+        <div class="stat-card">
             <span>Active</span>
 
-            <h2>
-                {{ active_subcategories }}
-            </h2>
+            <strong>
+                {{ active_categories|default:"0" }}
+            </strong>
         </div>
 
-        <div class="subcategory-stat-card">
-            <span>Inactive</span>
+        <div class="stat-card">
+            <span>Draft</span>
 
-            <h2>
-                {{ inactive_subcategories }}
-            </h2>
+            <strong>
+                {{ draft_categories|default:"0" }}
+            </strong>
         </div>
 
-        <div class="subcategory-stat-card">
-            <span>Parent Categories</span>
+        <div class="stat-card">
+            <span>Products</span>
 
-            <h2>
-                {{ total_parents }}
-            </h2>
+            <strong>
+                {{ total_products|default:"0" }}
+            </strong>
         </div>
     </section>
 
-    <section class="subcategory-table-wrapper">
+    <section class="table-wrapper">
         <form
             id="changelist-form"
             method="post"
@@ -88,10 +88,10 @@
                 {{ cl.formset.management_form }}
             {% endif %}
 
-            <section class="subcategory-toolbar">
+            <section class="childcategory-toolbar">
                 {% if action_form %}
 
-                    <div class="subcategory-toolbar-left">
+                    <div class="childcategory-toolbar-left">
                         <label
                             for="id_action"
                             class="toolbar-label">
@@ -122,24 +122,24 @@
                         </button>
                     </div>
 
-                    <div class="subcategory-toolbar-right">
+                    <div class="childcategory-toolbar-right">
                         <div class="toolbar-count-badge">
                             {{ cl.result_count }}
-                            Sub Categories{{ cl.result_count|pluralize }}
+                            Child Categories{{ cl.result_count|pluralize }}
                         </div>
                     </div>
                 {% endif %}
             </section>
 
-            <section class="subcategory-table-container">
+            <section class="childcategory-table-container">
                 <table 
                     id="result_list"
-                    class="subcategory-table">
-                    
+                    class="childcategory-table">
+
                     <thead>
                         <tr>
                             <th class="checkbox-column">
-                                <input
+                                <input 
                                     type="checkbox"
                                     id="action-toggle">
                             </th>
@@ -152,8 +152,8 @@
                                 Category Name
                             </th>
 
-                            <th class="parent-column">
-                                Parent Category
+                            <th class="sub-column">
+                                Sub Category
                             </th>
 
                             <th class="status-column">
@@ -192,13 +192,13 @@
 
                                         <img
                                             src="{{ category.image.url }}"
-                                            alt="{{ category.name }}"
-                                            class="table-image">
-
+                                            class="table-image"
+                                            alt="{{ category.name }}">
+                                    
                                     {% else %}
 
                                         <div class="image-placeholder">
-                                            <svg
+                                           <svg
                                                 width="24"
                                                 height="24"
                                                 viewBox="0 0 24 24"
@@ -241,9 +241,9 @@
                                 </div>
                             </td>
 
-                            <td class="parent-column">
-                                <span class="parent-badge">
-                                    {{ category.parent_category.name }}
+                            <td class="sub-column">
+                                <span class="subcategory-badge">
+                                    {{ category.sub_category.name }}
                                 </span>
                             </td>
 
@@ -253,10 +253,11 @@
                                     <span class="status-badge active">
                                         Active
                                     </span>
+
                                 {% else %}
 
-                                    <span class="status-badge inactive">
-                                        Inactive
+                                    <span class="status-badge draft">
+                                        Draft
                                     </span>
                                 {% endif %}
                             </td>
@@ -274,9 +275,9 @@
                             <td class="action-column">
                                 <div class="table-actions">
                                     <a
-                                        href="{% url 'admin:products_subcategory_change' category.pk %}"
-                                        class="action-btn">
-                                    
+                                        href="{% url 'admin:products_childcategory_change' category.pk %}"
+                                        class="edit-btn">
+
                                         Edit
                                     </a>
                                 </div>
@@ -288,17 +289,11 @@
                         <tr>
                             <td colspan="8">
                                 <div class="empty-state">
-
-                                    <h3>
-                                        No Sub Categories Found
-                                    </h3>
-
-                                    <p>
-                                        Create your first sub category to get started.
-                                    </p>
+                                    <h3>No child categories found.</h3>
                                 </div>
                             </td>
                         </tr>
+
                         {% endfor %}
                     </tbody>
                 </table>
@@ -306,14 +301,14 @@
         </form>
     </section>
 
-    <!-- PAGINATION FOOTER -->
+     <!-- PAGINATION FOOTER -->
     {% if cl.result_count %}
 
-        <section class="subcategory-pagination-footer">
-            <div class="subcategory-pagination-info">
+        <section class="childcategory-pagination-footer">
+            <div class="childcategory-pagination-info">
                 Showing
                 {{ cl.result_count }}
-                Sub Categories{{ cl.result_count|pluralize }}
+                Child Categories{{ cl.result_count|pluralize }}
             </div>
         </section>
     {% endif %}
@@ -354,35 +349,4 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-            const selectAll =
-                document.getElementById(
-                    "action-toggle"
-                );
-
-            if (!selectAll) {
-                return;
-            }
-
-            selectAll.addEventListener(
-                "change",
-                function () {
-                    document
-                        .querySelectorAll(
-                            "input[name='_selected_action']"
-                        )
-                        .forEach(
-                            checkbox => {
-                                checkbox.checked =
-                                    this.checked;
-                            }
-                        );
-                }
-            );
-        }
-    );
-</script>
 {% endblock %}

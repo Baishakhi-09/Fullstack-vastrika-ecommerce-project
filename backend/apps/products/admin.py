@@ -457,11 +457,33 @@ class ChildCategoryAdmin(
         "admin/products/childcategory/childcategory_form.html"
     )
 
+    change_list_template = (
+        "admin/products/childcategory/childcategory_list.html"
+    )
+
     list_display = (
         "name",
+        "get_parent_category",
         "sub_category",
         "sort_order",
         "is_active",
+    )
+
+    search_fields = (
+        "name",
+        "slug",
+        "sub_category__name",
+    )
+
+    list_filter = (
+        "is_active",
+        "sub_category",
+    )
+
+    ordering = (
+        "sub_category",
+        "sort_order",
+        "name",
     )
 
     prepopulated_fields = {
@@ -469,14 +491,100 @@ class ChildCategoryAdmin(
     }
 
     fieldsets = ()
+    
+    actions = [
+        "delete_selected_childcategories"
+    ]
 
     @admin.display(description="Parent Category")
     def get_parent_category(self, obj):
 
-        if obj.sub_category:
-            return obj.sub_category.parent_category
+        return (
+            obj.sub_category.parent_category
+            if obj.sub_category
+            else "-"
+        )
 
-        return "-"
+    def get_actions(
+        self,
+        request
+    ):
+        actions = super().get_actions(
+            request
+        )
+
+        actions.pop(
+            "delete_selected",
+            None
+        )
+
+        return actions
+
+    @admin.action(
+        description="Delete selected child categories"
+    )
+    def delete_selected_childcategories(
+        self,
+        request,
+        queryset
+    ):
+        total_deleted = queryset.count()
+
+        for obj in queryset:
+            obj.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} child category(s) deleted successfully."
+        )
+
+    def changelist_view(
+        self,
+        request,
+        extra_context=None
+    ):
+        extra_context = extra_context or {}
+
+        queryset = ChildCategory.objects.all()
+
+        extra_context.update(
+            {
+                "total_categories":
+                    queryset.count(),
+
+                "active_categories":
+                    queryset.filter(
+                        is_active=True
+                    ).count(),
+
+                "draft_categories":
+                    queryset.filter(
+                        is_active=False
+                    ).count(),
+
+                "total_products":
+                    0,  # replace later with real relation
+            }
+        )
+
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context
+        )
+
+        if hasattr(response, "context_data"):
+            action_form = response.context_data.get(
+                "action_form"
+            )
+
+            if action_form:
+                action_form.fields[
+                    "action"
+                ].widget.attrs.update({
+                    "id": "id_action"
+                })
+
+        return response
 
 
 # =========================================================

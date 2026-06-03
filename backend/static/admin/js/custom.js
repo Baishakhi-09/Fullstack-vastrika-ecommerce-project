@@ -1021,6 +1021,8 @@ function initDeleteModal() {
 
                 "delete_selected_subcategories",
 
+                "delete_selected_childcategories",
+
                 "delete_selected"
             ];
 
