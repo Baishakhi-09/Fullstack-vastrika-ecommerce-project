@@ -1504,13 +1504,70 @@ class StockAdmin(
         "admin/products/stock/stock_form.html"
     )
 
+    change_list_template = (
+        "admin/products/stock/stock_list.html"
+    )
+
     list_display = (
         "product_variant",
         "warehouse",
         "quantity",
     )
 
+    search_fields = (
+        "product_variant__sku",
+        "warehouse__name",
+    )
+
     fieldsets = ()
+
+    def get_queryset(
+        self,
+        request,
+    ):
+        queryset = (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "product_variant",
+                "warehouse",
+            )
+        )
+
+        status = request.GET.get(
+            "status"
+        )
+
+        if status == "in_stock":
+
+            queryset = queryset.filter(
+                quantity__gt=10
+            )
+
+        elif status == "low_stock":
+
+            queryset = queryset.filter(
+                quantity__gt=0,
+                quantity__lte=10
+            )
+
+        elif status == "out_stock":
+
+            queryset = queryset.filter(
+                quantity=0
+            )
+
+        warehouse = request.GET.get(
+            "warehouse"
+        )
+
+        if warehouse:
+
+            queryset = queryset.filter(
+                warehouse_id=warehouse
+            )
+
+        return queryset
 
     def changeform_view(
         self,
@@ -1532,15 +1589,15 @@ class StockAdmin(
             if stock:
                 available_stock = stock.quantity
 
-        inventory_status = "out of stock"
+        inventory_status = "Out Of Stock"
         inventory_status_class = "status-out-stock"
 
         if available_stock > 10:
-            inventory_status = "in_stock"
+            inventory_status = "In Stock"
             inventory_status_class = "status-in-stock"
 
         elif available_stock > 0:
-            inventory_status = "low_stock"
+            inventory_status = "Low Stock"
             inventory_status_class = "status-low-stock"
 
         extra_context.update({
@@ -1581,6 +1638,42 @@ class StockAdmin(
             object_id,
             form_url,
             extra_context,
+        )
+    
+    def changelist_view(
+        self,
+        request,
+        extra_context=None,
+    ):
+        extra_context = extra_context or {}
+
+        extra_context.update({
+
+            "total_stock_count":
+                Stock.objects.count(),
+
+            "in_stock_count":
+                Stock.objects.filter(
+                    quantity__gt=10
+                ).count(),
+
+            "low_stock_count":
+                Stock.objects.filter(
+                    quantity__lte=10,
+                    quantity__gt=0
+                ).count(),
+
+            "warehouse_count":
+                Warehouse.objects.count(),
+
+            "warehouses":
+                Warehouse.objects.all(),
+
+        })
+
+        return super().changelist_view(
+            request,
+            extra_context=extra_context,
         )
 
 # =========================================================

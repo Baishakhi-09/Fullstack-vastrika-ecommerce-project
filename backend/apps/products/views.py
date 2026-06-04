@@ -35,6 +35,8 @@ from .models import (
     Product,
     ProductTag,
     ProductVariant,
+    Stock,
+    Warehouse,
     WishlistItem,
 )
 from .serializers import (
@@ -265,6 +267,177 @@ def export_products_pdf(request):
 
     return response
 
+
+# Add Stock CSV Export
+@staff_member_required
+def export_stock_csv(request):
+
+    response = HttpResponse(
+        content_type="text/csv; charset=utf-8"
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="stock.csv"'
+    )
+
+    response.write("\ufeff")
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        "Product Variant",
+        "Warehouse",
+        "Quantity",
+        "Status",
+    ])
+
+    stocks = (
+        Stock.objects.select_related(
+            "product_variant",
+            "warehouse",
+        )
+        .order_by("-created_at")
+    )
+
+    for stock in stocks:
+
+        if stock.quantity > 10:
+            status = "In Stock"
+
+        elif stock.quantity > 0:
+            status = "Low Stock"
+
+        else:
+            status = "Out Of Stock"
+
+        writer.writerow([
+            stock.product_variant,
+            stock.warehouse,
+            stock.quantity,
+            status,
+        ])
+
+    return response
+
+# Add Stock Excel Export
+@staff_member_required
+def export_stock_excel(request):
+
+    workbook = Workbook()
+
+    worksheet = workbook.active
+
+    worksheet.title = "Stock"
+
+    worksheet.append([
+        "Product Variant",
+        "Warehouse",
+        "Quantity",
+        "Status",
+    ])
+
+    stocks = (
+        Stock.objects.select_related(
+            "product_variant",
+            "warehouse",
+        )
+        .order_by("-created_at")
+    )
+
+    for stock in stocks:
+
+        if stock.quantity > 10:
+            status = "In Stock"
+
+        elif stock.quantity > 0:
+            status = "Low Stock"
+
+        else:
+            status = "Out Of Stock"
+
+        worksheet.append([
+            str(stock.product_variant),
+            str(stock.warehouse),
+            stock.quantity,
+            status,
+        ])
+
+    response = HttpResponse(
+        content_type=(
+            "application/vnd.openxmlformats-officedocument"
+            ".spreadsheetml.sheet"
+        )
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="stock.xlsx"'
+    )
+
+    workbook.save(response)
+
+    return response
+
+# Add Stock PDF Export
+@staff_member_required
+def export_stock_pdf(request):
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="stock.pdf"'
+    )
+
+    document = SimpleDocTemplate(
+        response,
+        pagesize=letter,
+    )
+
+    data = [[
+        "Product Variant",
+        "Warehouse",
+        "Quantity",
+        "Status",
+    ]]
+
+    stocks = (
+        Stock.objects.select_related(
+            "product_variant",
+            "warehouse",
+        )
+        .order_by("-created_at")
+    )
+
+    for stock in stocks:
+
+        if stock.quantity > 10:
+            status = "In Stock"
+
+        elif stock.quantity > 0:
+            status = "Low Stock"
+
+        else:
+            status = "Out Of Stock"
+
+        data.append([
+            str(stock.product_variant),
+            str(stock.warehouse),
+            str(stock.quantity),
+            status,
+        ])
+
+    table = Table(data)
+
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.black),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+    ]))
+
+    document.build([table])
+
+    return response
 
 # -------------------- PRODUCT LIST / PLP -------------------- #
 class ProductListAPIView(generics.ListAPIView):

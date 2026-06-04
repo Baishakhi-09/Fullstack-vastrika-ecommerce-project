@@ -112,48 +112,6 @@
             </div>
         </div>
 
-        <!-- <section class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-label">
-                    Total Stock
-                </span>
-
-                <strong class="stat-value">
-                    {{ total_stock|default_if_none:"0" }}
-                </strong>
-            </div>
-
-            <div class="stat-card">
-                <span class="stat-label">
-                    Warehouses
-                </span>
-
-                <strong class="stat-value">
-                    {{ warehouse_count|default:"0" }}
-                </strong>
-            </div>
-
-            <div class="stat-card">
-                <span class="stat-label">
-                    Low Stock
-                </span>
-
-                <strong class="stat-value">
-                    {{ low_stock_count|default:"0" }}
-                </strong>
-            </div>
-
-            <div class="stat-card">
-                <span class="stat-label">
-                    Out Of Stock
-                </span>
-
-                <strong class="stat-value">
-                    {{ out_of_stock_count|default:"0" }}
-                </strong>
-            </div>
-        </section> -->
-
         <section class="stock-layout">
             <main class="stock-main">
                 {% include "admin/products/stock/components/stock_information.html" %}

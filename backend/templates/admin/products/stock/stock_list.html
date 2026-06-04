@@ -1,0 +1,419 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="stock-page">
+    <section class="page-header">
+        <div class="header-content">
+            <h1>
+                Stock Management
+            </h1>
+
+            <p>
+                Monitor inventory levels, warehouse allocation, and stock availability.
+            </p>
+        </div>
+
+        <div class="header-actions">
+            <a
+                href="{% url 'admin:products_stock_add' %}"
+                class="btn-primary">
+
+                + Add Stock
+            </a>
+        </div>
+    </section>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <span>
+                Total Stocks
+            </span>
+
+            <strong>
+                {{ total_stock_count|default:"0" }}
+            </strong>
+        </div>
+
+        <div class="stat-card">
+            <span>
+                In Stock
+            </span>
+
+            <strong>
+                {{ in_stock_count|default:"0" }}
+            </strong>
+        </div>
+
+        <div class="stat-card">
+            <span>
+                Low Stock
+            </span>
+
+            <strong>
+                {{ low_stock_count|default:"0" }}
+            </strong>
+        </div>
+
+        <div class="stat-card">
+            <span>
+                Warehouses
+            </span>
+
+            <strong>
+                {{ warehouse_count|default:"0" }}
+            </strong>
+        </div>
+    </section>
+
+    <section class="stock-toolbar">
+        <form
+            method="get"
+            class="toolbar-card">
+
+            <div class="toolbar-search-row">
+                <div class="search-field">
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="Search product variant, SKU, or warehouse...">
+
+                    <button
+                        type="submit"
+                        class="search-btn">
+
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            <div class="toolbar-filter-row">
+                <select name="warehouse">
+                    <option value="">
+                        All Warehouses
+                    </option>
+
+                    {% for warehouse in warehouses %}
+
+                        <option
+                            value="{{ warehouse.id }}"
+                            {% if request.GET.warehouse == warehouse.id|stringformat:"s" %}
+                                selected
+                            {% endif %}>
+
+                            {{ warehouse.name }}
+                        </option>
+
+                    {% endfor %}
+                </select>
+
+                <select name="status">
+                    <option value="">
+                        All Status
+                    </option>
+
+                    <option
+                        value="in_stock"
+                        {% if request.GET.status == "in_stock" %}
+                            selected
+                        {% endif %}>
+
+                        In Stock
+                    </option>
+
+                    <option
+                        value="low_stock"
+                        {% if request.GET.status == "low_stock" %}
+                            selected
+                        {% endif %}>
+
+                        Low Stock
+                    </option>
+
+                    <option
+                        value="out_stock"
+                        {% if request.GET.status == "out_stock" %}
+                            selected
+                        {% endif %}>
+
+                        Out Of Stock
+                    </option>
+                </select>
+
+                <button
+                    type="submit"
+                    class="btn-primary">
+
+                    Apply Filters
+                </button>
+
+                <a
+                    href="{% url 'admin:products_stock_changelist' %}"
+                    class="btn-light">
+
+                    Reset
+                </a>
+
+                <div class="export-dropdown">
+                    <button
+                        type="button"
+                        class="btn-secondary export-toggle-btn">
+
+                        Export
+                        <span class="material-icons">
+                            expand_more
+                        </span>
+                    </button>
+
+                    <div class="export-menu">
+                        <a
+                            href="{% url 'export_stock_csv' %}"
+                            class="export-menu-item">
+
+                            Export CSV
+                        </a>
+
+                        <a
+                            href="{% url 'export_stock_excel' %}"
+                            class="export-menu-item">
+
+                            Export Excel
+                        </a>
+
+                        <a
+                            href="{% url 'export_stock_pdf' %}"
+                            class="export-menu-item">
+
+                            Export PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <section class="table-card">
+        <form
+            id="changelist-form"
+            method="post"
+            novalidate>
+
+            {% csrf_token %}
+
+            {% if cl.formset %}
+                {{ cl.formset.management_form }}
+            {% endif %}
+
+            <section class="stock-toolbar">
+                {% if action_form %}
+
+                    <div class="stock-toolbar-left">
+                        <label
+                            for="id_action"
+                            class="toolbar-label">
+                            
+                            Action
+                        </label>
+
+                        <select
+                            id="id_action"
+                            name="action"
+                            required>
+
+                            {% for choice in action_form.action.field.choices %}
+                                <option value="{{ choice.0 }}">
+                                    {{ choice.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <button
+                            type="submit"
+                            name="index"
+                            value="0"
+                            class="toolbar-go-btn"
+                            title="Run selected action">
+
+                            Go
+                        </button>
+                    </div>
+
+                    <div class="stock-toolbar-right">
+                        <div class="toolbar-count-badge">
+                            {{ cl.result_count }}
+                            Sub Categories{{ cl.result_count|pluralize }}
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="stock-table-container">
+                <table
+                    id="result_list"
+                    class="stock-table">
+
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column">
+                                <input
+                                    type="checkbox"
+                                    id="action-toggle">
+                            </th>
+
+                            <th class="variant-column">
+                                Product Variant
+                            </th>
+
+                            <th class="warehouse-column">
+                                Warehouse
+                            </th>
+
+                            <th class="quantity-column">
+                                Quantity
+                            </th>
+
+                            <th class="status-column">
+                                Inventory Status
+                            </th>
+
+                            <th class="created_column">
+                                Created Date
+                            </th>
+
+                            <th class="action-column">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for stock in cl.result_list %}
+
+                            <tr>
+                                <td class="checkbox-column">
+                                    <input
+                                        type="checkbox"
+                                        name="_selected_action"
+                                        value="{{ stock.pk }}">
+                                </td>
+
+                                <td class="variant-column">
+                                    <div class="product-cell">
+                                        <div class="product-details">
+                                            <strong class="product-name">
+                                                {{ stock.product_variant }}
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="warehouse-column">
+                                    {% if stock.warehouse %}
+                                        <span class="warehouse-name">
+                                            {{ stock.warehouse }}
+                                        </span>
+
+                                    {% else %}
+                                        <span class="empty-value">
+                                            Not Assigned
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="quantity-column">
+                                    <strong class="quantity-value">
+                                        {{ stock.quantity }}
+
+                                        {% if stock.quantity == 1 %}
+                                            Unit
+
+                                        {% else %}
+                                            Units
+
+                                        {% endif %}
+                                    </strong>
+                                </td>
+
+                                <td class="status-column">
+                                    {% if stock.quantity > 10 %}
+                                        <span class="status-badge status-active">
+                                            In Stock
+                                        </span>
+
+                                    {% elif stock.quantity > 0 %}
+                                        <span class="status-badge status-warning">
+                                            Low Stock
+                                        </span>
+
+                                    {% else %}
+                                        <span class="status-badge status-danger">
+                                            Out Of Stock
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="created_column">
+                                    {% if stock.created_at %}
+                                        <time datetime="{{ stock.created_at|date:'c' }}">
+                                            {{ stock.created_at|date:"M d, Y" }}
+                                        </time>
+
+                                    {% else %}
+
+                                        <span class="empty-value">
+                                            Not Available
+                                        </span>
+
+                                    {% endif %}
+                                </td>
+
+                                <td class="action-column">
+                                    <div class="table-actions">
+                                        <a
+                                            href="{% url 'admin:products_stock_change' stock.pk %}"
+                                            class="action-link action-edit">
+
+                                            Edit
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+                                <td
+                                    colspan="8"
+                                    class="empty-state">
+
+                                    <div class="empty-state-content">
+                                        <h3>
+                                            No Stock Records Found
+                                        </h3>
+
+                                        <p>
+                                            Create your first stock record to start managing inventory.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </form>
+    </section>
+
+    <section class="pagination-wrapper">
+        <div class="pagination-info">
+            Showing
+
+            {{ cl.result_count }}
+            stock records
+        </div>
+    </section>
+</section>
+{% endblock %}

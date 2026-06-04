@@ -19,6 +19,9 @@ from .views import (
     export_products_csv,
     export_products_excel,
     export_products_pdf,
+    export_stock_csv,
+    export_stock_excel,
+    export_stock_pdf,
     
     ai_tag_analysis,
 )
@@ -145,6 +148,24 @@ urlpatterns = [
         "admin/products/export/pdf/",
         export_products_pdf,
         name="export_products_pdf",
+    ),
+
+    path(
+        "admin/stock/export/csv/",
+        export_stock_csv,
+        name="export_stock_csv",
+    ),
+
+    path(
+        "admin/stock/export/excel/",
+        export_stock_excel,
+        name="export_stock_excel",
+    ),
+
+    path(
+        "admin/stock/export/pdf/",
+        export_stock_pdf,
+        name="export_stock_pdf",
     ),
 
     # PRODUCT DETAIL
