@@ -1,0 +1,172 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+
+{{ block.super }}
+
+{{ media }}
+
+
+{% endblock %}
+
+{% block content %}
+
+<form
+    method="post"
+    enctype="multipart/form-data"
+    class="stock-form">
+
+    {% csrf_token %}
+
+    {% for hidden in adminform.form.hidden_fields %}
+
+        {{ hidden }}
+
+    {% endfor %}
+
+
+    {% if messages %}
+        <div class="messages-wrapper">
+
+            {% for message in messages %}
+                <div class="message-item {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if adminform.form.non_field_errors %}
+        <div class="form-errors">
+            {% if adminform.form.non_field_errors %}
+
+                <ul class="error-list">
+                    {% for error in adminform.form.non_field_errors %}
+
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <section class="stock-page">
+        <div class="page-header">
+            <div class="header-content">
+                <h1>
+                    {% if original %}
+
+                        Edit Stock
+                    {% else %}
+
+                        Add Stock
+                    {% endif %}
+                </h1>
+
+                <nav class="page-breadcrumb">
+                    <a href="{% url 'admin:index' %}">
+                        Dashboard
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="{% url 'admin:products_stock_changelist' %}">
+                        Stock
+                    </a>
+
+                    <span>/</span>
+
+                    <span class="current-page">
+                        {% if original %}
+
+                            Edit Stock
+                        {% else %}
+
+                            Add Stock
+                        {% endif %}
+                    </span>
+                </nav>
+
+                <p>
+                    Manage inventory quantities, warehouse allocation, stock levels, and warehouse operations.
+                </p>
+            </div>
+
+            <div class="quick-actions">
+                <button
+                    type="submit"
+                    name="_addanother"
+                    class="btn-secondary">
+
+                    Save & Add Another
+                </button>
+
+                <button
+                    type="submit"
+                    name="_save"
+                    class="btn-primary">
+
+                    Save Stock
+                </button>
+            </div>
+        </div>
+
+        <!-- <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">
+                    Total Stock
+                </span>
+
+                <strong class="stat-value">
+                    {{ total_stock|default_if_none:"0" }}
+                </strong>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-label">
+                    Warehouses
+                </span>
+
+                <strong class="stat-value">
+                    {{ warehouse_count|default:"0" }}
+                </strong>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-label">
+                    Low Stock
+                </span>
+
+                <strong class="stat-value">
+                    {{ low_stock_count|default:"0" }}
+                </strong>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-label">
+                    Out Of Stock
+                </span>
+
+                <strong class="stat-value">
+                    {{ out_of_stock_count|default:"0" }}
+                </strong>
+            </div>
+        </section> -->
+
+        <section class="stock-layout">
+            <main class="stock-main">
+                {% include "admin/products/stock/components/stock_information.html" %}
+
+                {% include "admin/products/stock/components/inventory_controls.html" %}
+            </main>
+
+            <aside class="stock-sidebar">
+                {% include "admin/products/stock/components/inventory_summary.html" %}
+
+                {% include "admin/products/stock/components/audit_information.html" %}
+            </aside>
+        </section>
+    </section>
+</form>
+{% endblock %}

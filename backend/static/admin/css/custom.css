@@ -9859,6 +9859,484 @@ tbody tr:nth-child(even) {
 }
 
 /* ===============================
+    STOCK ADMIN PAGE
+================================ */
+
+/* ===============================
+    STOCK EDITOR PAGE
+================================ */
+
+.stock-page {
+    padding: 25px;
+}
+
+.stock-page .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 32px;
+    border-radius: 2px;
+    background: linear-gradient(135deg, #0f172a, #142f57);
+    color: #fff;
+}
+
+.stock-page .page-header .header-content {
+    flex: 1;
+}
+
+.stock-page .page-header .header-content h1 {
+    margin: 0 0 10px;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.03em;
+    color: #ffffff;
+}
+
+.stock-page .page-header .header-content .page-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.stock-page .page-header .header-content .page-breadcrumb a {
+    color: #ffffff;
+    text-decoration: none;
+    opacity: .88;
+    transition: opacity .2s ease;
+}
+
+.stock-page .page-header .header-content .page-breadcrumb .current-page {
+    color: #c5396a;
+}
+
+.stock-page .page-header .header-content p {
+    max-width: 620px;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, .82);
+}
+
+.stock-page .page-header .quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stock-page .page-header .quick-actions .btn-primary,
+.stock-page .page-header .quick-actions .btn-secondary {
+    height: 52px;
+    padding: 0 24px;
+    border-radius: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.stock-page .page-header .quick-actions .btn-secondary {
+    background: #fff;
+    color: #344054;
+    border: none !important;
+}
+
+.stock-page .page-header .quick-actions .btn-primary {
+    background: #e83e8c;
+    color: #fff;
+    border: none;
+}
+
+.stock-page .stock-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 24px;
+    align-items: start;
+}
+
+.stock-page .stock-layout .stock-main .admin-card {
+    position: relative;
+    padding: 32px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, .04);
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 22px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-header h2 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-header p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #64748b;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group {
+    position: relative;
+    margin-bottom: 0 !important;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group label {
+    display: inline-block;
+    align-items: center;
+    margin-bottom: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group .field-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group .field-wrapper 
+.related-widget-wrapper {
+    width: 100%;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group .field-wrapper 
+.related-widget-wrapper select,
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group input {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 18px;
+    font-family: 'Amaranth', sans-serif;
+    background: #fff;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group .field-wrapper 
+.related-widget-wrapper .related-widget-wrapper-link {
+    display: none !important;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .form-grid .form-group .field-help {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-header {
+    margin-bottom: 8px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-header 
+.field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    width: fit-content;
+    min-height: 32px;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.status-badge.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.status-badge.status-pending {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.empty-state {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.metric-value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    color: #0f172a;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.metric-value .metric-unit {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.status-badge.status-in-stock {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.status-badge.status-low-stock {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid .form-group .field-value 
+.status-badge.status-out-stock {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-note {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.stock-page .stock-layout .stock-main .admin-card .card-body .inventory-note .note-icon {
+    flex-shrink: 0;
+    font-weight: 700;
+}
+
+.stock-page .stock-layout .stock-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-header {
+    padding: 22px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-header .card-header-content h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 24px;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: right;
+    line-height: 1.4;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item time {
+    color: inherit;
+    font-weight: inherit;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item .status-in-stock {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item .status-low-stock {
+    color: #b45309;
+    background: #fef3c7;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item .status-out-stock {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item .status-active {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item .status-pending {
+    color: #475569;
+    background: #f1f5f9;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-divider {
+    width: 100%;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item .audit-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item .audit-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: right;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item 
+.audit-value time {
+    color: inherit;
+    font-weight: inherit;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item .status-badge 
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item .status-badge 
+.status-pending {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* ===============================
     RESPONSIVE
 ================================ */
 
@@ -10179,5 +10657,31 @@ tbody tr:nth-child(even) {
     .brand-editor-page .product-editor-layout .editor-main .admin-card .card-body .form-fieldset 
     .form-group .brand-upload-wrapper .brand-upload-dropzone .brand-live-preview .brand-preview-image-wrapper {
         padding: 20px;
+    }
+
+    .stock-page .stock-layout .stock-main .admin-card .card-body .inventory-form-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stock-page .stock-layout .stock-sidebar .admin-card .card-body .audit-list .audit-item .audit-value {
+        text-align: left;
+    }
+}
+
+@media (max-width: 576px) {
+    .stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .stock-page .stock-layout .stock-sidebar .admin-card .card-body .summary-list .summary-item strong {
+        text-align: left;
     }
 }

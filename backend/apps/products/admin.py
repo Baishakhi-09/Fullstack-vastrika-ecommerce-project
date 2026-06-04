@@ -788,10 +788,6 @@ class ProductTagAdmin(
                 })
 
         return response
-    
-    # =====================================================
-    # CHANGE FORM
-    # =====================================================
 
     def changeform_view(
         self,
@@ -845,10 +841,6 @@ class ProductTagAdmin(
                     seo_score
                 )
 
-                # =====================================
-                # ASSOCIATED PRODUCTS COUNT
-                # =====================================
-
                 try:
 
                     associated_products_count = (
@@ -860,10 +852,6 @@ class ProductTagAdmin(
                 except Exception:
 
                     associated_products_count = 0
-
-                # =====================================
-                # VISIBILITY STATUS
-                # =====================================
 
                 if seo_score >= 80:
 
@@ -920,8 +908,7 @@ class ProductTagAdmin(
             form_url,
             extra_context,
         )
-            
-
+         
 
 # =========================================================
 # PRODUCT ADMIN
@@ -1402,7 +1389,6 @@ class ProductAdmin(
             is_featured=True
         )
 
-
 # =========================================================
 # PRODUCT IMAGE ADMIN
 # =========================================================
@@ -1458,7 +1444,6 @@ class ProductImageAdmin(
 
         return "No Image"
 
-
 # =========================================================
 # PRODUCT VARIANT ADMIN
 # =========================================================
@@ -1506,6 +1491,97 @@ class ProductVariantAdmin(
     def available_stock_display(self, obj):
         return obj.available_stock
 
+# =========================================================
+# STOCK ADMIN
+# =========================================================
+
+class StockAdmin(
+    AuditAdminMixin,
+    RoleBasedAdminMixin,
+    admin.ModelAdmin,
+):
+    change_form_template = (
+        "admin/products/stock/stock_form.html"
+    )
+
+    list_display = (
+        "product_variant",
+        "warehouse",
+        "quantity",
+    )
+
+    fieldsets = ()
+
+    def changeform_view(
+        self,
+        request,
+        object_id=None,
+        form_url="",
+        extra_context=None,
+    ):
+        extra_context = extra_context or {}
+
+        available_stock = 0
+
+        if object_id:
+            stock = self.get_object(
+                request,
+                object_id
+            )
+
+            if stock:
+                available_stock = stock.quantity
+
+        inventory_status = "out of stock"
+        inventory_status_class = "status-out-stock"
+
+        if available_stock > 10:
+            inventory_status = "in_stock"
+            inventory_status_class = "status-in-stock"
+
+        elif available_stock > 0:
+            inventory_status = "low_stock"
+            inventory_status_class = "status-low-stock"
+
+        extra_context.update({
+            "total_stock":
+                Stock.objects.count(),
+
+            "warehouse_count":
+                Warehouse.objects.count(),
+
+            "low_stock_count":
+                Stock.objects.filter(
+                    quantity__lte=5
+                ).count(),
+
+            "out_of_stock_count":
+                Stock.objects.filter(
+                    quantity=0
+                ).count(),
+
+            "current_stock":
+                available_stock,
+
+            "reserved_stock":
+                0,
+
+            "available_stock":
+                available_stock,
+
+            "inventory_status":
+                inventory_status,
+
+            "inventory_status_class":
+                inventory_status_class,
+        })
+
+        return super().changeform_view(
+            request,
+            object_id,
+            form_url,
+            extra_context,
+        )
 
 # =========================================================
 # CART ADMIN
@@ -1547,7 +1623,6 @@ class WishlistItemAdmin(
     ordering = (
         "-created_at",
     )
-
 
 # =========================================================
 # NOTIFICATION ADMIN
@@ -1645,6 +1720,7 @@ admin_site.register(
 
 admin_site.register(
     Stock,
+    StockAdmin,
 )
 
 admin_site.register(

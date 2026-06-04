@@ -1,0 +1,118 @@
+<div class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h3>
+                Inventory Summary
+            </h3>
+
+            <p>
+                Live inventory overview, stock availability, and warehouse status.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div
+            class="summary-list"
+            role="list">
+
+            <div
+                class="summary-item"
+                role="listitem">
+
+                <span>
+                    Current Stock
+                </span>
+
+                <strong>
+                    {{ current_stock|default_if_none:"0" }}
+                </strong>
+            </div>
+
+            <div 
+                class="summary-item"
+                role="listitem">
+
+                <span>
+                    Reserved Stock
+                </span>
+
+                <strong>
+                    {{ reserved_stock|default_if_none:"0" }}
+                </strong>
+            </div>
+
+            <div class="summary-item">
+                <span>
+                    Available Stock
+                </span>
+
+                <strong>
+                    {{ available_stock|default_if_none:"0" }}
+                </strong>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-item">
+                <span>
+                    Inventory Status
+                </span>
+
+                <strong class="status-badge {{ inventory_status_class|default:'status-out-stock' }}">
+                    {{ inventory_status|default:"Out Of Stock" }}
+                </strong>
+            </div>
+
+            <div class="summary-item">
+                <span>
+                    Warehouse Status
+                </span>
+
+                <strong class="status-badge {{ warehouse_status_class|default:'status-pending' }}">
+                    {{ warehouse_status|default:"Pending" }}
+                </strong>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-item">
+                <span>
+                    Last Updated
+                </span>
+
+                <strong>
+                    {% if original and original.updated_at %}
+
+                        <time datetime="{{ original.updated_at|date:'c' }}">
+                            {{ original.updated_at|date:"M d, Y • h:i A" }}
+                        </time>
+
+                    {% else %}
+                        Pending Update
+
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="summary-item">
+                <span>
+                    Record Status
+                </span>
+
+                {% if original %}
+
+                    <strong class="status-badge status-active">
+                        Existing Record
+                    </strong>
+
+                {% else %}
+
+                    <strong class="status-badge status-pending">
+                        New Record
+                    </strong>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

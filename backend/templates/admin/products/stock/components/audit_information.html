@@ -1,0 +1,103 @@
+<div class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h3>
+                Audit Information
+            </h3>
+
+            <p>
+                Review record ownership, creation history, and modification details.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="audit-list">
+            <div class="audit-item">
+                <span class="audit-label">
+                    Created By
+                </span>
+
+                <strong class="audit-value">
+                    {% if original and original.created_by %}
+                        {{ original.created_by }}
+
+                    {% else %}
+                        Not Available
+
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="audit-item">
+                <span class="audit-label">
+                    Created Date
+                </span>
+
+                <strong class="audit-value">
+                    {% if original and original.created_at %}
+                        <time datetime="{{ original.created_at|date:'c' }}">
+                            {{ original.created_at|date:"M d, Y • h:i A" }}
+                        </time>
+
+                    {% else %}
+                        Not Available
+
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="audit-item">
+                <span class="audit-label">
+                    Updated By
+                </span>
+
+                <strong class="audit-value">
+                    {% if original and original.updated_by %}
+                        {{ original.updated_by }}
+
+                    {% else %}
+                        Not Available
+
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="audit-item">
+                <span class="audit-label">
+                    Last Updated
+                </span>
+
+                <strong class="audit-value">
+                    {% if original and original.updated_at %}
+
+                        <time datetime="{{ original.updated_at|date:'c' }}">
+                            {{ original.updated_at|date:"M d, Y • h:i A" }}
+                        </time>
+
+                    {% else %}
+                        Not Available
+
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="audit-item">
+                <span class="audit-label">
+                    Record Status
+                </span>
+
+                {% if original %}
+                    <strong class="status-badge status-active">
+                        Existing Record
+                    </strong>
+
+                {% else %}
+                    <strong class="status-badge status-pending">
+                        New Record
+                    </strong>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

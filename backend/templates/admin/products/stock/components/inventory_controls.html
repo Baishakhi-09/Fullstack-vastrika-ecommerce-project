@@ -1,0 +1,112 @@
+<div class="admin-card inventory-controls-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Inventory Controls
+            </h2>
+
+            <p>
+                Monitor stock allocation, warehouse assignment, and inventory availability.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="inventory-form-grid">
+            <div class="form-group">
+                <div class="field-header">
+                    <div class="field-label">
+                        Assigned Warehouse
+                    </div>
+                </div>
+
+                <div class="field-value">
+                    {% if original and original.warehouse %}
+
+                        <span class="status-badge status-active">
+                            {{ original.warehouse.name }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="status-badge status-pending">
+                            Not Assigned
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="field-header">
+
+                    <div class="field-label">
+
+                        Product Variant
+
+                    </div>
+
+                </div>
+
+                <div class="field-value">
+                    {% if original and original.product_variant %}
+                        {{ original.product_variant }}
+
+                    {% else %}
+
+                        <span class="empty-state">
+                            Not Selected
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="field-header">
+                    <div class="field-label">
+                        Current Quantity
+                    </div>
+                </div>
+
+                <div class="field-value">
+                    <strong class="metric-value">
+                        {{ current_stock|default_if_none:"0" }}
+
+                        <span class="metric-unit">
+                            {% if current_stock == 1 %}
+                                Unit
+
+                            {% else %}
+                                Units
+
+                            {% endif %}
+                        </span>
+                    </strong>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="field-header">
+                    <div class="field-label">
+                        Inventory Status
+                    </div>
+                </div>
+
+                <div class="field-value">
+                    <span class="status-badge {{ inventory_status_class|default:'status-out-stock' }}">
+                        {{ inventory_status|default:"Out Of Stock" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="inventory-note">
+            <span class="note-icon">
+                ℹ
+            </span>
+
+            <span>
+                Inventory availability is calculated automatically from the stock quantity assigned to this warehouse.
+            </span>
+        </div>
+    </div>
+</div>

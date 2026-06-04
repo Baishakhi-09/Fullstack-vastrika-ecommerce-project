@@ -1,0 +1,81 @@
+<div class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Stock Information
+            </h2>
+
+            <p>
+                Configure inventory allocation, warehouse assignment, and available stock quantity.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="form-grid">
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.product_variant.label_tag }}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.product_variant }}
+                </div>
+
+                {% if adminform.form.product_variant.help_text %}
+                    <div class="field-help">
+                        {{ adminform.form.product_variant.help_text }}
+                    </div>
+                {% endif %}
+
+                {% for error in adminform.form.product_variant.errors %}
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.warehouse.label_tag }}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.warehouse }}
+                </div>
+
+                {% if adminform.form.warehouse.help_text %}
+                    <div class="field-help">
+                        {{ adminform.form.warehouse.help_text }}
+                    </div>
+                {% endif %}
+
+                {% for error in adminform.form.warehouse.errors %}
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.quantity.label_tag }}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.quantity }}
+                </div>
+
+                <div class="field-help">
+                    Specify the available inventory quantity for the selected warehouse.
+                </div>
+
+                {% for error in adminform.form.quantity.errors %}
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
