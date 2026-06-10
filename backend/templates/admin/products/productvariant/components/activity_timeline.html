@@ -1,0 +1,136 @@
+<section class="admin-card timeline-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Activity Timeline
+            </h2>
+
+            <p>
+                Lifecycle and operational history of this product variant.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        {% if original %}
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker timeline-success"></div>
+
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            Variant Created
+                        </div>
+
+                        <div class="timeline-description">
+                            Product variant record was created in the catalog.
+                        </div>
+
+                        <div class="timeline-meta">
+                            {% if original.created_at %}
+                                {{ original.created_at|date:"M d, Y H:i" }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker timeline-primary"></div>
+
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            Last Updated
+                        </div>
+
+                        <div class="timeline-description">
+                            Variant information was modified.
+                        </div>
+
+                        <div class="timeline-meta">
+                            {% if original.updated_at %}
+                                {{ original.updated_at|date:"M d, Y H:i" }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker timeline-warning"></div>
+
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            Inventory Status
+                        </div>
+
+                        <div class="timeline-description">
+                            {% if original.available_stock <= 0 %}
+
+                                Variant is currently out of stock.
+                            {% elif original.available_stock <= 5 %}
+
+                                Variant inventory is running low.
+                            {% else %}
+
+                                Variant inventory is healthy.
+                            {% endif %}
+                        </div>
+
+                        <div class="timeline-meta">
+
+                            Available Stock:
+                            {{ original.available_stock }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker timeline-info"></div>
+
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            Variant Snapshot
+                        </div>
+
+                        <div class="timeline-description">
+                            {{ original.color }}
+                            /
+                            {{ original.size }}
+
+                            {% if original.variant_sku %}
+                                • {{ original.variant_sku }}
+                            {% endif %}
+                        </div>
+
+                        <div class="timeline-meta">
+                            {% if original.is_active %}
+
+                                Active Variant
+                            {% else %}
+
+                                Inactive Variant
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-state-content">
+                    <h3>
+                        Timeline Not Available
+                    </h3>
+
+                    <p>
+                        Save the variant first to generate activity history.
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

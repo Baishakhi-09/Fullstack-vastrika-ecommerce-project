@@ -132,7 +132,6 @@
                         aria-label="Search">
                         Search
                     </button>
-
                 </div>
             </form>
         </div>
@@ -190,9 +189,11 @@
         <div class="table-container product-table-area">
             <form id="changelist-form" method="post" novalidate>
                 {% csrf_token %}
+
                 {% if cl.formset %}
                     {{ cl.formset.management_form }}
                 {% endif %}
+                
                 {% if action_form and actions_on_top and cl.show_admin_actions %}
                 <div class="admin-actions-top">
                     {% admin_actions %}
@@ -212,10 +213,6 @@
                 {% pagination cl %}
             </div>
         </div>
-
-        <!-- =================================================
-             FILTER SIDEBAR
-        ================================================== -->
 
         {% if cl.has_filters %}
             <aside id="changelist-filter" class="product-filter-sidebar">

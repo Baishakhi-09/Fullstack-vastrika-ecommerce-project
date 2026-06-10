@@ -12,7 +12,7 @@
                 </h2>
 
                 <p class="card-description">
-                    {% trans "Manage core product details, brand associations, and product descriptions." %}
+                    {% trans "Manage product identity, categorization, branding, and customer-facing descriptions." %}
                 </p>
             </div>
         </div>
@@ -20,10 +20,12 @@
 
     <div class="card-body">
         <fieldset class="form-fieldset">
+
             <legend class="fieldset-legend">
-                {% trans "Product Classification" %}
+                {% trans "Product Information" %}
             </legend>
 
+            <!-- PRODUCT NAME -->
             <div class="form-group full-width">
                 <label
                     for="{{ adminform.form.name.id_for_label }}"
@@ -34,211 +36,201 @@
                     </span>
 
                     {% if adminform.form.name.field.required %}
-
-                        <span
-                            class="required-indicator"
-                            aria-hidden="true">
-
-                            *
-                        </span>
+                        <span class="required-indicator">*</span>
                     {% endif %}
                 </label>
-
-                {% if adminform.form.name.help_text %}
-
-                    <div
-                        class="field-help-text"
-                        id="{{ adminform.form.name.id_for_label }}_help">
-
-                        {{ adminform.form.name.help_text }}
-                    </div>
-                {% endif %}
-
-                {% if adminform.form.name.errors %}
-
-                    <div
-                        class="field-errors"
-                        role="alert">
-
-                        {{ adminform.form.name.errors }}
-                    </div>
-                {% endif %}
 
                 <div class="admin-input-wrapper">
                     {{ adminform.form.name }}
                 </div>
+
+                {% if adminform.form.name.errors %}
+                    <div class="field-errors">
+                        {{ adminform.form.name.errors }}
+                    </div>
+                {% endif %}
             </div>
 
-            <div class="form-grid two-column-grid">
+            <!-- SLUG -->
+            {% if adminform.form.slug %}
+            <div class="form-group full-width">
+
+                <label
+                    for="{{ adminform.form.slug.id_for_label }}"
+                    class="form-label">
+
+                    <span class="label-text">
+                        {{ adminform.form.slug.label }}
+                    </span>
+                </label>
+
+                <div class="admin-input-wrapper">
+                    {{ adminform.form.slug }}
+                </div>
+
+                {% if adminform.form.slug.errors %}
+                    <div class="field-errors">
+                        {{ adminform.form.slug.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+            <legend class="fieldset-legend">
+                {% trans "Brand & Classification" %}
+            </legend>
+
+            <div class="form-grid three-column-grid">
+
+                {% if adminform.form.brand %}
                 <div class="form-group">
+
                     <label
                         for="{{ adminform.form.brand.id_for_label }}"
                         class="form-label">
 
-                        <span class="label-text">
-                            {{ adminform.form.brand.label }}
-                        </span>
-
-                        {% if adminform.form.brand.field.required %}
-
-                            <span
-                                class="required-indicator"
-                                aria-hidden="true">
-
-                                *
-                            </span>
-                        {% endif %}
+                        {{ adminform.form.brand.label }}
                     </label>
-
-                    {% if adminform.form.brand.help_text %}
-
-                        <div
-                            class="field-help-text"
-                            id="{{ adminform.form.brand.id_for_label }}_help">
-                            {{ adminform.form.brand.help_text }}
-                        </div>
-                    {% endif %}
-
-                    {% if adminform.form.brand.errors %}
-
-                        <div
-                            class="field-errors"
-                            role="alert">
-
-                            {{ adminform.form.brand.errors }}
-                        </div>
-                    {% endif %}
 
                     <div class="admin-select-wrapper">
                         {{ adminform.form.brand }}
                     </div>
                 </div>
+                {% endif %}
 
+                {% if adminform.form.collection %}
+                    <div class="form-group">
+
+                        <label
+                            for="{{ adminform.form.collection.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.collection.label }}
+                        </label>
+
+                        <div class="admin-input-wrapper">
+                            {{ adminform.form.collection }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if adminform.form.gender %}
                 <div class="form-group">
+
+                    <label
+                        for="{{ adminform.form.gender.id_for_label }}"
+                        class="form-label">
+
+                        {{ adminform.form.gender.label }}
+                    </label>
+
+                    <div class="admin-select-wrapper">
+                        {{ adminform.form.gender }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-grid two-column-grid"
+            style="margin-top: 20px;">
+                {% if adminform.form.occasion %}
+                <div class="form-group">
+
+                    <label
+                        for="{{ adminform.form.occasion.id_for_label }}"
+                        class="form-label">
+
+                        {{ adminform.form.occasion.label }}
+                    </label>
+
+                    <div class="admin-select-wrapper">
+                        {{ adminform.form.occasion }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if adminform.form.tags %}
+                <div class="form-group">
+
                     <label
                         for="{{ adminform.form.tags.id_for_label }}"
                         class="form-label">
 
-                        <span class="label-text">
-                            {{ adminform.form.tags.label }}
-                        </span>
+                        {{ adminform.form.tags.label }}
                     </label>
-
-                    {% if adminform.form.tags.help_text %}
-
-                        <div
-                            class="field-help-text"
-                            id="{{ adminform.form.tags.id_for_label }}_help">
-
-                            {{ adminform.form.tags.help_text }}
-                        </div>
-                    {% endif %}
-
-                    {% if adminform.form.tags.errors %}
-
-                        <div
-                            class="field-errors"
-                            role="alert">
-
-                            {{ adminform.form.tags.errors }}
-                        </div>
-                    {% endif %}
 
                     <div class="admin-tags-wrapper">
                         {{ adminform.form.tags }}
                     </div>
                 </div>
+                {% endif %}
             </div>
+        </fieldset>
 
+        <fieldset class="form-fieldset">
+            <legend class="fieldset-legend">
+                {% trans "Category" %}
+            </legend>
+
+            <div class="form-group">
+                <label
+                    for="{{ adminform.form.child_category.id_for_label }}"
+                    class="form-label">
+
+                    Category
+                </label>
+
+                <div class="admin-select-wrapper">
+                    {{ adminform.form.child_category }}
+                </div>
+
+                {% if adminform.form.child_category.errors %}
+                    <div class="field-errors">
+                        {{ adminform.form.child_category.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+            <legend class="fieldset-legend">
+                {% trans "Content" %}
+            </legend>
+
+            {% if adminform.form.short_description %}
             <div class="form-group full-width">
+
                 <label
                     for="{{ adminform.form.short_description.id_for_label }}"
                     class="form-label">
 
-                    <span class="label-text">
-                        {{ adminform.form.short_description.label }}
-                    </span>
-
-                    {% if adminform.form.short_description.field.required %}
-
-                        <span
-                            class="required-indicator"
-                            aria-hidden="true">
-
-                            *
-                        </span>
-                    {% endif %}
+                    {{ adminform.form.short_description.label }}
                 </label>
-
-                {% if adminform.form.short_description.help_text %}
-
-                    <div
-                        class="field-help-text"
-                        id="{{ adminform.form.short_description.id_for_label }}_help">
-
-                        {{ adminform.form.short_description.help_text }}
-                    </div>
-                {% endif %}
-
-                {% if adminform.form.short_description.errors %}
-
-                    <div
-                        class="field-errors"
-                        role="alert">
-
-                        {{ adminform.form.short_description.errors }}
-                    </div>
-                {% endif %}
 
                 <div class="admin-input-wrapper">
                     {{ adminform.form.short_description }}
                 </div>
             </div>
+            {% endif %}
 
-            <div class="form-group full-width">
+            {% if adminform.form.description %}
+            <div class="form-group full-width" 
+                style="margin-top: 15px;">
+
                 <label
                     for="{{ adminform.form.description.id_for_label }}"
                     class="form-label">
 
-                    <span class="label-text">
-                        {{ adminform.form.description.label }}
-                    </span>
-
-                    {% if adminform.form.description.field.required %}
-
-                        <span
-                            class="required-indicator"
-                            aria-hidden="true">
-
-                            *
-                        </span>
-                    {% endif %}
+                    {{ adminform.form.description.label }}
                 </label>
-
-                {% if adminform.form.description.help_text %}
-
-                    <div
-                        class="field-help-text"
-                        id="{{ adminform.form.description.id_for_label }}_help">
-
-                        {{ adminform.form.description.help_text }}
-                    </div>
-                {% endif %}
-
-                {% if adminform.form.description.errors %}
-
-                    <div
-                        class="field-errors"
-                        role="alert">
-
-                        {{ adminform.form.description.errors }}
-                    </div>
-                {% endif %}
 
                 <div class="admin-textarea-wrapper">
                     {{ adminform.form.description }}
                 </div>
             </div>
+            {% endif %}
         </fieldset>
     </div>
 </section>

@@ -1,196 +1,26 @@
 <section class="admin-card variants-card">
-
-    <!-- =====================================================
-        CARD HEADER
-    ====================================================== -->
-
-    <div class="card-header card-header-flex">
+    <header class="card-header">
         <div class="card-header-content">
-            <h2> Variants </h2>
+            <div class="card-title-group">
+                <h2 class="card-title">
+                    Variants
+                </h2>
 
-            <p>
-                Create and manage product variants,
-                inventory combinations and attribute options.
-            </p>
+                <p class="card-description">
+                    Manage product variants, inventory,
+                    SKU configuration and pricing.
+                </p>
+            </div>
         </div>
-
-        <!-- ACTIONS -->
-        <div class="variant-header-actions">
-            <button
-                type="button"
-                class="primary-btn"
-                id="generateVariantsBtn">
-
-                Generate Variants
-            </button>
-        </div>
-    </div>
-
-    <!-- =====================================================
-        CARD BODY
-    ====================================================== -->
+    </header>
 
     <div class="card-body">
-        <fieldset class="form-fieldset">
-            <legend>
-                Variant Configuration
-            </legend>
+        {% for inline_admin_formset in inline_admin_formsets %}
 
-            <div class="form-grid two-column-grid">
-                <div class="form-group">
-                    <label for="variantSizes">
-                        Sizes
-                    </label>
+            {% if inline_admin_formset.opts.verbose_name|lower == "product variant" %}
+                {% include "admin/edit_inline/tabular.html" %}
 
-                    <input
-                        type="text"
-                        id="variantSizes"
-                        class="admin-input"
-                        placeholder="S, M, L, XL">
-
-                    <p class="help-text">
-                        Separate sizes using commas.
-                    </p>
-                </div>
-
-                <div class="form-group">
-                    <label for="variantColors">
-                        Colors
-                    </label>
-
-                    <input
-                        type="text"
-                        id="variantColors"
-                        class="admin-input"
-                        placeholder="Black, White, Blue">
-
-                    <p class="help-text">
-                        Separate colors using commas.
-                    </p>
-                </div>
-            </div>
-        </fieldset>
-
-        <div class="variant-summary-grid">
-
-            <!-- TOTAL -->
-            <div class="variant-summary-card">
-                <div class="variant-summary-label">
-                    Total Variants
-                </div>
-
-                <div
-                    class="variant-summary-value"
-                    id="totalVariantsValue">
-
-                    0
-                </div>
-            </div>
-
-            <!-- STOCK -->
-            <div class="variant-summary-card">
-                <div class="variant-summary-label">
-                    Total Stock
-                </div>
-
-                <div
-                    class="variant-summary-value"
-                    id="variantStockValue">
-
-                    0
-                </div>
-            </div>
-
-            <!-- STATUS -->
-            <div class="variant-summary-card">
-                <div class="variant-summary-label">
-                    Variant Status
-                </div>
-
-                <div
-                    class="variant-summary-value"
-                    id="variantStatusValue">
-
-                    Empty
-                </div>
-            </div>
-        </div>
-
-        <div class="variant-table-wrapper">
-            <div class="variant-table-header">
-                <h3> Variant Table </h3>
-            </div>
-
-            <div class="variant-table-scroll">
-                <table class="variant-table">
-                    <thead>
-                        <tr>
-                            <th> SKU </th>
-
-                            <th> Size </th>
-
-                            <th> Color </th>
-
-                            <th> Stock </th>
-
-                            <th> Price </th>
-
-                            <th> Status </th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="variantTableBody">
-
-                        <!-- EMPTY STATE -->
-                        <tr class="variant-empty-row">
-                            <td colspan="6">
-                                <div class="variant-empty-state">
-                                    <div class="variant-empty-icon">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.8"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round">
-
-                                            <rect
-                                                x="3"
-                                                y="4"
-                                                width="18"
-                                                height="16"
-                                                rx="2">
-                                            </rect>
-
-                                            <path
-                                                d="M8 8h8">
-                                            </path>
-
-                                            <path
-                                                d="M8 12h8">
-                                            </path>
-
-                                            <path
-                                                d="M8 16h5">
-                                            </path>
-                                        </svg>
-                                    </div>
-
-                                    <h4>
-                                        No Variants Generated
-                                    </h4>
-
-                                    <p>
-                                        Create size and color
-                                        combinations to generate variants.
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </section>

@@ -1,0 +1,126 @@
+<section class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Variant Information
+            </h2>
+
+            <p>
+                Configure product association and variant attributes for this product variant.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Product Association
+                </h3>
+
+                <p>
+                    Select the parent product for this variant.
+                </p>
+            </div>
+
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.product.label_tag }}
+
+                    {% if adminform.form.product.field.required %}
+
+                        <span class="required-mark">*</span>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.product }}
+                </div>
+
+                {% if adminform.form.product.help_text %}
+                    <div class="field-help">
+
+                        {{ adminform.form.product.help_text }}
+                    </div>
+                {% endif %}
+
+                {% for error in adminform.form.product.errors %}
+                    <div class="field-error">
+
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Variant Attributes
+                </h3>
+
+                <p>
+                    Define the characteristics that make this variant unique.
+                </p>
+            </div>
+
+            <div class="form-grid two-column-grid">
+                <div class="form-group">
+                    <div class="field-header">
+                        {{ adminform.form.color.label_tag }}
+
+                        {% if adminform.form.color.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.color }}
+                    </div>
+
+                    {% if adminform.form.color.help_text %}
+                        <div class="field-help">
+
+                            {{ adminform.form.color.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in adminform.form.color.errors %}
+                        <div class="field-error">
+
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <div class="field-header">
+                        {{ adminform.form.size.label_tag }}
+
+                        {% if adminform.form.size.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.size }}
+                    </div>
+
+                    {% if adminform.form.size.help_text %}
+                        <div class="field-help">
+
+                            {{ adminform.form.size.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in adminform.form.size.errors %}
+                        <div class="field-error">
+
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

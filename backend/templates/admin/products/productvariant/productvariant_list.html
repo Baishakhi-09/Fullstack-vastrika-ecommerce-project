@@ -1,0 +1,312 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+    {% block extrahead %}
+
+        {{ block.super }}
+
+        <link
+            rel="stylesheet"
+            href="{% static 'admin/css/custom.css' %}">
+
+    {% endblock %}
+
+    {% block content %}
+
+    <div class="variant-list-page">
+        <section class="page-header">
+            <div class="page-header-content">
+                <h1>
+                    Product Variants
+                </h1>
+
+                <p>
+                    Manage inventory variants, stock levels, and availability.
+                </p>
+            </div>
+
+            <div class="page-header-actions">
+                <a
+                    href="{% url 'admin:products_productvariant_add' %}"
+                    class="btn-primary">
+
+                    + Add Variant
+                </a>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">
+                    Total Variants
+                </div>
+
+                <div class="stat-value">
+                    {{ total_variants|default:0 }}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">
+                    Active Variants
+                </div>
+
+                <div class="stat-value">
+                    {{ active_variants|default:0 }}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">
+                    Low Stock
+                </div>
+
+                <div class="stat-value">
+                    {{ low_stock_variants|default:0 }}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">
+                    Out Of Stock
+                </div>
+
+                <div class="stat-value">
+                    {{ out_of_stock_variants|default:0 }}
+                </div>
+            </div>
+        </section>
+
+        <section class="table-card">
+            <form
+                id="changelist-form"
+                method="post"
+                novalidate>
+            
+                {% csrf_token %}
+
+                {% if cl.formset %}
+                    {{ cl.formset.management_form }}
+                {% endif %}
+
+                <section class="variant-toolbar">
+                    {% if action_form %}
+
+                        <div class="variant-toolbar-left">
+                            <label for="{{ action_form.action.id_for_label }}">
+                                Action
+                            </label>
+
+                            {{ action_form.action }}
+
+                            <button
+                                type="submit"
+                                name="index"
+                                value="0"
+                                class="toolbar-go-btn"
+                                title="Run selected action">
+
+                                Go
+                            </button>
+                        </div>
+
+                        <div class="variant-toolbar-right">
+                            <div class="toolbar-count-badge">
+                                {{ cl.result_count }}
+                                Product variant{{ cl.result_count|pluralize }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </section>
+
+                <div class="variant-table-container">
+                    <table class="variant-table"
+                        id="result_list">
+
+                        <thead>
+                            <tr>
+                                <th class="checkbox-column">
+                                    <input 
+                                        type="checkbox"
+                                        id="action-toggle"
+                                        class="action-select"
+                                        aria-label="Select all variant tags">
+                                </th>
+
+                                <th class="name-column">
+                                    Product
+                                </th>
+
+                                <th class="variant-column">
+                                    Variant
+                                </th>
+
+                                <th class="sku-column">
+                                    SKU
+                                </th>
+
+                                <th class="total-stock-column">
+                                    Total Stock
+                                </th>
+
+                                <th class="available-stock-column">
+                                    Available Stock
+                                </th>
+
+                                <th class="reserved-stock-column">
+                                    Reserved Stock
+                                </th>
+
+                                <th class="status-column">
+                                    Status
+                                </th>
+
+                                <th class="created-column">
+                                    Created Date
+                                </th>
+
+                                <th class="action-column">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for variant in cl.result_list %}
+
+                                <tr>
+                                    <td class="checkbox-column">
+                                        <input
+                                            type="checkbox"
+                                            name="_selected_action"
+                                            value="{{ variant.pk }}"
+                                            class="action-select">
+                                    </td>
+
+                                    <td class="name-column">
+                                        {{ variant.product.name }}
+                                    </td>
+
+                                    <td class="variant-column">
+                                        {{ variant.color }}
+                                        /
+                                        {{ variant.size }}
+                                    </td>
+
+                                    <td class="sku-column">
+                                        {{ variant.variant_sku }}
+                                    </td>
+
+                                    <td class="total-stock-column">
+                                        {{ variant.stock }}
+                                    </td>
+
+                                    <td class="available-stock-column">
+                                        {{ variant.available_stock }}
+                                    </td>
+
+                                    <td class="reserved-stock-column">
+                                        {{ variant.reserved_stock }}
+                                    </td>
+
+                                    <td class="status-column">
+                                        {% if variant.available_stock > 5 %}
+
+                                            <span class="badge-success">
+                                                In Stock
+                                            </span>
+
+                                        {% elif variant.available_stock > 0 %}
+
+                                            <span class="badge-warning">
+                                                Low Stock
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge-danger">
+                                                Out Of Stock
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="created-column">
+                                        {{ variant.created_at|date:"d M Y" }}
+                                    </td>
+
+                                    <td class="action-column">
+                                        <a
+                                            href="{% url 'admin:products_productvariant_change' variant.id %}"
+                                            class="btn-edit">
+
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+
+                            {% empty %}
+
+                                <tr>
+                                    <td colspan="10">
+                                        <div class="empty-table-state">
+                                            <h3>
+                                                No variants found.
+                                            </h3>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </section>
+
+        {% if cl.result_count %}
+
+        <section class="variant-pagination-footer">
+            <div class="variant-pagination-info">
+                Showing
+                {{ cl.result_count }}
+                Product Variant{{ cl.result_count|pluralize }}
+            </div>
+        </section>
+
+    {% endif %}
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div
+        id="delete-modal"
+        class="delete-modal">
+
+        <div class="delete-modal-backdrop"></div>
+
+        <div class="delete-modal-content">
+            <h3> Confirm Delete </h3>
+
+            <p>
+                Are you sure you want to delete the selected brands?
+                This action cannot be undone.
+            </p>
+
+            <div class="delete-modal-actions">
+                <button
+                    type="button"
+                    id="modal-cancel-btn"
+                    class="modal-cancel-btn">
+
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    id="modal-delete-btn"
+                    class="modal-delete-btn">
+
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -10,22 +10,52 @@
         </div>
 
         <div class="sidebar-card-body">
-
-            <!-- STATUS BADGE -->
             <div class="product-status-wrapper">
+
                 <div
-                    class="product-status-badge"
+                    class="product-status-badge
+                    {% if original and original.status == 'published' %}
+                        status-published
+                    {% elif original and original.status == 'archived' %}
+                        status-archived
+                    {% else %}
+                        status-draft
+                    {% endif %}"
                     id="productStatusBadge">
 
-                    Draft
+                    {% if original %}
+                        {{ original.get_status_display }}
+                    {% else %}
+                        Draft
+                    {% endif %}
+
                 </div>
 
                 <p
                     class="product-status-message"
                     id="productStatusMessage">
 
-                    This product is currently saved as draft.
+                    {% if original %}
+
+                        {% if original.status == "published" %}
+                            This product is currently published and visible to customers.
+
+                        {% elif original.status == "archived" %}
+                            This product has been archived.
+
+                        {% else %}
+                            This product is currently saved as draft.
+
+                        {% endif %}
+
+                    {% else %}
+
+                        This product has not been saved yet.
+
+                    {% endif %}
+
                 </p>
+
             </div>
 
             <!-- STATUS FIELD -->
@@ -64,7 +94,9 @@
                 </div>
 
                 <label class="sidebar-switch">
-                    {{ adminform.form.is_featured }}
+                    <span class="sr-only">Featured Product</span>
+
+                    {{ adminform.form.is_featured.as_widget }}
 
                     <span class="sidebar-slider"></span>
                 </label>
@@ -84,7 +116,9 @@
                 </div>
 
                 <label class="sidebar-switch">
-                    {{ adminform.form.is_active }}
+                    <span class="sr-only">Public Visibility</span>
+
+                    {{ adminform.form.is_active.as_widget }}
 
                     <span class="sidebar-slider"></span>
                 </label>
@@ -104,7 +138,9 @@
                 </div>
 
                 <label class="sidebar-switch">
-                    {{ adminform.form.is_best_seller }}
+                    <span class="sr-only">Best Seller</span>
+
+                    {{ adminform.form.is_best_seller.as_widget }}
 
                     <span class="sidebar-slider"></span>
                 </label>

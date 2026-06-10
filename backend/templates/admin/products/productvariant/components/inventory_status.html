@@ -1,0 +1,135 @@
+<section class="admin-card inventory-status-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Inventory Status
+            </h2>
+
+            <p>
+                Monitor stock availability and inventory health.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="form-section">
+            <div class="form-group switch-group">
+                <div class="field-wrapper switch-field">
+                    {{ adminform.form.is_active }}
+
+                    <span class="switch-label">
+                        Active Variant
+                    </span>
+                </div>
+
+                {% for error in adminform.form.is_active.errors %}
+                    <div class="field-error">
+
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if original %}
+
+            <div class="inventory-status-overview">
+                {% if original.available_stock <= 0 %}
+
+                    <div class="status-indicator status-danger">
+                        <span class="status-dot"></span>
+
+                        <span class="status-text">
+                            Out of Stock
+                        </span>
+                    </div>
+
+                {% elif original.available_stock <= 5 %}
+
+                    <div class="status-indicator status-warning">
+                        <span class="status-dot"></span>
+
+                        <span class="status-text">
+                            Low Stock
+                        </span>
+                    </div>
+
+                {% else %}
+
+                    <div class="status-indicator status-success">
+                        <span class="status-dot"></span>
+
+                        <span class="status-text">
+                            In Stock
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="inventory-metrics">
+                <div class="metric-row">
+                    <span class="metric-label">
+                        Total Stock
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ original.stock }}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">
+                        Reserved
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ original.reserved_stock }}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">
+                        Available
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ original.available_stock }}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="stock-health">
+                <div class="stock-health-header">
+                    Stock Health
+                </div>
+
+                {% if original.available_stock <= 0 %}
+
+                    <div class="health-message health-danger">
+                        Inventory depleted. Replenishment required immediately.
+                    </div>
+
+                {% elif original.available_stock <= 5 %}
+
+                    <div class="health-message health-warning">
+                        Inventory running low. Consider restocking soon.
+                    </div>
+
+                {% else %}
+
+                    <div class="health-message health-success">
+                        Inventory levels are healthy.
+                    </div>
+                {% endif %}
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <p>
+                    Inventory status will be available after the variant is created.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</section>

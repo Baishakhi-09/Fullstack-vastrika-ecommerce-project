@@ -1,0 +1,140 @@
+<section class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Inventory Management
+            </h2>
+
+            <p>
+                Manage stock allocation, reservations, and available inventory for this variant.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="form-grid two-column-grid">
+
+            <!-- Stock -->
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.stock.label_tag }}
+
+                    {% if adminform.form.stock.field.required %}
+                        <span class="required-mark">*</span>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.stock }}
+                </div>
+
+                {% if adminform.form.stock.help_text %}
+                    <div class="field-help">
+
+                        {{ adminform.form.stock.help_text }}
+                    </div>
+
+                {% endif %}
+
+                {% for error in adminform.form.stock.errors %}
+                    <div class="field-error">
+
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Reserved Stock -->
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.reserved_stock.label_tag }}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.reserved_stock }}
+                </div>
+
+                {% if adminform.form.reserved_stock.help_text %}
+                    <div class="field-help">
+
+                        {{ adminform.form.reserved_stock.help_text }}
+                    </div>
+                {% endif %}
+
+                {% for error in adminform.form.reserved_stock.errors %}
+                    <div class="field-error">
+
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if original %}
+            <div class="inventory-overview">
+                <div class="inventory-metric">
+                    <span class="metric-label">
+                        Total Stock
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ original.stock }}
+                    </strong>
+                </div>
+
+                <div class="inventory-metric">
+                    <span class="metric-label">
+                        Reserved
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ original.reserved_stock }}
+                    </strong>
+                </div>
+
+                <div class="inventory-metric">
+                    <span class="metric-label">
+                        Available
+                    </span>
+
+                    <strong class="metric-value">
+                        {{ original.available_stock }}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="inventory-health">
+                {% if original.available_stock <= 0 %}
+
+                    <span class="health-badge health-danger">
+                        Out of Stock
+                    </span>
+
+                {% elif original.available_stock <= 5 %}
+
+                    <span class="health-badge health-warning">
+                        Low Stock
+                    </span>
+
+                {% else %}
+
+                    <span class="health-badge health-success">
+                        In Stock
+                    </span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="info-banner">
+            <div class="info-banner-content">
+                <strong>
+                    Inventory Rule:
+                </strong>
+
+                <span>
+                    Reserved stock cannot exceed total stock. Available stock is automatically calculated.
+                </span>
+            </div>
+        </div>
+    </div>
+</section>

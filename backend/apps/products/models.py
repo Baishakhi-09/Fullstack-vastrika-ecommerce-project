@@ -8,6 +8,7 @@ from django.db.models.functions import Lower
 from django.db import models
 from django.db.models import F, Q, Sum
 from django.utils.text import slugify
+from django.urls import reverse
 
 
 # -------------------- ABSTRACT BASE MODEL -------------------- #
@@ -458,7 +459,15 @@ class Product(TimeStampedModel):
         ("published", "Published"),
         ("archived", "Archived"),
     )
-    
+
+    GST_CHOICES = (
+        ("gst_0", "GST 0%"),
+        ("gst_5", "GST 5%"),
+        ("gst_12", "GST 12%"),
+        ("gst_18", "GST 18%"),
+        ("gst_28", "GST 28%"),
+    )
+
     GENDER_CHOICES = (
         ("men", "Men"),
         ("women", "Women"),
@@ -476,35 +485,46 @@ class Product(TimeStampedModel):
         ("lounge", "Lounge"),
     )
 
+    SHIPPING_CLASS_CHOICES = (
+        ("standard", "Standard"),
+        ("express", "Express"),
+        ("fragile", "Fragile"),
+    )
+
+    DELIVERY_TIME_CHOICES = (
+        ("1-2_days", "1-2 Days"),
+        ("3-5_days", "3-5 Days"),
+        ("5-7_days", "5-7 Days"),
+    )
+
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-    sku = models.CharField(max_length=80, unique=True, blank=True)
-
     short_description = models.CharField(max_length=300, blank=True)
     description = models.TextField(blank=True)
 
     brand = models.ForeignKey(
-        Brand,
+        "products.Brand",
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
-        related_name="products",
+        blank=True
     )
 
-    parent_category = models.ForeignKey(
-        ParentCategory,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="products",
-    )
-    sub_category = models.ForeignKey(
-        SubCategory,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="products",
-    )
+    # parent_category = models.ForeignKey(
+    #     ParentCategory,
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    #     related_name="products",
+    # )
+
+    # sub_category = models.ForeignKey(
+    #     SubCategory,
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    #     related_name="products",
+    # )
+
     child_category = models.ForeignKey(
         ChildCategory,
         on_delete=models.SET_NULL,
@@ -515,16 +535,19 @@ class Product(TimeStampedModel):
 
     tags = models.ManyToManyField(ProductTag, blank=True, related_name="products")
 
-    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default="unisex")
-    occasion = models.CharField(max_length=20, choices=OCCASION_CHOICES, blank=True)
+    collection = models.CharField(
+        max_length=120,
+        blank=True
+    )
 
-    mrp = models.DecimalField(
+    selling_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=Decimal("0.00"),
         validators=[MinValueValidator(Decimal("0.00"))],
     )
-    selling_price = models.DecimalField(
+
+    mrp = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=Decimal("0.00"),
@@ -537,25 +560,54 @@ class Product(TimeStampedModel):
         default=0
     )
 
-    low_stock_threshold = models.PositiveIntegerField(
-        default=5
+    tax = models.CharField(
+        max_length=20,
+        choices=GST_CHOICES,
+        default="gst_0",
     )
 
-    allow_backorders = models.BooleanField(
-        default=False
-    )
+    sku = models.CharField(max_length=80, unique=True, blank=True)
 
     barcode = models.CharField(
         max_length=120,
         blank=True
     )
 
-    tax_class = models.CharField(
-        max_length=100,
-        blank=True
+    allow_backorders = models.BooleanField(
+        default=False
     )
 
-    # SHIPPING
+    # stock = models.PositiveIntegerField(
+    #     default=0
+    # )
+
+    # low_stock_threshold = models.PositiveIntegerField(
+    #     default=5
+    # )
+
+    shipping_class = models.CharField(
+        max_length=50,
+        choices=SHIPPING_CLASS_CHOICES,
+        default="standard",
+    )
+
+    delivery_time = models.CharField(
+        max_length=50,
+        choices=DELIVERY_TIME_CHOICES,
+        default="3-5_days",
+    )
+
+    free_shipping = models.BooleanField(
+        default=False
+    )
+
+    average_rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(Decimal("0.00"))],
+    )
+
     weight = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -580,39 +632,23 @@ class Product(TimeStampedModel):
         default=0
     )
 
-    SHIPPING_CLASS_CHOICES = (
-        ("standard", "Standard"),
-        ("express", "Express"),
-        ("fragile", "Fragile"),
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default="unisex")
+    occasion = models.CharField(max_length=20, choices=OCCASION_CHOICES, blank=True)
+
+    meta_title = models.CharField(max_length=255, blank=True)
+    meta_description = models.CharField(max_length=500, blank=True)
+
+    seo_keywords = models.CharField(
+        max_length=500,
+        blank=True
     )
 
-    shipping_class = models.CharField(
-        max_length=50,
-        choices=SHIPPING_CLASS_CHOICES,
-        default="standard",
+    search_keywords = models.TextField(
+        blank=True
     )
 
-    DELIVERY_TIME_CHOICES = (
-        ("1-2_days", "1-2 Days"),
-        ("3-5_days", "3-5 Days"),
-        ("5-7_days", "5-7 Days"),
-    )
-
-    delivery_time = models.CharField(
-        max_length=50,
-        choices=DELIVERY_TIME_CHOICES,
-        default="3-5_days",
-    )
-
-    free_shipping = models.BooleanField(
-        default=False
-    )
-
-    average_rating = models.DecimalField(
-        max_digits=3,
-        decimal_places=2,
-        default=Decimal("0.00"),
-        validators=[MinValueValidator(Decimal("0.00"))],
+    canonical_url = models.URLField(
+        blank=True
     )
 
     status = models.CharField(
@@ -621,54 +657,44 @@ class Product(TimeStampedModel):
         default="draft"
     )
 
-    seo_keywords = models.CharField(
-        max_length=500,
-        blank=True
-    )
-
-    canonical_url = models.URLField(
-        blank=True
-    )
-
-    view_count = models.PositiveIntegerField(
-        default=0
-    )
-
-    wishlist_count = models.PositiveIntegerField(
-        default=0
-    )
-
-    review_count = models.PositiveIntegerField(default=0)
-
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
     is_new_arrival = models.BooleanField(default=False)
     is_best_seller = models.BooleanField(default=False)
 
+    is_trending = models.BooleanField(
+        default=False
+    )
+
+    is_hot = models.BooleanField(
+        default=False
+    )
+
     is_returnable = models.BooleanField(default=True)
     is_exchangeable = models.BooleanField(default=True)
     is_cod_available = models.BooleanField(default=True)
 
-    meta_title = models.CharField(max_length=255, blank=True)
-    meta_description = models.CharField(max_length=500, blank=True)
-
     class Meta:
         db_table = "products_product"
         ordering = ["-created_at"]
+
         indexes = [
-            models.Index(fields=["sku"]),
+            models.Index(fields=["status"]),
             models.Index(fields=["is_active"]),
+            models.Index(fields=["brand"]),
+            models.Index(fields=["slug"]),
+            models.Index(fields=["sku"]),
             models.Index(fields=["is_featured"]),
             models.Index(fields=["is_new_arrival"]),
             models.Index(fields=["is_best_seller"]),
             models.Index(fields=["gender"]),
-            models.Index(fields=["parent_category"]),
-            models.Index(fields=["sub_category"]),
+            # models.Index(fields=["parent_category"]),
+            # models.Index(fields=["sub_category"]),
             models.Index(fields=["child_category"]),
-            models.Index(fields=["brand"]),
             models.Index(fields=["selling_price"]),
             models.Index(fields=["created_at"]),
         ]
+
         constraints = [
             models.CheckConstraint(
                 check=Q(selling_price__gte=0),
@@ -697,36 +723,51 @@ class Product(TimeStampedModel):
             discount = ((self.mrp - self.selling_price) / self.mrp) * 100
             return max(0, round(discount))
         return 0
-
+    
+    @property
+    def profit(self):
+        return self.selling_price - self.cost_price
+    
     @property
     def in_stock(self):
         return self.variants.filter(is_active=True, stock__gt=0).exists()
-
+    
     @property
     def total_stock(self):
         return (
             self.variants.filter(is_active=True).aggregate(total=Sum("stock"))["total"]
             or 0
         )
+    
+    @property
+    def stock_status(self):
 
+        if self.total_stock <= 0:
+            return "Out of Stock"
+
+        if self.total_stock <= 5:
+            return "Low Stock"
+
+        return "In Stock"
+    
     def clean(self):
-        if self.sub_category and self.parent_category:
-            if self.sub_category.parent_category_id != self.parent_category_id:
-                raise ValidationError({
-                    "sub_category": "Selected sub-category does not belong to the selected parent category."
-                })
+        # if self.sub_category and self.parent_category:
+        #     if self.sub_category.parent_category_id != self.parent_category_id:
+        #         raise ValidationError({
+        #             "sub_category": "Selected sub-category does not belong to the selected parent category."
+        #         })
+            
+        #     if self.child_category and self.sub_category:
+        #         if self.child_category.sub_category_id != self.sub_category_id:
+        #             raise ValidationError({
+        #                 "child_category": "Selected child category does not belong to the selected sub-category."
+        #             })
 
-        if self.child_category and self.sub_category:
-            if self.child_category.sub_category_id != self.sub_category_id:
-                raise ValidationError({
-                    "child_category": "Selected child category does not belong to the selected sub-category."
-                })
-
-        if self.child_category and self.parent_category:
-            if self.child_category.sub_category.parent_category_id != self.parent_category_id:
-                raise ValidationError({
-                    "child_category": "Selected child category does not belong to the selected parent category."
-                })
+        # if self.child_category and self.parent_category:
+        #     if self.child_category.sub_category.parent_category_id != self.parent_category_id:
+        #         raise ValidationError({
+        #             "child_category": "Selected child category does not belong to the selected parent category."
+        #         })
 
         if self.selling_price > self.mrp:
             raise ValidationError({
@@ -737,8 +778,9 @@ class Product(TimeStampedModel):
             raise ValidationError({
                 "average_rating": "Average rating must be between 0 and 5."
             })
-
+    
     def save(self, *args, **kwargs):
+        
         if not self.sku:
             self.sku = f"SKU-{uuid.uuid4().hex[:10].upper()}"
 
@@ -755,6 +797,14 @@ class Product(TimeStampedModel):
 
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse(
+            "product_detail",
+            kwargs={
+                "slug": self.slug
+            }
+        )
 
 
 # -------------------- PRODUCT IMAGE -------------------- #
@@ -834,7 +884,28 @@ class ProductVariant(TimeStampedModel):
         default=0
     )
 
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    compare_at_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
     stock = models.PositiveIntegerField(default=0)
+    view_count = models.PositiveIntegerField (
+        default=0,
+        editable=False
+    )
+
+    review_count = models.PositiveIntegerField (
+        default=0, editable=False
+    )
+
     reserved_stock = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 

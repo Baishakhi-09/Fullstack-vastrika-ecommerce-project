@@ -1,0 +1,101 @@
+<section class="admin-card analytics-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Analytics
+            </h2>
+
+            <p>
+                Performance and activity insights for this product variant.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        {% if original %}
+
+            <div class="analytics-grid">
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Views
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ original.view_count|default:0 }}
+                    </div>
+                </div>
+
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Reviews
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ original.review_count|default:0 }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="analytics-meta">
+                <div class="meta-row">
+                    <span class="meta-label">
+                        Created
+                    </span>
+
+                    <span class="meta-value">
+                        {% if original.created_at %}
+
+                            {{ original.created_at|date:"M d, Y H:i" }}
+                        {% else %}
+
+                            —
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="meta-row">
+                    <span class="meta-label">
+                        Last Updated
+                    </span>
+
+                    <span class="meta-value">
+                        {% if original.updated_at %}
+
+                            {{ original.updated_at|date:"M d, Y H:i" }}
+                        {% else %}
+
+                            —
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="analytics-insight">
+                {% if original.view_count > 1000 %}
+
+                    <div class="insight-badge insight-success">
+                        High Visibility Variant
+                    </div>
+
+                {% elif original.view_count > 100 %}
+                    <div class="insight-badge insight-info">
+
+                        Growing Engagement
+                    </div>
+                {% else %}
+
+                    <div class="insight-badge insight-neutral">
+                        Collecting Performance Data
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+
+            <div class="empty-state">
+                <p>
+                    Analytics data will appear after the variant has been created and customer activity has been recorded.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</section>

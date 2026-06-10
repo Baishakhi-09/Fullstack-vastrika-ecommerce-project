@@ -1,0 +1,181 @@
+{% extends "admin/change_form.html" %}
+{% load static admin_modify %}
+
+{% block extrahead %}
+
+{{ block.super }}
+
+{{ media }}
+
+<link
+    rel="stylesheet"
+    href="{% static 'admin/css/custom.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<form
+    method="post"
+    enctype="multipart/form-data"
+    class="variant-workspace">
+
+    {% csrf_token %}
+
+    {% for hidden in adminform.form.hidden_fields %}
+
+        {{ hidden }}
+
+    {% endfor %}
+
+    <section class="workspace-page">
+
+        <!-- HEADER -->
+        <header class="workspace-header">
+            <div class="workspace-header-left">
+                <h1 class="workspace-title">
+                    {% if original %}
+                        {{ original.product.name }}
+
+                    {% else %}
+                        Create Product Variant
+
+                    {% endif %}
+                </h1>
+
+                <div class="workspace-breadcrumb">
+                    <a href="{% url 'admin:index' %}">
+                        Dashboard
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="{% url 'admin:products_productvariant_changelist' %}">
+                        Productvariant
+                    </a>
+
+                    <span>/</span>
+
+                    <span class="active">
+                        {% if original %}
+                            Edit Productvariant
+                        {% else %}
+                            Add Productvariant
+                        {% endif %}
+                    </span>
+                </div>
+
+                {% if original %}
+                    <div class="workspace-meta">
+                        {% if original.variant_sku %}
+                            <span class="meta-item">
+                                SKU:
+                                {{ original.variant_sku }}
+
+                            </span>
+                        {% endif %}
+
+                        {% if original.color %}
+                            <span class="meta-item">
+                                {{ original.color }}
+                            </span>
+                        {% endif %}
+
+                        {% if original.size %}
+                            <span class="meta-item">
+                                {{ original.size }}
+                            </span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="workspace-header-right">
+                <div class="workspace-actions">
+                    <button
+                        type="submit"
+                        name="_save"
+                        class="workspace-header-btn secondary-btn">
+
+                        {% if original %}
+                            Update Productvariant
+                        {% else %}
+                            Save Productvariant
+                        {% endif %}
+                    </button>
+
+                    <button
+                        type="submit"
+                        name="_continue"
+                        class="workspace-header-btn primary-btn">
+
+                        Save & Continue Editing
+                    </button>
+                </div>
+
+                <div class="workspace-header-status
+                    {% if original %}
+                        is-editing
+                    {% else %}
+                        is-new
+                    {% endif %}">
+
+                    <span class="status-dot"></span>
+
+                    <div>
+                        <small>
+                            Productvariant Status
+                        </small>
+
+                        <strong>
+                            {% if original %}
+                                Published Productvariant
+                            {% else %}
+                                New Productvariant
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- GLOBAL FORM ERRORS -->
+        {% if adminform.form.non_field_errors %}
+            <div class="workspace-alert">
+                {{ adminform.form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <!-- MAIN GRID -->
+        <div class="workspace-editor-layout workspace-grid">
+
+            <!-- LEFT SIDE -->
+            <main class="workspace-main">
+                {% include "admin/products/productvariant/components/variant_information.html" %}
+
+                {% include "admin/products/productvariant/components/identification_card.html" %}
+
+                {% include "admin/products/productvariant/components/inventory_card.html" %}
+            </main>
+
+            <!-- RIGHT SIDEBAR -->
+            <aside class="workspace-sidebar">
+                {% include "admin/products/productvariant/components/inventory_status.html" %}
+
+                {% include "admin/products/productvariant/components/live_summary.html" %}
+
+                {% include "admin/products/productvariant/components/analytics_card.html" %}
+
+                {% include "admin/products/productvariant/components/activity_timeline.html" %}
+            </aside>
+        </div>
+    </section>
+
+    {% if adminform.form.errors %}
+        <div style="background:red;color:white;padding:20px;">
+            {{ adminform.form.errors }}
+        </div>
+    {% endif %}
+
+</form>
+{% endblock %}

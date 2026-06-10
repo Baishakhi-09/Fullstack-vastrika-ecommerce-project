@@ -35,7 +35,7 @@ function initializeAdminApp() {
     initInventorySystem();
     initShippingSystem();
 
-    initVariantSystem();
+    // initVariantSystem();
     initSeoSystem();
     initProductSidebar();
 
@@ -1023,6 +1023,8 @@ function initDeleteModal() {
 
                 "delete_selected_childcategories",
 
+                "delete_selected_productvariant",
+
                 "delete_selected"
             ];
 
@@ -1278,35 +1280,49 @@ function initBasicInformationUI() {
 
 function initProductSaveButtons() {
 
-    const form = document.querySelector(
-        "#product-admin-form"
+    const form = document.getElementById(
+        "product-admin-form"
     );
 
     if (!form) {
         return;
     }
 
-    const buttons = form.querySelectorAll(
-        ".save-draft-btn, .publish-btn"
+    const saveButtons = form.querySelectorAll(
+        ".primary-btn, .secondary-btn"
     );
 
     form.addEventListener(
         "submit",
-        () => {
+        function () {
 
-            buttons.forEach((button) => {
+            const clickedButton =
+                document.activeElement;
 
-                button.classList.add(
-                    "is-loading"
-                );
+            saveButtons.forEach(
+                function (button) {
 
-                button.disabled = true;
+                    if (button !== clickedButton) {
+                        button.disabled = true;
+                    }
 
-            });
+                    button.classList.add(
+                        "is-loading"
+                    );
 
+                    if (!button.dataset.originalText) {
+                        button.dataset.originalText =
+                            button.textContent.trim();
+                    }
+
+                }
+            );
+
+        },
+        {
+            once: true
         }
     );
-
 }
 
 /* =========================================================
@@ -1314,7 +1330,6 @@ function initProductSaveButtons() {
 ========================================================= */
 
 function initMediaGallery() {
-
     const dropzone = document.getElementById(
         "mediaDropzone"
     );
@@ -1323,8 +1338,14 @@ function initMediaGallery() {
         return;
     }
 
-    const input = dropzone.querySelector(
-        "input[type='file']"
+    if (dropzone.dataset.initialized === "true") {
+        return;
+    }
+
+    dropzone.dataset.initialized = "true";
+
+    const input = document.getElementById(
+        "id_images"
     );
 
     const previewGrid = document.getElementById(
@@ -1335,20 +1356,14 @@ function initMediaGallery() {
         ".media-count-badge"
     );
 
-    if (!input || !previewGrid) {
+    if (!input || !previewGrid || !countBadge) {
         return;
     }
-
-    /* =====================================================
-       CLICK TO UPLOAD
-    ====================================================== */
 
     dropzone.addEventListener(
         "click",
         () => {
-
             input.click();
-
         }
     );
 
@@ -1360,17 +1375,14 @@ function initMediaGallery() {
         dropzone.addEventListener(
             eventName,
             (event) => {
-
                 event.preventDefault();
                 event.stopPropagation();
 
                 dropzone.classList.add(
                     "drag-active"
                 );
-
             }
         );
-
     });
 
     [
@@ -1388,26 +1400,20 @@ function initMediaGallery() {
                 dropzone.classList.remove(
                     "drag-active"
                 );
-
             }
         );
-
     });
 
     dropzone.addEventListener(
         "drop",
         (event) => {
-
             const files = event.dataTransfer.files;
-
-            if (files.length) {
-
-                input.files = files;
-
-                renderMediaPreview(files);
-
+            
+            if (!files || !files.length) {
+                return;
             }
 
+            renderMediaPreview(files);
         }
     );
 
@@ -1415,15 +1421,19 @@ function initMediaGallery() {
         "change",
         (event) => {
 
-            renderMediaPreview(
-                event.target.files
-            );
+            const files = event.target.files;
 
+            if (!files || !files.length) {
+                return;
+            }
+
+            renderMediaPreview(files);
         }
     );
 
     function renderMediaPreview(files) {
         previewGrid.innerHTML = "";
+
         const imageFiles = Array.from(files);
 
         countBadge.textContent =
@@ -1436,7 +1446,7 @@ function initMediaGallery() {
 
             const reader = new FileReader();
 
-            reader.onload = (e) => {
+            reader.onload = function (e) {
                 const card = document.createElement(
                     "div"
                 );
@@ -1464,34 +1474,45 @@ function initMediaGallery() {
 ========================================================= */
 
 function initPricingCalculator() {
-    const sellingPriceInput = document.getElementById(
-        "id_selling_price"
-    );
+    const sellingPriceInput = 
+        document.getElementById("id_selling_price");
 
-    const comparePriceInput = document.getElementById(
-        "id_mrp"
-    );
+    const comparePriceInput = 
+        document.getElementById("id_mrp");
 
-    const costPriceInput = document.getElementById(
-        "id_cost_price"
-    );
+    const costPriceInput = 
+        document.getElementById("id_cost_price");
 
-    const profitMarginValue = document.getElementById(
-        "profitMarginValue"
-    );
+    const taxClassInput =
+        document.getElementById("id_tax");
 
-    const estimatedProfitValue = document.getElementById(
-        "estimatedProfitValue"
-    );
+    const profitMarginValue = 
+        document.getElementById("profitMarginValue");
 
-    const discountValue = document.getElementById(
-        "discountValue"
-    );
+    const profitValue =
+        document.getElementById("profitValue");
+
+    const discountValue = 
+        document.getElementById("discountValue");
+
+    const taxAmountValue =
+        document.getElementById("taxAmountValue");
+    
+    const finalPriceValue =
+        document.getElementById("finalPriceValue");
 
     if (
         !sellingPriceInput ||
-        !comparePriceInput ||
-        !costPriceInput
+        !comparePriceInput
+    ) {
+        return;
+    }
+
+    if (
+        !profitMarginValue ||
+        !profitValue ||
+        !discountValue ||
+        !taxAmountValue
     ) {
         return;
     }
@@ -1509,41 +1530,86 @@ function initPricingCalculator() {
 
         const costPrice =
             parseFloat(
-                costPriceInput.value
+                costPriceInput?.value
             ) || 0;
 
-        const estimatedProfit =
-            sellingPrice - costPrice;
-
+        let estimatedProfit = 0;
         let profitMargin = 0;
+        let discount = 0;
+        let gstRate = 0;
+        let taxAmount = 0;
 
-        if (sellingPrice > 0) {
-            profitMargin =
-                (
-                    estimatedProfit /
-                    sellingPrice
-                ) * 100;
+        if (costPriceInput) {
+            estimatedProfit =
+                sellingPrice - costPrice;
+
+            if (sellingPrice > 0) {
+                profitMargin =
+                    (
+                        estimatedProfit /
+                        sellingPrice
+                    ) * 100;
+            }
         }
 
-        let discount = 0;
-        if (comparePrice > 0) {
+        if (
+            comparePrice > 0 &&
+            sellingPrice > 0
+        ) {
             discount =
                 (
                     (
                         comparePrice -
                         sellingPrice
-                    ) / comparePrice
+                    ) /
+                    comparePrice
                 ) * 100;
+        }
+
+        switch (taxClassInput?.value) {
+
+            case "gst_5":
+                gstRate = 5;
+                break;
+
+            case "gst_12":
+                gstRate = 12;
+                break;
+
+            case "gst_18":
+                gstRate = 18;
+                break;
+
+            case "gst_28":
+                gstRate = 28;
+                break;
+
+                default:
+                    gstRate = 0;
+        }
+
+        taxAmount =
+            (sellingPrice * gstRate) / 100;
+
+        const finalPrice =
+            sellingPrice + taxAmount;
+
+        if (finalPriceValue) {
+            finalPriceValue.textContent =
+                `₹${finalPrice.toFixed(2)}`;
         }
 
         profitMarginValue.textContent =
             `${profitMargin.toFixed(1)}%`;
 
-        estimatedProfitValue.textContent =
+        profitValue.textContent =
             `₹${estimatedProfit.toFixed(2)}`;
 
         discountValue.textContent =
             `${discount.toFixed(1)}%`;
+
+        taxAmountValue.textContent =
+            `₹${taxAmount.toFixed(2)}`;
 
         profitMarginValue.classList.remove(
             "profit-positive",
@@ -1571,13 +1637,23 @@ function initPricingCalculator() {
     [
         sellingPriceInput,
         comparePriceInput,
-        costPriceInput
-    ].forEach((input) => {
+        costPriceInput,
+        taxClassInput
+    ]
+    .filter(Boolean)
+    .forEach((input) => {
         input.addEventListener(
             "input",
             updatePricingInsights
         );
+
+        input.addEventListener(
+            "change",
+            updatePricingInsights
+        );
     });
+
+    updatePricingInsights();
 }
 
 /* =========================================================
@@ -1597,22 +1673,14 @@ function initInventorySystem() {
         "generateSkuBtn"
     );
 
-    const stockInput = document.getElementById(
-        "id_stock_quantity"
-    );
-
-    const thresholdInput = document.getElementById(
-        "id_low_stock_threshold"
-    );
-
     const backorderInput = document.getElementById(
         "id_allow_backorders"
     );
 
-    const stockBadge = document.getElementById(
-        "inventoryStatusBadge"
-    );
-
+    // const stockBadge = document.getElementById(
+    //     "inventoryStatusBadge"
+    // );
+    
     const availableStockValue = document.getElementById(
         "availableStockValue"
     );
@@ -1620,6 +1688,10 @@ function initInventorySystem() {
     const stockHealthValue = document.getElementById(
         "stockHealthValue"
     );
+
+    // const thresholdInput = document.getElementById(
+    //     "id_low_stock_threshold"
+    // );
 
     const backorderValue = document.getElementById(
         "backorderValue"
@@ -1652,19 +1724,19 @@ function initInventorySystem() {
     }
 
     function updateInventoryInsights() {
-        if (!stockInput) {
-            return;
-        }
+        // const threshold =
+        //     parseInt(thresholdInput?.value) || 0;
 
-        const stock =
-            parseInt(stockInput.value) || 0;
+        let stock = 0;
 
-        const threshold =
-            parseInt(thresholdInput?.value) || 0;
-
-        if (availableStockValue) {
-            availableStockValue.textContent =
-                `${stock} Units`;
+        if (
+            availableStockValue &&
+            availableStockValue.dataset.stock
+        ) {
+            stock =
+                parseInt(
+                    availableStockValue.dataset.stock
+                ) || 0;
         }
 
         if (stockHealthValue) {
@@ -1682,7 +1754,7 @@ function initInventorySystem() {
                     "stock-danger"
                 );
 
-            } else if (stock <= threshold) {
+            } else if (stock <= 5) {
                 stockHealthValue.textContent =
                     "Low Stock";
 
@@ -1700,53 +1772,51 @@ function initInventorySystem() {
             }
         }
 
-        if (stockBadge) {
-            if (stock <= 0) {
-                stockBadge.textContent =
-                    "Out of Stock";
+        // if (stockBadge) {
+        //     if (stock <= 0) {
+        //         stockBadge.textContent =
+        //             "Out of Stock";
 
-                stockBadge.style.background =
-                    "#fee2e2";
+        //         stockBadge.style.background =
+        //             "#fee2e2";
 
-                stockBadge.style.color =
-                    "#991b1b";
+        //         stockBadge.style.color =
+        //             "#991b1b";
 
-            } else if (stock <= threshold) {
-                stockBadge.textContent =
-                    "Low Stock";
+        //     } else if (stock <= threshold) {
+        //         stockBadge.textContent =
+        //             "Low Stock";
 
-                stockBadge.style.background =
-                    "#fef3c7";
+        //         stockBadge.style.background =
+        //             "#fef3c7";
 
-                stockBadge.style.color =
-                    "#92400e";
+        //         stockBadge.style.color =
+        //             "#92400e";
 
-            } else {
-                stockBadge.textContent =
-                    "In Stock";
+        //     } else {
+        //         stockBadge.textContent =
+        //             "In Stock";
 
-                stockBadge.style.background =
-                    "#dcfce7";
+        //         stockBadge.style.background =
+        //             "#dcfce7";
 
-                stockBadge.style.color =
-                    "#166534";
-            }
-        }
+        //         stockBadge.style.color =
+        //             "#166534";
+        //     }
+        // }
 
         if (
             backorderInput &&
             backorderValue
         ) {
-            backorderValue.textContent =
+            backorderValue.innerHTML =
                 backorderInput.checked
-                    ? "Enabled"
-                    : "Disabled";
+                    ? '<span class="badge-success">Enabled</span>'
+                    : '<span class="badge-danger">Disabled</span>';
         }
     }
 
     [
-        stockInput,
-        thresholdInput,
         backorderInput
     ].forEach((input) => {
         if (!input) {
@@ -1763,6 +1833,8 @@ function initInventorySystem() {
             updateInventoryInsights
         );
     });
+
+    updateInventoryInsights();
 }
 
 function initShippingSystem() {
@@ -1872,120 +1944,262 @@ function initShippingSystem() {
    VARIANT SYSTEM
 ========================================================= */
 
-function initVariantSystem() {
-    const sizesInput = document.getElementById(
-        "variantSizes"
-    );
+// function initVariantSystem() {
 
-    const colorsInput = document.getElementById(
-        "variantColors"
-    );
+//     const sizesInput = document.getElementById(
+//         "variantSizes"
+//     );
 
-    const generateBtn = document.getElementById(
-        "generateVariantsBtn"
-    );
+//     const colorsInput = document.getElementById(
+//         "variantColors"
+//     );
 
-    const tableBody = document.getElementById(
-        "variantTableBody"
-    );
+//     const generateBtn = document.getElementById(
+//         "generateVariantsBtn"
+//     );
 
-    const totalVariantsValue = document.getElementById(
-        "totalVariantsValue"
-    );
+//     const tableBody = document.getElementById(
+//         "variantTableBody"
+//     );
 
-    const variantStockValue = document.getElementById(
-        "variantStockValue"
-    );
+//     const totalVariantsValue = document.getElementById(
+//         "totalVariantsValue"
+//     );
 
-    const variantStatusValue = document.getElementById(
-        "variantStatusValue"
-    );
+//     const variantStockValue = document.getElementById(
+//         "variantStockValue"
+//     );
 
-    if (
-        !sizesInput ||
-        !colorsInput ||
-        !generateBtn ||
-        !tableBody
-    ) {
-        return;
-    }
+//     const variantStatusValue = document.getElementById(
+//         "variantStatusValue"
+//     );
 
-    generateBtn.addEventListener(
-        "click",
-        () => {
-            const sizes =
-                sizesInput.value
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean);
+//     if (
+//         !sizesInput ||
+//         !colorsInput ||
+//         !generateBtn ||
+//         !tableBody
+//     ) {
+//         return;
+//     }
 
-            const colors =
-                colorsInput.value
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean);
+//     generateBtn.addEventListener(
+//         "click",
+//         () => {
 
-            if (!sizes.length || !colors.length) {
-                return;
-            }
+//             const sizes =
+//                 sizesInput.value
+//                     .split(",")
+//                     .map((item) => item.trim())
+//                     .filter(Boolean);
 
-            tableBody.innerHTML = "";
+//             const colors =
+//                 colorsInput.value
+//                     .split(",")
+//                     .map((item) => item.trim())
+//                     .filter(Boolean);
 
-            let totalVariants = 0;
-            let totalStock = 0;
+//             if (
+//                 !sizes.length ||
+//                 !colors.length
+//             ) {
 
-            sizes.forEach((size) => {
-                colors.forEach((color) => {
-                    totalVariants += 1;
+//                 alert(
+//                     "Please enter at least one size and one color."
+//                 );
 
-                    const stock =
-                        Math.floor(
-                            Math.random() * 50
-                        ) + 1;
+//                 return;
+//             }
 
-                    totalStock += stock;
+//             tableBody.innerHTML = "";
 
-                    const sku =
-                        `${size}-${color}`
-                            .replace(/\s+/g, "-")
-                            .toUpperCase();
+//             let totalVariants = 0;
+//             let totalStock = 0;
 
-                    const row =
-                        document.createElement("tr");
+//             sizes.forEach((size) => {
 
-                    row.innerHTML = `
-                        <td>${sku}</td>
+//                 colors.forEach((color) => {
 
-                        <td>${size}</td>
+//                     totalVariants += 1;
 
-                        <td>${color}</td>
+//                     /* ---------------------------------
+//                        DEMO STOCK
+//                        Replace later with real stock
+//                     --------------------------------- */
 
-                        <td>${stock}</td>
+//                     const stock = 0;
 
-                        <td>₹0</td>
+//                     totalStock += stock;
 
-                        <td>
-                            <span class="variant-status-badge variant-status-active">
-                                Active
-                            </span>
-                        </td>
-                    `;
+//                     const sku =
+//                         `${size}-${color}`
+//                             .replace(/\s+/g, "-")
+//                             .toUpperCase();
 
-                    tableBody.appendChild(row);
-                });
-            });
+//                     const sellingPrice =
+//                         document.getElementById(
+//                             "id_selling_price"
+//                         )?.value || "0";
 
-            totalVariantsValue.textContent =
-                totalVariants;
+//                     const row =
+//                         document.createElement("tr");
 
-            variantStockValue.textContent =
-                totalStock;
+//                     row.innerHTML = `
+//                         <td>${sku}</td>
 
-            variantStatusValue.textContent =
-                "Generated";
-        }
-    );
-}
+//                         <td>${size}</td>
+
+//                         <td>${color}</td>
+
+//                         <td>${stock}</td>
+
+//                         <td>₹${sellingPrice}</td>
+
+//                         <td>
+//                             <span
+//                                 class="variant-status-badge variant-status-active">
+
+//                                 Active
+//                             </span>
+//                         </td>
+//                     `;
+
+//                     tableBody.appendChild(row);
+//                 });
+//             });
+
+//             if (totalVariantsValue) {
+
+//                 totalVariantsValue.textContent =
+//                     totalVariants;
+//             }
+
+//             if (variantStockValue) {
+
+//                 variantStockValue.textContent =
+//                     totalStock;
+//             }
+
+//             if (variantStatusValue) {
+
+//                 variantStatusValue.textContent =
+//                     totalVariants > 0
+//                         ? "Generated"
+//                         : "Empty";
+//             }
+
+//             const availableStockValue =
+//                 document.getElementById(
+//                     "availableStockValue"
+//                 );
+
+//             const stockHealthValue =
+//                 document.getElementById(
+//                     "stockHealthValue"
+//                 );
+
+//             const stockBadge =
+//                 document.getElementById(
+//                     "inventoryStatusBadge"
+//                 );
+
+//             const thresholdInput =
+//                 document.getElementById(
+//                     "id_low_stock_threshold"
+//                 );
+
+//             if (availableStockValue) {
+
+//                 availableStockValue.dataset.stock =
+//                     totalStock;
+
+//                 availableStockValue.textContent =
+//                     `${totalStock} Units`;
+//             }
+
+//             const threshold =
+//                 parseInt(
+//                     thresholdInput?.value
+//                 ) || 0;
+
+//             if (stockHealthValue) {
+//                 stockHealthValue.classList.remove(
+//                     "stock-healthy",
+//                     "stock-warning",
+//                     "stock-danger"
+//                 );
+
+//                 if (totalStock <= 0) {
+
+//                     stockHealthValue.textContent =
+//                         "Out of Stock";
+
+//                     stockHealthValue.classList.add(
+//                         "stock-danger"
+//                     );
+
+//                 } else if (
+//                     totalStock <= threshold
+//                 ) {
+
+//                     stockHealthValue.textContent =
+//                         "Low Stock";
+
+//                     stockHealthValue.classList.add(
+//                         "stock-warning"
+//                     );
+
+//                 } else {
+
+//                     stockHealthValue.textContent =
+//                         "Healthy";
+
+//                     stockHealthValue.classList.add(
+//                         "stock-healthy"
+//                     );
+//                 }
+//             }
+
+//             if (stockBadge) {
+//                 if (totalStock <= 0) {
+
+//                     stockBadge.textContent =
+//                         "Out of Stock";
+
+//                     stockBadge.style.background =
+//                         "#fee2e2";
+
+//                     stockBadge.style.color =
+//                         "#991b1b";
+
+//                 } else if (
+//                     totalStock <= threshold
+//                 ) {
+
+//                     stockBadge.textContent =
+//                         "Low Stock";
+
+//                     stockBadge.style.background =
+//                         "#fef3c7";
+
+//                     stockBadge.style.color =
+//                         "#92400e";
+
+//                 } else {
+
+//                     stockBadge.textContent =
+//                         "In Stock";
+
+//                     stockBadge.style.background =
+//                         "#dcfce7";
+
+//                     stockBadge.style.color =
+//                         "#166534";
+//                 }
+//             }
+//         }
+//     );
+// }
 
 /* =========================================================
    SEO SYSTEM

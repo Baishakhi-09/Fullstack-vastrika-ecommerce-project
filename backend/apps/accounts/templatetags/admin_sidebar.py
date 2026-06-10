@@ -38,10 +38,10 @@ SIDEBAR_CONFIG = {
                 "icon": "local_offer",
                 "order": 3,
             },
-            "productimage": {
-                "icon": "image",
-                "order": 4,
-            },
+            # "productimage": {
+            #     "icon": "image",
+            #     "order": 4,
+            # },
         },
     },
     "categories": {

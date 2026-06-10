@@ -15,6 +15,7 @@ from .forms import (
     ParentCategoryForm,
     SubCategoryForm,
     ChildCategoryForm,
+    ProductVariantAdminForm,
 )
 
 from .models import (
@@ -93,7 +94,31 @@ class RoleBasedAdminMixin:
         obj=None,
     ):
         return self._has_admin_access(request)
+    
+# =========================================================
+# AUDIT ADMIN MIXIN
+# =========================================================
+    
+class AuditAdminMixin:
 
+    def save_model(
+        self,
+        request,
+        obj,
+        form,
+        change
+    ):
+        if not obj.pk:
+            obj.created_by = request.user
+
+        obj.updated_by = request.user
+
+        super().save_model(
+            request,
+            obj,
+            form,
+            change
+        )
 
 # =========================================================
 # PRODUCT IMAGE INLINE
@@ -103,7 +128,7 @@ class ProductImageInline(admin.TabularInline):
 
     model = ProductImage
 
-    extra = 1
+    extra = 0
 
     ordering = ("sort_order",)
 
@@ -151,7 +176,9 @@ class ProductVariantInline(admin.TabularInline):
 
     model = ProductVariant
 
-    extra = 1
+    extra = 0
+
+    show_change_link = True
 
     fields = (
         "color",
@@ -175,26 +202,223 @@ class ProductVariantInline(admin.TabularInline):
 
         return 0
     
-class AuditAdminMixin:
+# =========================================================
+# PRODUCT VARIANT ADMIN
+# =========================================================
 
-    def save_model(
+class ProductVariantAdmin(
+    AuditAdminMixin,
+    RoleBasedAdminMixin,
+    admin.ModelAdmin,
+):
+    form = ProductVariantAdminForm
+
+    change_form_template = (
+        "admin/products/productvariant/productvariant_form.html"
+    )
+
+    change_list_template = (
+        "admin/products/productvariant/productvariant_list.html"
+    )
+
+    list_select_related = (
+        "product",
+    )
+
+    list_display = (
+        "product_name",
+        "color",
+        "size",
+        "variant_sku",
+        "stock",
+        "reserved_stock",
+        "available_stock_display",
+        "is_active",
+        "created_at",
+    )
+
+    list_filter = ( 
+        "size", 
+        "color", 
+        "is_active", 
+        "created_at", 
+    )
+
+    search_fields = ( 
+        "product__name", 
+        "variant_sku", 
+    )
+
+    ordering = ( 
+        "product", 
+        "color", 
+        "size", 
+    )
+
+    readonly_fields = (
+        "available_stock_display",
+    )
+
+    @admin.display(description="Available Stock")
+    def available_stock_display(self, obj):
+        if obj:
+            return obj.available_stock
+        return 0
+    
+    @admin.display(description="Product")
+    def product_name(self, obj): 
+        return obj.product.name
+
+    def changeform_view(
         self,
         request,
-        obj,
-        form,
-        change
+        object_id=None,
+        form_url="",
+        extra_context=None,
     ):
-        if not obj.pk:
-            obj.created_by = request.user
 
-        obj.updated_by = request.user
+        extra_context = extra_context or {}
 
-        super().save_model(
+        if object_id:
+            variant = self.get_object(
+                request,
+                object_id
+            )
+
+            if variant:
+                available_stock = variant.available_stock
+
+                if available_stock <= 0:
+                    inventory_status = "Out of Stock"
+
+                    inventory_class = "status-danger"
+
+                elif available_stock <= 5:
+                    inventory_status = "Low Stock"
+
+                    inventory_class = "status-warning"
+
+                else:
+                    inventory_status = "In Stock"
+
+                    inventory_class = "status-success"
+
+                extra_context.update({
+
+                    "inventory_status":
+                        inventory_status,
+
+                    "inventory_class":
+                        inventory_class,
+
+                    "available_stock":
+                        available_stock,
+
+                })
+
+        return super().changeform_view(
             request,
-            obj,
-            form,
-            change
+            object_id,
+            form_url,
+            extra_context,
         )
+
+    actions = [
+        "delete_selected_productvariant"
+    ]
+
+    def get_actions(
+        self,
+        request
+    ):
+        actions = super().get_actions(request)
+
+        # Remove delete action
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+
+        return actions
+
+    @admin.action(
+        description="Delete selected productvariant"
+    )
+    def delete_selected_productvariant(
+        self,
+        request,
+        queryset
+    ):
+        total_deleted = queryset.count()
+
+        queryset.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} productvariant(s) deleted successfully."
+        )
+
+    def changelist_view(
+        self,
+        request,
+        extra_context=None,
+    ):
+
+        extra_context = extra_context or {}
+
+        queryset = ProductVariant.objects.all()
+
+        total_variants = queryset.count()
+
+        active_variants = queryset.filter(
+            is_active=True
+        ).count()
+
+        low_stock_variants = sum(
+            1
+            for variant in queryset
+            if 0 < variant.available_stock <= 5
+        )
+
+        out_of_stock_variants = sum(
+            1
+            for variant in queryset
+            if variant.available_stock == 0
+        )
+
+        extra_context.update({
+
+            "total_variants":
+                total_variants,
+
+            "active_variants":
+                active_variants,
+
+            "low_stock_variants":
+                low_stock_variants,
+
+            "out_of_stock_variants":
+                out_of_stock_variants,
+
+        })
+
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context,
+        )
+
+        if hasattr(response, "context_data"):
+
+            action_form = response.context_data.get(
+                "action_form"
+            )
+
+            if action_form:
+                action_form.fields[
+                    "action"
+                ].widget.attrs.update({
+                    "id": "id_action"
+                })
+
+        return response
 
 # =========================================================
 # CATEGORY ADMINS
@@ -919,30 +1143,26 @@ class ProductAdmin(
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
-    def formfield_for_foreignkey(
-        self,
-        db_field,
-        request,
-        **kwargs
-    ):
-        formfield = super().formfield_for_foreignkey(
-            db_field,
-            request,
-            **kwargs
-        )
-
-        if db_field.name == "brand":
-
-            formfield.widget.can_add_related = False
-
-            formfield.widget.can_change_related = False
-
-            formfield.widget.can_delete_related = False
-
-            formfield.widget.can_view_related = False
-
-        return formfield
     form = ProductAdminForm
+
+    change_list_template = (
+        "admin/products/product/product_list.html"
+    )
+
+    change_form_template = (
+        "admin/products/product/product_form.html"
+    )
+
+    autocomplete_fields = [
+        "brand",
+        "tags",
+        "child_category",
+    ]
+
+    inlines = [
+        # ProductImageInline,
+        ProductVariantInline,
+    ]
 
     def get_form(
         self,
@@ -960,14 +1180,6 @@ class ProductAdmin(
 
         return form
 
-    change_list_template = (
-        "admin/products/change_list.html"
-    )
-
-    change_form_template = (
-        "admin/products/product/change_form.html"
-    )
-
     list_display = (
         "product_image",
         "display_name",
@@ -984,10 +1196,6 @@ class ProductAdmin(
     )
 
     list_display_links = None
-
-    autocomplete_fields = [
-        "tags",
-    ]
 
     @admin.display(description="Actions")
     def edit_product(self, obj):
@@ -1010,13 +1218,14 @@ class ProductAdmin(
         )
 
     list_filter = (
+        "status",
         "is_active",
         "is_featured",
         "is_new_arrival",
         "is_best_seller",
         "gender",
         "brand",
-        "parent_category",
+        "child_category",
         "created_at",
     )
 
@@ -1035,11 +1244,6 @@ class ProductAdmin(
         "updated_at",
     )
 
-    inlines = [
-        ProductImageInline,
-        ProductVariantInline,
-    ]
-
     ordering = (
         "-created_at",
     )
@@ -1050,17 +1254,7 @@ class ProductAdmin(
 
     list_select_related = (
         "brand",
-        "parent_category",
-        "sub_category",
         "child_category",
-    )
-
-    autocomplete_fields = (
-        "brand",
-        "tags",
-        # "parent_category",
-        # "sub_category",
-        # "child_category",
     )
 
     date_hierarchy = "created_at"
@@ -1095,8 +1289,8 @@ class ProductAdmin(
 
         ("Categories", {
             "fields": (
-                "parent_category",
-                "sub_category",
+                # "parent_category",
+                # "sub_category",
                 "child_category",
             )
         }),
@@ -1119,16 +1313,24 @@ class ProductAdmin(
             "fields": (
                 "mrp",
                 "selling_price",
+                "cost_price",
+                "tax",
                 "discount_badge",
             )
         }),
 
         ("Stock & Visibility", {
             "fields": (
-            "barcode",
-            "low_stock_threshold",
-            "allow_backorders",
-            "stock_badge",
+                "status",
+
+                "barcode",
+                "allow_backorders",
+
+                "is_active",
+                "is_featured",
+                "is_best_seller",
+
+                "stock_badge",
             )
         }),
 
@@ -1167,32 +1369,41 @@ class ProductAdmin(
         }),
     )
 
-    class Media:
-
-        css = {
-            "all": (
-                "admin/css/custom.css",
-            )
-        }
-
-        js = (
-            "admin/js/custom.js",
-        )
-
     def get_queryset(self, request):
 
         queryset = super().get_queryset(request)
 
         return queryset.select_related(
             "brand",
-            "parent_category",
-            "sub_category",
+            # "parent_category",
+            # "sub_category",
             "child_category",
         ).prefetch_related(
             "images",
             "variants",
             "tags",
         )
+
+    def calculate_seo_score(self, product):
+        score = 0
+
+        if product.meta_title:
+            score += 30
+
+        if product.meta_title and (
+            50 <= len(product.meta_title) <= 60
+        ):
+            score += 20
+
+        if product.meta_description:
+            score += 30
+
+        if product.meta_description and (
+            140 <= len(product.meta_description) <= 160
+        ):
+            score += 20
+
+        return score
 
     def changelist_view(
         self,
@@ -1228,6 +1439,40 @@ class ProductAdmin(
         return super().changelist_view(
             request,
             extra_context=extra_context,
+        )
+
+    def changeform_view(
+        self,
+        request,
+        object_id=None,
+        form_url="",
+        extra_context=None,
+    ):
+
+        extra_context = extra_context or {}
+
+        seo_score = 0
+
+        if object_id:
+
+            product = self.get_object(
+                request,
+                object_id,
+            )
+
+            if product:
+
+                seo_score = self.calculate_seo_score(
+                    product
+                )
+
+        extra_context["seo_score"] = seo_score
+
+        return super().changeform_view(
+            request,
+            object_id,
+            form_url,
+            extra_context,
         )
 
     @admin.display(description="Name")
@@ -1297,16 +1542,10 @@ class ProductAdmin(
     @admin.display(description="Category")
     def category_display(self, obj):
 
-        categories = filter(None, [
-            obj.parent_category,
-            obj.sub_category,
-            obj.child_category,
-        ])
+        if obj.child_category:
+            return obj.child_category.name
 
-        return " → ".join(
-            str(category)
-            for category in categories
-        )
+        return "-"
 
     @admin.display(description="Discount")
     def discount_badge(self, obj):
@@ -1445,53 +1684,6 @@ class ProductImageAdmin(
         return "No Image"
 
 # =========================================================
-# PRODUCT VARIANT ADMIN
-# =========================================================
-
-class ProductVariantAdmin(
-    RoleBasedAdminMixin,
-    admin.ModelAdmin,
-):
-
-    list_display = (
-        "product",
-        "color",
-        "size",
-        "variant_sku",
-        "stock",
-        "reserved_stock",
-        "available_stock_display",
-        "is_active",
-        "created_at",
-    )
-
-    list_filter = (
-        "size",
-        "color",
-        "is_active",
-        "created_at",
-    )
-
-    search_fields = (
-        "product__name",
-        "variant_sku",
-    )
-
-    readonly_fields = (
-        "available_stock_display",
-    )
-
-    ordering = (
-        "product",
-        "color",
-        "size",
-    )
-
-    @admin.display(description="Available Stock")
-    def available_stock_display(self, obj):
-        return obj.available_stock
-
-# =========================================================
 # STOCK ADMIN
 # =========================================================
 
@@ -1515,7 +1707,7 @@ class StockAdmin(
     )
 
     search_fields = (
-        "product_variant__sku",
+        "product_variant__variant_sku",
         "warehouse__name",
     )
 
@@ -1693,6 +1885,12 @@ class CartItemAdmin(
         "created_at",
     )
 
+    list_select_related = (
+        "user",
+        "product",
+        "variant",
+    )
+
     ordering = (
         "-created_at",
     )
@@ -1711,6 +1909,11 @@ class WishlistItemAdmin(
         "user",
         "product",
         "created_at",
+    )
+
+    list_select_related = (
+        "user",
+        "product",
     )
 
     ordering = (
@@ -1766,6 +1969,30 @@ class AdminNotificationReadAdmin(
         "-read_at",
     )
 
+class WarehouseAdmin(
+    AuditAdminMixin,
+    RoleBasedAdminMixin,
+    admin.ModelAdmin,
+):
+
+    list_display = (
+        "name",
+        "is_active",
+        "created_at",
+    )
+
+    search_fields = (
+        "name",
+    )
+
+    list_filter = (
+        "is_active",
+        "created_at",
+    )
+
+    ordering = (
+        "name",
+    )
 
 # =========================================================
 # ADMIN REGISTRATION
@@ -1818,6 +2045,7 @@ admin_site.register(
 
 admin_site.register(
     Warehouse,
+    WarehouseAdmin,
 )
 
 admin_site.register(

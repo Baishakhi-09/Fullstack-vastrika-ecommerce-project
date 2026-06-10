@@ -7,8 +7,24 @@ from .models import(
     ParentCategory,
     SubCategory,
     ChildCategory,
+    ProductVariant,
 )
 
+
+class BaseCategoryForm(forms.ModelForm):
+    def clean_name(self) -> str:
+        return (
+            self.cleaned_data["name"]
+            .strip()
+        )
+
+    def clean_slug(self) -> str:
+        slug = self.cleaned_data.get(
+            "slug",
+            ""
+        )
+
+        return slug.strip().lower()
 
 # Product
 class ProductAdminForm(forms.ModelForm):
@@ -31,6 +47,12 @@ class ProductAdminForm(forms.ModelForm):
                 attrs={
                     "class": "admin-input",
                     "autocomplete": "off",
+                }
+            ),
+
+            "tax": forms.Select(
+                attrs={
+                    "class": "admin-select",
                 }
             ),
         }
@@ -80,7 +102,11 @@ class ProductAdminForm(forms.ModelForm):
             # Placeholder
             if not isinstance(
                 field.widget,
-                forms.CheckboxInput
+                (
+                    forms.CheckboxInput,
+                    forms.Select,
+                    forms.ClearableFileInput,
+                )
             ):
                 field.widget.attrs.setdefault(
                     "placeholder",
@@ -91,6 +117,7 @@ class ProductAdminForm(forms.ModelForm):
             if field_name in [
                 "mrp",
                 "selling_price",
+                "cost_price",
             ]:
                 field.widget.attrs[
                     "inputmode"
@@ -101,6 +128,7 @@ class ProductAdminForm(forms.ModelForm):
                 "slug",
                 "mrp",
                 "selling_price",
+                "cost_price",
             ]:
                 field.widget.attrs[
                     "autocomplete"
@@ -114,7 +142,9 @@ class ProductAdminForm(forms.ModelForm):
             })
 
             field.widget.attrs["class"] = " ".join(
-                filter(None, css_classes)
+                dict.fromkeys(
+                    filter(None, css_classes)
+                )
             )
 
         # Autofocus
@@ -129,18 +159,46 @@ class ProductAdminForm(forms.ModelForm):
                 "data-slug-field": "true"
             })
 
+        if "child_category" in self.fields:
+            self.fields[
+                "child_category"
+            ].queryset = (
+                ChildCategory.objects
+                .filter(is_active=True)
+                .select_related(
+                    "sub_category",
+                    "sub_category__parent_category"
+                )
+            )
+
     def clean(self):
         cleaned_data = super().clean()
 
         mrp = cleaned_data.get("mrp")
         selling_price = cleaned_data.get("selling_price")
 
+        if mrp is not None and mrp < 0:
+            self.add_error(
+                "mrp",
+                "MRP cannot be negative."
+            )
+
         if (
-            mrp
-            and selling_price
+            selling_price is not None
+            and selling_price < 0
+        ):
+            self.add_error(
+                "selling_price",
+                "Selling price cannot be negative."
+            )
+
+        if (
+            mrp is not None
+            and selling_price is not None
             and selling_price > mrp
         ):
-            raise forms.ValidationError(
+            self.add_error(
+                "selling_price",
                 "Selling price cannot exceed MRP."
             )
 
@@ -181,6 +239,12 @@ class BrandAdminForm(forms.ModelForm):
                 }
             ),
         }
+
+    def clean_name(self) -> str:
+        return (
+            self.cleaned_data["name"]
+            .strip()
+        )
 
 # Product-tag
 class ProductTagAdminForm(forms.ModelForm):
@@ -260,13 +324,21 @@ class ProductTagAdminForm(forms.ModelForm):
             ),
         }
 
-    def clean_name(self):
+    def clean_slug(self) -> str:
+        slug = self.cleaned_data.get(
+            "slug",
+            ""
+        )
+
+        return slug.strip().lower()
+
+    def clean_name(self) -> str:
         return self.cleaned_data[
             "name"
         ].strip()
 
 # PARENT CATEGORY
-class ParentCategoryForm(forms.ModelForm):
+class ParentCategoryForm(BaseCategoryForm):
     brands = forms.ModelMultipleChoiceField(
         queryset=Brand.objects.all(),
         widget=forms.CheckboxSelectMultiple,
@@ -313,9 +385,6 @@ class ParentCategoryForm(forms.ModelForm):
                     "rows": 5,
                 }
             ),
-
-            "brands": forms.SelectMultiple(),
-            "tags": forms.SelectMultiple(),
 
             "meta_title": forms.TextInput(
                 attrs={
@@ -390,13 +459,9 @@ class ParentCategoryForm(forms.ModelForm):
 
                 if hasattr(widget, "can_view_related"):
                     widget.can_view_related = False
-
-    def clean_name(self):
-        return self.cleaned_data[
-            "name"
-        ].strip()
     
-class SubCategoryForm(forms.ModelForm):
+    
+class SubCategoryForm(BaseCategoryForm):
     class Meta:
         model = SubCategory
 
@@ -479,7 +544,7 @@ class SubCategoryForm(forms.ModelForm):
                 "sort_order"
             ].label = "Sort Order"
 
-class ChildCategoryForm(forms.ModelForm):
+class ChildCategoryForm(BaseCategoryForm):
 
     class Meta:
         model = ChildCategory
@@ -516,3 +581,19 @@ class ChildCategoryForm(forms.ModelForm):
                 }
             ),
         }
+
+class ProductVariantAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = ProductVariant
+
+        fields = (
+            "product",
+            "color",
+            "size",
+            "variant_sku",
+            "barcode",
+            "stock",
+            "reserved_stock",
+            "is_active",
+        )

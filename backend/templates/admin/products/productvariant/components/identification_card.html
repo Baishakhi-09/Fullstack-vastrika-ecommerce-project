@@ -1,0 +1,87 @@
+<section class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Identification
+            </h2>
+
+            <p>
+                Manage unique identifiers used for inventory tracking, order processing, and product synchronization.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="form-grid two-column-grid">
+
+            <!-- SKU -->
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.variant_sku.label_tag }}
+
+                    {% if adminform.form.variant_sku.field.required %}
+                        <span class="required-mark">*</span>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.variant_sku }}
+                </div>
+
+                {% if adminform.form.variant_sku.help_text %}
+                    <div class="field-help">
+
+                        {{ adminform.form.variant_sku.help_text }}
+                    </div>
+                {% endif %}
+
+                {% for error in adminform.form.variant_sku.errors %}
+                    <div class="field-error">
+
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Barcode -->
+            <div class="form-group">
+                <div class="field-header">
+                    {{ adminform.form.barcode.label_tag }}
+                </div>
+
+                <div class="field-wrapper">
+                    {{ adminform.form.barcode }}
+                </div>
+
+                {% if adminform.form.barcode.help_text %}
+                    <div class="field-help">
+
+                        {{ adminform.form.barcode.help_text }}
+                    </div>
+                {% endif %}
+
+                {% for error in adminform.form.barcode.errors %}
+                    <div class="field-error">
+
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if original and original.variant_sku %}
+            <div class="info-banner">
+
+                <div class="info-banner-content">
+                    <strong>
+                        Current SKU:
+                    </strong>
+
+                    <span>
+                        {{ original.variant_sku }}
+                    </span>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

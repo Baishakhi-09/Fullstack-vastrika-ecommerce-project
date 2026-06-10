@@ -19,12 +19,15 @@
     </header>
 
     <div class="card-body">
+
         <fieldset class="form-fieldset">
             <legend class="fieldset-legend">
                 {% trans "Inventory Management" %}
             </legend>
 
             <div class="form-grid two-column-grid">
+
+                <!-- SKU -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.sku.id_for_label }}"
@@ -35,18 +38,15 @@
                         </span>
 
                         {% if adminform.form.sku.field.required %}
-
                             <span
                                 class="required-indicator"
                                 aria-hidden="true">
-
                                 *
                             </span>
                         {% endif %}
                     </label>
 
                     {% if adminform.form.sku.help_text %}
-
                         <div
                             class="field-help-text"
                             id="{{ adminform.form.sku.id_for_label }}_help">
@@ -56,7 +56,6 @@
                     {% endif %}
 
                     {% if adminform.form.sku.errors %}
-
                         <div
                             class="field-errors"
                             role="alert">
@@ -79,6 +78,7 @@
                     </div>
                 </div>
 
+                <!-- BARCODE -->
                 <div class="form-group">
                     <label
                         for="{{ adminform.form.barcode.id_for_label }}"
@@ -90,7 +90,6 @@
                     </label>
 
                     {% if adminform.form.barcode.help_text %}
-
                         <div
                             class="field-help-text"
                             id="{{ adminform.form.barcode.id_for_label }}_help">
@@ -100,7 +99,6 @@
                     {% endif %}
 
                     {% if adminform.form.barcode.errors %}
-
                         <div
                             class="field-errors"
                             role="alert">
@@ -114,166 +112,94 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <!-- ALLOW BACKORDERS -->
+                {% if adminform.form.allow_backorders %}
+                    <div class="form-group full-width">
 
-                    <label
-                        for="{{ adminform.form.stock_quantity.id_for_label }}"
-                        class="form-label">
+                        <label
+                            for="{{ adminform.form.allow_backorders.id_for_label }}"
+                            class="form-label">
 
-                        <span class="label-text">
-                            {{ adminform.form.stock_quantity.label }}
-                        </span>
-
-                        {% if adminform.form.stock_quantity.field.required %}
-
-                            <span
-                                class="required-indicator"
-                                aria-hidden="true">
-
-                                *
+                            <span class="label-text">
+                                {{ adminform.form.allow_backorders.label }}
                             </span>
+                        </label>
+
+                        {% if adminform.form.allow_backorders.help_text %}
+                            <div
+                                class="field-help-text"
+                                id="{{ adminform.form.allow_backorders.id_for_label }}_help">
+
+                                {{ adminform.form.allow_backorders.help_text }}
+                            </div>
                         {% endif %}
-                    </label>
 
-                    {% if adminform.form.stock_quantity.help_text %}
+                        {% if adminform.form.allow_backorders.errors %}
+                            <div
+                                class="field-errors"
+                                role="alert">
 
-                        <div
-                            class="field-help-text"
-                            id="{{ adminform.form.stock_quantity.id_for_label }}_help">
+                                {{ adminform.form.allow_backorders.errors }}
+                            </div>
+                        {% endif %}
 
-                            {{ adminform.form.stock_quantity.help_text }}
-                        </div>
-                    {% endif %}
+                        <div class="inventory-toggle-wrapper">
 
-                    {% if adminform.form.stock_quantity.errors %}
+                            <div class="inventory-toggle-control">
+                                {{ adminform.form.allow_backorders }}
+                            </div>
 
-                        <div
-                            class="field-errors"
-                            role="alert">
+                            <div class="inventory-toggle-content">
 
-                            {{ adminform.form.stock_quantity.errors }}
-                        </div>
-                    {% endif %}
+                                <label
+                                    for="{{ adminform.form.allow_backorders.id_for_label }}"
+                                    class="inventory-toggle-label">
 
-                    <div class="inventory-number-wrapper">
-                        {{ adminform.form.stock_quantity }}
-                    </div>
+                                    {% trans "Allow customers to place orders even when stock is unavailable." %}
+                                </label>
 
-                    <div
-                        class="inventory-status-badge"
-                        id="inventoryStatusBadge"
-                        role="status">
-
-                        {% trans "In Stock" %}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label
-                        for="{{ adminform.form.low_stock_threshold.id_for_label }}"
-                        class="form-label">
-
-                        <span class="label-text">
-                            {{ adminform.form.low_stock_threshold.label }}
-                        </span>
-                    </label>
-
-                    {% if adminform.form.low_stock_threshold.help_text %}
-
-                        <div
-                            class="field-help-text"
-                            id="{{ adminform.form.low_stock_threshold.id_for_label }}_help">
-
-                            {{ adminform.form.low_stock_threshold.help_text }}
-                        </div>
-                    {% endif %}
-
-                    {% if adminform.form.low_stock_threshold.errors %}
-
-                        <div
-                            class="field-errors"
-                            role="alert">
-
-                            {{ adminform.form.low_stock_threshold.errors }}
-                        </div>
-                    {% endif %}
-
-                    <div class="inventory-number-wrapper">
-                        {{ adminform.form.low_stock_threshold }}
-                    </div>
-                </div>
-
-                <div class="form-group full-width">
-                    <div class="form-label">
-                        <span class="label-text">
-                            {{ adminform.form.allow_backorders.label }}
-                        </span>
-                    </div>
-
-                    {% if adminform.form.allow_backorders.help_text %}
-
-                        <div
-                            class="field-help-text"
-                            id="{{ adminform.form.allow_backorders.id_for_label }}_help">
-
-                            {{ adminform.form.allow_backorders.help_text }}
-                        </div>
-                    {% endif %}
-
-                    {% if adminform.form.allow_backorders.errors %}
-
-                        <div
-                            class="field-errors"
-                            role="alert">
-
-                            {{ adminform.form.allow_backorders.errors }}
-                        </div>
-                    {% endif %}
-
-                    <div class="inventory-toggle-wrapper">
-                        <div class="inventory-toggle-control">
-                            <input
-                                type="checkbox"
-                                name="allow_backorders"
-                                id="id_allow_backorders"
-                                class="inventory-toggle-input"
-
-                                {% if adminform.form.allow_backorders.value %}
-                                    checked
-                                {% endif %}>
-                        </div>
-
-                        <div class="inventory-toggle-content">
-                            <label
-                                for="id_allow_backorders"
-                                class="inventory-toggle-label">
-
-                                {% trans "Allow customers to place orders even when stock is unavailable." %}
-                            </label>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                {% endif %}
+
             </div>
         </fieldset>
+
+        <!-- INVENTORY INSIGHTS -->
 
         <div class="inventory-insights-grid">
 
             <!-- AVAILABLE STOCK -->
+
             <div class="inventory-insight-card">
+
                 <div class="inventory-insight-label">
                     {% trans "Available Stock" %}
                 </div>
 
                 <div
                     class="inventory-insight-value"
-                    id="availableStockValue">
+                    id="availableStockValue"
+                    data-stock="{% if original %}{{ original.total_stock|default:0 }}{% else %}0{% endif %}">
 
-                    0 {% trans "Units" %}
+                    {% if original %}
+                        {{ original.total_stock|default:0 }}
+                    {% else %}
+                        0
+                    {% endif %}
+
+                    <span class="inventory-unit">
+                        {% trans "Units" %}
+                    </span>
                 </div>
             </div>
 
             <!-- STOCK HEALTH -->
+
             <div class="inventory-insight-card">
+
                 <div class="inventory-insight-label">
                     {% trans "Stock Health" %}
                 </div>
@@ -282,12 +208,21 @@
                     class="inventory-insight-value"
                     id="stockHealthValue">
 
-                    {% trans "Healthy" %}
+                    {% if original %}
+                        <span class="stock-status-badge stock-status-{{ original.stock_status|slugify }}">
+                            {{ original.stock_status }}
+                        </span>
+                    {% else %}
+                        {% trans "Create variants to track stock" %}
+                    {% endif %}
+
                 </div>
             </div>
 
-            <!-- BACKORDERS -->
+            <!-- BACKORDER STATUS -->
+
             <div class="inventory-insight-card">
+
                 <div class="inventory-insight-label">
                     {% trans "Backorders" %}
                 </div>
@@ -296,9 +231,25 @@
                     class="inventory-insight-value"
                     id="backorderValue">
 
-                    {% trans "Disabled" %}
+                    {% if adminform.form.allow_backorders and adminform.form.allow_backorders.value %}
+
+                        <span class="badge-success">
+                            {% trans "Enabled" %}
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge-danger">
+                            {% trans "Disabled" %}
+                        </span>
+
+                    {% endif %}
+
                 </div>
             </div>
+
         </div>
+
     </div>
+
 </section>

@@ -1,0 +1,124 @@
+<section class="admin-card summary-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Live Summary
+            </h2>
+
+            <p>
+                Real-time overview of the current product variant.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="summary-list">
+
+            <!-- Product -->
+            <div class="summary-row">
+                <span class="summary-key">
+                    Product
+                </span>
+
+                <span class="summary-value">
+                    {% if original and original.product %}
+
+                        {{ original.product.name }}
+                    {% else %}
+
+                        —
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- Color -->
+            <div class="summary-row">
+                <span class="summary-key">
+                    Color
+                </span>
+
+                <span class="summary-value">
+                    {% if original and original.color %}
+
+                        {{ original.color }}
+                    {% else %}
+
+                        —
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- Size -->
+            <div class="summary-row">
+                <span class="summary-key">
+                    Size
+                </span>
+
+                <span class="summary-value">
+                    {% if original and original.size %}
+
+                        {{ original.size }}
+                    {% else %}
+
+                        —
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- SKU -->
+            <div class="summary-row">
+                <span class="summary-key">
+                    SKU
+                </span>
+
+                <span class="summary-value">
+                    {% if original and original.variant_sku %}
+
+                        {{ original.variant_sku }}
+                    {% else %}
+
+                        Auto Generated
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- Status -->
+            <div class="summary-row">
+                <span class="summary-key">
+                    Status
+                </span>
+
+                <span class="summary-value">
+                    {% if original and original.is_active %}
+
+                        <span class="status-badge status-active">
+                            Active
+                        </span>
+                    {% else %}
+
+                        <span class="status-badge status-inactive">
+                            Draft
+                        </span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- Available Stock -->
+            <div class="summary-row">
+                <span class="summary-key">
+                    Available Stock
+                </span>
+
+                <span class="summary-value">
+                    {% if original %}
+
+                        {{ original.available_stock }}
+                    {% else %}
+
+                        0
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
