@@ -1,0 +1,118 @@
+<section class="admin-card analytics-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Warehouse Analytics
+            </h2>
+
+            <p>
+                Real-time inventory, warehouse capacity, and operational performance metrics.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        {% if original %}
+
+            <div class="analytics-grid">
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Total Variants
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ total_variants|default_if_none:0 }}
+                    </div>
+                </div>
+
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Total Stock
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ total_stock|default_if_none:0 }}
+                    </div>
+                </div>
+
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Reserved Stock
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ reserved_stock|default_if_none:0 }}
+                    </div>
+                </div>
+
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Available Stock
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ available_stock|default_if_none:0 }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="analytics-summary">
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Warehouse Status
+                    </span>
+
+                    <span class="summary-value">
+                        {% if original.is_active %}
+
+                            <span class="status-badge status-success">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge status-warning">
+                                Inactive
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Inventory Health
+                    </span>
+
+                    <span class="summary-value">
+                        {% if available_stock > 0 %}
+
+                            <span class="status-badge status-success">
+                                Healthy
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge status-danger">
+                                Critical
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-state-content">
+                    <h3>
+                        Analytics Unavailable
+                    </h3>
+
+                    <p>
+                        Save the warehouse first to generate inventory metrics, warehouse performance insights, and operational analytics.
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

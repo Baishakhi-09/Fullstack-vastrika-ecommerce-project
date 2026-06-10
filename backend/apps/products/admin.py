@@ -16,6 +16,7 @@ from .forms import (
     SubCategoryForm,
     ChildCategoryForm,
     ProductVariantAdminForm,
+    WarehouseAdminForm,
 )
 
 from .models import (
@@ -1969,11 +1970,20 @@ class AdminNotificationReadAdmin(
         "-read_at",
     )
 
+# =========================================================
+# WAREHOUSE
+# =========================================================
+
 class WarehouseAdmin(
     AuditAdminMixin,
     RoleBasedAdminMixin,
     admin.ModelAdmin,
 ):
+    form = WarehouseAdminForm
+
+    change_form_template = (
+        "admin/products/warehouse/warehouse_form.html"
+    )
 
     list_display = (
         "name",

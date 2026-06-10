@@ -1,0 +1,126 @@
+<section class="admin-card summary-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Live Summary
+            </h2>
+
+            <p>
+                Real-time warehouse overview and operational status.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="summary-list">
+            <div class="summary-row">
+                <span class="summary-label">
+                    Warehouse
+                </span>
+
+                <strong class="summary-value">
+                    {% if original and original.name %}
+                        {{ original.name }}
+
+                    {% else %}
+                        Not Available
+
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">
+                    Warehouse Code
+                </span>
+
+                <strong class="summary-value">
+                    {% if original and original.code %}
+
+                        {{ original.code }}
+                    {% else %}
+
+                        Not Available
+                    {% endif %}
+                </strong>
+            </div>
+
+            {% if original.location %}
+
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Location
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.location }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.email %}
+
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Email
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.email }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.phone %}
+
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Phone
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.phone }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            <div class="summary-row">
+                <span class="summary-label">
+                    Status
+                </span>
+
+                <span
+                    class="status-badge
+                    {% if original and original.is_active %}
+
+                        status-success
+                    {% else %}
+
+                        status-warning
+                    {% endif %}">
+
+                    {% if original and original.is_active %}
+                        Active
+
+                    {% else %}
+
+                        Draft
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if original and original.created_at %}
+
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Created
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.created_at|date:"M d, Y" }}
+                    </strong>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

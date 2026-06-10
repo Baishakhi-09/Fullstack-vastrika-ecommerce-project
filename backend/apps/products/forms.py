@@ -8,6 +8,7 @@ from .models import(
     SubCategory,
     ChildCategory,
     ProductVariant,
+    Warehouse,
 )
 
 
@@ -597,3 +598,34 @@ class ProductVariantAdminForm(forms.ModelForm):
             "reserved_stock",
             "is_active",
         )
+
+class WarehouseAdminForm(forms.ModelForm):
+    class Meta:
+
+        model = Warehouse
+
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        if "name" in self.fields:
+            self.fields["name"].widget.attrs.update({
+                "autocomplete": "organization"
+            })
+
+        if "email" in self.fields:
+            self.fields["email"].widget.attrs.update({
+                "autocomplete": "email"
+            })
+
+        if "phone" in self.fields:
+            self.fields["phone"].widget.attrs.update({
+                "autocomplete": "tel"
+            })
+
+        if "location" in self.fields:
+            self.fields["location"].widget.attrs.update({
+                "autocomplete": "street-address"
+            })

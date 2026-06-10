@@ -1,0 +1,51 @@
+<section class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Operational Settings
+            </h2>
+
+            <p>
+                Configure warehouse availability, operational controls, and inventory management settings.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        {% if adminform.form.is_active %}
+
+            <div class="settings-group">
+                <div class="setting-item">
+                    <div class="setting-content">
+                        <div class="setting-header">
+                            <label
+                                for="{{ adminform.form.is_active.id_for_label }}"
+                                class="setting-title">
+
+                                {{ adminform.form.is_active.label }}
+                            </label>
+
+                            <div class="setting-control">
+                                {{ adminform.form.is_active }}
+                            </div>
+                        </div>
+
+                        {% if adminform.form.is_active.help_text %}
+
+                            <div class="field-help">
+                                {{ adminform.form.is_active.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.is_active.errors %}
+                            <div class="field-error">
+
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

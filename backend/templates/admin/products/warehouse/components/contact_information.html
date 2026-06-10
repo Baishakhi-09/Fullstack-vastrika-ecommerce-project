@@ -1,0 +1,85 @@
+<section class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Contact Information
+            </h2>
+
+            <p>
+                Configure warehouse communication details for inventory operations, logistics coordination, and support management.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="form-grid">
+            {% if adminform.form.email %}
+
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.email.id_for_label }}"
+                        class="form-label">
+
+                        {{ adminform.form.email.label }}
+
+                        {% if adminform.form.email.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.email }}
+                    </div>
+
+                    {% if adminform.form.email.help_text %}
+
+                        <div class="field-help">
+                            {{ adminform.form.email.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in adminform.form.email.errors %}
+                        <div class="field-error">
+
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if adminform.form.phone %}
+
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.phone.id_for_label }}"
+                        class="form-label">
+
+                        {{ adminform.form.phone.label }}
+
+                        {% if adminform.form.phone.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.phone }}
+                    </div>
+
+                    {% if adminform.form.phone.help_text %}
+                        <div class="field-help">
+
+                            {{ adminform.form.phone.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in adminform.form.phone.errors %}
+
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

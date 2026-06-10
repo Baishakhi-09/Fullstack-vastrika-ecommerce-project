@@ -1,0 +1,110 @@
+{% extends "admin/change_form.html" %}
+{% load static admin_modify %}
+
+{% block extrahead %}
+
+    {{ block.super }}
+
+    {{ media }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'admin/css/custom.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<form
+    method="post"
+    enctype="multipart/form-data"
+    class="warehouse-workspace">
+
+    {% csrf_token %}
+
+    {% for hidden in adminform.form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+
+    <section class="workspace-page">
+        <header class="workspace-header">
+            <div class="workspace-header-left">
+                <h1 class="workspace-title">
+                    {% if original %}
+                        {{ original.name }}
+                    {% else %}
+                        Create Warehouse
+                    {% endif %}
+                </h1>
+
+                <div class="workspace-breadcrumb">
+                    <a href="{% url 'admin:index' %}">
+                        Dashboard
+                    </a>
+
+                    <span>/</span>
+
+                    <a href="{% url 'admin:products_warehouse_changelist' %}">
+                        Warehouses
+                    </a>
+
+                    <span>/</span>
+
+                    <span class="active">
+                        {% if original %}
+                            Edit Warehouse
+                        {% else %}
+                            Add Warehouse
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="workspace-header-right">
+                <div class="workspace-actions">
+                    <button
+                        type="submit"
+                        name="_save"
+                        class="workspace-btn secondary-btn">
+
+                        Save Warehouse
+                    </button>
+
+                    <button
+                        type="submit"
+                        name="_continue"
+                        class="workspace-btn primary-btn">
+
+                        Save & Continue Editing
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        {% if adminform.form.non_field_errors %}
+
+            <div class="workspace-alert">
+                {{ adminform.form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="workspace-grid">
+            <main class="workspace-main">
+                {% include "admin/products/warehouse/components/warehouse_information.html" %}
+
+                {% include "admin/products/warehouse/components/contact_information.html" %}
+
+                {% include "admin/products/warehouse/components/operational_settings.html" %}
+            </main>
+
+            <aside class="workspace-sidebar">
+                {% include "admin/products/warehouse/components/live_summary.html" %}
+
+                {% include "admin/products/warehouse/components/analytics_card.html" %}
+
+                {% include "admin/products/warehouse/components/activity_timeline.html" %}
+            </aside>
+        </div>
+    </section>
+</form>
+{% endblock %}

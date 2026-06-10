@@ -1,0 +1,138 @@
+<section class="admin-card timeline-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Activity Timeline
+            </h2>
+
+            <p>
+                Historical warehouse events, status updates, and operational activity records.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        {% if original and original.pk %}
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker timeline-success"></div>
+
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            Warehouse Created
+                        </div>
+
+                        <div class="timeline-description">
+                            Warehouse record was created and registered in the system.
+                        </div>
+
+                        <div class="timeline-meta">
+                            {% if original.created_at %}
+
+                                {{ original.created_at|date:"M d, Y H:i" }}
+                            {% else %}
+
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker timeline-primary"></div>
+
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            Last Updated
+                        </div>
+
+                        <div class="timeline-description">
+                            Warehouse information was modified.
+                        </div>
+
+                        <div class="timeline-meta">
+                            {% if original.updated_at %}
+
+                                {{ original.updated_at|date:"M d, Y H:i" }}
+                            {% else %}
+
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker timeline-info"></div>
+
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            Warehouse Status
+                        </div>
+
+                        <div class="timeline-description">
+                            {% if original.is_active %}
+                                Warehouse is currently active and available for operations.
+
+                            {% else %}
+                                Warehouse is currently inactive.
+
+                            {% endif %}
+                        </div>
+
+                        <div class="timeline-meta">
+                            {% if original.is_active %}
+
+                                Active Warehouse
+                            {% else %}
+
+                                Inactive Warehouse
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if total_variants is not None %}
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker timeline-warning"></div>
+
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                Inventory Snapshot
+                            </div>
+
+                            <div class="timeline-description">
+                                Current warehouse inventory overview.
+                            </div>
+
+                            <div class="timeline-meta">
+                                {{ total_variants|default_if_none:0 }}
+                                Variants
+                                •
+
+                                {{ available_stock|default_if_none:0 }}
+                                Available Units
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-state-content">
+                    <h3>
+                        Timeline Unavailable
+                    </h3>
+
+                    <p>
+                        Save the warehouse first to generate activity history, inventory events, and operational records.
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

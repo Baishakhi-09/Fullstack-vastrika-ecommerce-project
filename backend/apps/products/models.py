@@ -956,7 +956,10 @@ class ProductVariant(TimeStampedModel):
 class Warehouse(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
     location = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Enable or disable this warehouse for inventory operations."
+    )
 
     code = models.CharField(
         max_length=30,

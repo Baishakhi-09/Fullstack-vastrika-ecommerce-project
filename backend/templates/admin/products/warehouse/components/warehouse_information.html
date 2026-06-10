@@ -1,0 +1,121 @@
+<section class="admin-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Warehouse Information
+            </h2>
+
+            <p>
+                Configure warehouse identity, operational code, and location details.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="form-grid">
+            {% if adminform.form.name %}
+
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.name.id_for_label }}"
+                        class="form-label">
+
+                        {{ adminform.form.name.label }}
+
+                        {% if adminform.form.name.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.name }}
+                    </div>
+
+                    {% if adminform.form.name.help_text %}
+                        <div class="field-help">
+
+                            {{ adminform.form.name.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in adminform.form.name.errors %}
+
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+
+            {% if adminform.form.code %}
+                <div class="form-group">
+
+                    <label
+                        for="{{ adminform.form.code.id_for_label }}"
+                        class="form-label">
+
+                        {{ adminform.form.code.label }}
+
+                        {% if adminform.form.code.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.code }}
+                    </div>
+
+                    {% if adminform.form.code.help_text %}
+                        <div class="field-help">
+
+                            {{ adminform.form.code.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in adminform.form.code.errors %}
+                        <div class="field-error">
+
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+
+            {% if adminform.form.location %}
+                <div class="form-group full-width">
+
+                    <label
+                        for="{{ adminform.form.location.id_for_label }}"
+                        class="form-label">
+
+                        {{ adminform.form.location.label }}
+
+                        {% if adminform.form.location.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.location }}
+                    </div>
+
+                    {% if adminform.form.location.help_text %}
+                        <div class="field-help">
+
+                            {{ adminform.form.location.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in adminform.form.location.errors %}
+                        <div class="field-error">
+
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
