@@ -1985,14 +1985,23 @@ class WarehouseAdmin(
         "admin/products/warehouse/warehouse_form.html"
     )
 
+    change_list_template = (
+        "admin/products/warehouse/warehouse_list.html"
+    )
+
     list_display = (
         "name",
+        "location",
+        "phone",
         "is_active",
         "created_at",
     )
 
     search_fields = (
         "name",
+        "code",
+        "location",
+        "phone",
     )
 
     list_filter = (
@@ -2003,6 +2012,107 @@ class WarehouseAdmin(
     ordering = (
         "name",
     )
+
+    @admin.display(description="Status")
+    def warehouse_status(self, obj):
+
+        if obj.is_active:
+            return "Active"
+
+        return "Inactive"
+    
+    actions = [
+        "delete_selected_warehouse"
+    ]
+
+    def get_actions(
+        self,
+        request
+    ):
+        actions = super().get_actions(request)
+
+        # Remove delete action
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+
+        return actions
+
+    @admin.action(
+        description="Delete selected warehouse"
+    )
+    def delete_selected_warehouse(
+        self,
+        request,
+        queryset
+    ):
+        total_deleted = queryset.count()
+
+        queryset.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} warehouse(s) deleted successfully."
+        )
+
+    def changelist_view(
+        self,
+        request,
+        extra_context=None,
+    ):
+
+        extra_context = extra_context or {}
+
+        queryset = Warehouse.objects.all()
+
+        total_warehouses = queryset.count()
+
+        active_warehouses = queryset.filter(
+            is_active=True
+        ).count()
+
+        inactive_warehouses = queryset.filter(
+            is_active=False
+        ).count()
+
+        locations_covered = queryset.exclude(
+            location=""
+        ).count()
+
+        extra_context.update({
+
+            "total_warehouses":
+                total_warehouses,
+
+            "active_warehouses":
+                active_warehouses,
+
+            "inactive_warehouses":
+                inactive_warehouses,
+
+            "locations_covered":
+                locations_covered,
+
+        })
+
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context,
+        )
+
+        if hasattr(response, "context_data"):
+
+            action_form = response.context_data.get(
+                "action_form"
+            )
+
+            if action_form:
+                action_form.fields[
+                    "action"
+                ].widget.attrs.update({
+                    "id": "id_action"
+                })
+
+        return response
 
 # =========================================================
 # ADMIN REGISTRATION

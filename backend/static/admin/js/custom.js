@@ -1025,6 +1025,8 @@ function initDeleteModal() {
 
                 "delete_selected_productvariant",
 
+                "delete_selected_warehouse",
+
                 "delete_selected"
             ];
 
