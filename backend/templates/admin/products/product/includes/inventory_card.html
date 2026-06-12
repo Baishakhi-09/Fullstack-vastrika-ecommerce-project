@@ -1,0 +1,316 @@
+<section
+    id="inventory-section"
+    class="admin-card inventory-card">
+
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Inventory Management
+            </h2>
+
+            <p>
+                Manage stock allocation, warehouse fulfillment, inventory valuation, and operational readiness.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <!-- INVENTORY DASHBOARD -->
+        <div class="inventory-dashboard">
+            <div class="metric-card">
+                <div class="metric-label">
+                    Total Stock
+                </div>
+
+                <div class="metric-value">
+                    {{ total_stock|default:"0" }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    Available Stock
+                </div>
+
+                <div class="metric-value">
+                    {{ available_stock|default:"0" }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    Reserved Stock
+                </div>
+
+                <div class="metric-value">
+                    {{ reserved_stock|default:"0" }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    Inventory Value
+                </div>
+
+                <div class="metric-value">
+                    {{ currency_symbol|default:"₹" }}
+                    {{ inventory_value|default:"0" }}
+                </div>
+            </div>
+        </div>
+
+        <!-- INVENTORY CONFIGURATION -->
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Inventory Configuration
+                </h3>
+
+                <p>
+                    Configure inventory allocation and stock management settings.
+                </p>
+            </div>
+
+            <div class="form-grid three-column-grid">
+                {% if adminform.form.stock %}
+
+                    <div class="form-group">
+                        <label
+                            for="{{ adminform.form.stock.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.stock.label }}
+
+                            {% if adminform.form.stock.field.required %}
+                                <span class="required-mark">*</span>
+                            {% endif %}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.stock }}
+                        </div>
+
+                        {% if adminform.form.stock.help_text %}
+                            <div class="field-help">
+
+                                {{ adminform.form.stock.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.stock.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if adminform.form.reserved_stock %}
+
+                    <div class="form-group">
+                        <label
+                            for="{{ adminform.form.reserved_stock.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.reserved_stock.label }}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.reserved_stock }}
+                        </div>
+
+                        {% if adminform.form.reserved_stock.help_text %}
+                            <div class="field-help">
+
+                                {{ adminform.form.reserved_stock.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.reserved_stock.errors %}
+                            <div class="field-error">
+
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Available Stock
+                    </label>
+
+                    <div class="readonly-metric">
+                        {{ available_stock|default:"0" }}
+                    </div>
+
+                    <div class="field-help">
+                        Automatically calculated inventory available for sale.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WAREHOUSE MANAGEMENT -->
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Warehouse Management
+                </h3>
+
+                <p>
+                    Assign inventory to a warehouse for fulfillment and logistics operations.
+                </p>
+            </div>
+
+            <div class="form-grid">
+                {% if adminform.form.warehouse %}
+
+                    <div class="form-group">
+                        <label
+                            for="{{ adminform.form.warehouse.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.warehouse.label }}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.warehouse }}
+                        </div>
+
+                        {% if adminform.form.warehouse.help_text %}
+
+                            <div class="field-help">
+
+                                {{ adminform.form.warehouse.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="warehouse-summary">
+                <div class="summary-row">
+                    <span>
+                        Warehouse Status
+                    </span>
+
+                    <span
+                        class="status-badge
+                        {{ warehouse_status_class|default:'status-warning' }}">
+
+                        {{ warehouse_status|default:"Unassigned" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVENTORY HEALTH -->
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Inventory Health
+                </h3>
+
+                <p>
+                    Inventory availability, fulfillment readiness, and operational monitoring.
+                </p>
+            </div>
+
+            <div class="inventory-health-grid">
+                <div class="inventory-health-item">
+                    <div class="inventory-health-label">
+                        Stock Status
+                    </div>
+
+                    <div class="inventory-health-value">
+                        <span
+                            class="health-badge
+                            {{ inventory_status_class|default:'warning' }}">
+
+                            {{ inventory_status|default:"Unknown" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="inventory-health-item">
+                    <div class="inventory-health-label">
+                        Fulfillment
+                    </div>
+
+                    <div class="inventory-health-value">
+                        <span
+                            class="health-badge
+                            {{ fulfillment_status_class|default:'warning' }}">
+
+                            {{ fulfillment_status|default:"Pending" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="inventory-health-item">
+                    <div class="inventory-health-label">
+                        Reorder Status
+                    </div>
+
+                    <div class="inventory-health-value">
+                        <span
+                            class="health-badge
+                            {{ reorder_status_class|default:'warning' }}">
+
+                            {{ reorder_status|default:"Monitoring" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVENTORY ANALYTICS -->
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Inventory Analytics
+                </h3>
+
+                <p>
+                    Inventory intelligence and warehouse utilization metrics.
+                </p>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Inventory Value
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ currency_symbol|default:"₹" }}
+                        {{ inventory_value|default:"0" }}
+                    </div>
+                </div>
+
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Reserved %
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ reserved_percentage|default:"0" }}%
+                    </div>
+                </div>
+
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Availability %
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ availability_percentage|default:"0" }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

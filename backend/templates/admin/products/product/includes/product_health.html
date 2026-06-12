@@ -1,0 +1,222 @@
+<section class="admin-card product-health-card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h2>
+                Product Health
+            </h2>
+
+            <p>
+                Product readiness, content quality, inventory performance, SEO optimization, and publishing status.
+            </p>
+        </div>
+    </div>
+
+    <div class="card-body">
+        {% if original %}
+
+            <!-- HEALTH OVERVIEW -->
+            <div class="health-overview">
+                <div class="health-score-card">
+                    <div class="health-score-circle">
+                        {{ product_health_score|default:"0" }}%
+                    </div>
+
+                    <div class="health-score-content">
+                        <div class="health-score-title">
+                            Product Health Score
+                        </div>
+
+                        <div class="health-score-description">
+                            {{ health_message|default:"Health information unavailable." }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEALTH KPI DASHBOARD -->
+            <div class="health-kpi-grid">
+                <div class="health-kpi-card">
+                    <div class="kpi-label">
+                        SEO Score
+                    </div>
+
+                    <div class="kpi-value">
+                        {{ seo_score|default:"0" }}%
+                    </div>
+                </div>
+
+                <div class="health-kpi-card">
+                    <div class="kpi-label">
+                        Media Score
+                    </div>
+
+                    <div class="kpi-value">
+                        {{ media_score|default:"0" }}%
+                    </div>
+                </div>
+
+                <div class="health-kpi-card">
+                    <div class="kpi-label">
+                        Inventory Score
+                    </div>
+
+                    <div class="kpi-value">
+                        {{ inventory_score|default:"0" }}%
+                    </div>
+                </div>
+
+                <div class="health-kpi-card">
+                    <div class="kpi-label">
+                        Commerce Score
+                    </div>
+
+                    <div class="kpi-value">
+                        {{ commerce_score|default:"0" }}%
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEALTH STATUS -->
+            <div class="health-metrics">
+                <div class="health-metric">
+                    <div class="metric-label">
+                        SEO Health
+                    </div>
+
+                    <div class="metric-value">
+                        <span
+                            class="health-badge {{ seo_status_class|default:'warning' }}">
+
+                            {{ seo_status|default:"Pending" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="health-metric">
+                    <div class="metric-label">
+                        Media Health
+                    </div>
+
+                    <div class="metric-value">
+                        <span
+                            class="health-badge {{ media_status_class|default:'warning' }}">
+
+                            {{ media_status|default:"Pending" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="health-metric">
+                    <div class="metric-label">
+                        Inventory Health
+                    </div>
+
+                    <div class="metric-value">
+                        <span
+                            class="health-badge {{ inventory_status_class|default:'warning' }}">
+
+                            {{ inventory_status|default:"Unknown" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="health-metric">
+                    <div class="metric-label">
+                        Commerce Health
+                    </div>
+
+                    <div class="metric-value">
+                        <span
+                            class="health-badge {{ commerce_status_class|default:'warning' }}">
+
+                            {{ commerce_status|default:"Pending" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="health-metric">
+                    <div class="metric-label">
+                        Publishing Status
+                    </div>
+
+                    <div class="metric-value">
+                        <span
+                            class="health-badge {{ publishing_status_class|default:'warning' }}">
+
+                            {{ publishing_status|default:"Draft" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VARIANT SUMMARY -->
+            <div class="health-summary-card">
+                <div class="summary-header">
+                    Variant Overview
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            Total Variants
+                        </div>
+
+                        <div class="summary-value">
+                            {{ variant_count|default:"0" }}
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            Active Variants
+                        </div>
+
+                        <div class="summary-value">
+                            {{ active_variant_count|default:"0" }}
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            Out of Stock
+                        </div>
+
+                        <div class="summary-value">
+                            {{ out_of_stock_variant_count|default:"0" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- READINESS CHECKLIST -->
+            <div class="health-footer">
+                <div class="health-footer-title">
+                    Readiness Checklist
+                </div>
+
+                <ul class="health-checklist">
+                    {% for item in readiness_checklist %}
+                        <li
+                            class="{% if item.completed %}completed{% endif %}">
+
+                            {{ item.label }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-state-content">
+                    <h3>
+                        Product Health Unavailable
+                    </h3>
+
+                    <p>
+                        Save the product first to generate health metrics, readiness insights, SEO analysis, inventory monitoring, and publishing intelligence.
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

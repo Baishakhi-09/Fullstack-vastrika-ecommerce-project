@@ -125,11 +125,14 @@ class AuditAdminMixin:
 # PRODUCT IMAGE INLINE
 # =========================================================
 
-class ProductImageInline(admin.TabularInline):
+class ProductImageInline(admin.StackedInline):
 
     model = ProductImage
 
     extra = 0
+
+    verbose_name = "Product Image"
+    verbose_name_plural = "Product Images"
 
     ordering = ("sort_order",)
 
@@ -137,6 +140,7 @@ class ProductImageInline(admin.TabularInline):
         "image_preview",
         "image",
         "alt_text",
+        "image_type",
         "is_primary",
         "sort_order",
     )
@@ -178,6 +182,10 @@ class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
 
     extra = 0
+
+    verbose_name = "Product Variant"
+
+    verbose_name_plural = "Product Variants"
 
     show_change_link = True
 
@@ -1154,14 +1162,13 @@ class ProductAdmin(
         "admin/products/product/product_form.html"
     )
 
-    autocomplete_fields = [
-        "brand",
-        "tags",
-        "child_category",
-    ]
+    autocomplete_fields = []
+        # "brand",
+        # "tags",
+        # "child_category",
 
     inlines = [
-        # ProductImageInline,
+        ProductImageInline,
         ProductVariantInline,
     ]
 
@@ -1238,7 +1245,6 @@ class ProductAdmin(
     )
 
     readonly_fields = (
-        "slug",
         "discount_badge",
         "stock_badge",
         "created_at",
@@ -1303,6 +1309,12 @@ class ProductAdmin(
             )
         }),
 
+        ("Media", {
+            "fields": (
+                "video",
+            )
+        }),
+
         ("Attributes", {
             "fields": (
                 "gender",
@@ -1359,6 +1371,7 @@ class ProductAdmin(
             "fields": (
                 "meta_title",
                 "meta_description",
+                "og_image",
             )
         }),
 

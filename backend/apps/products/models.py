@@ -502,6 +502,13 @@ class Product(TimeStampedModel):
     short_description = models.CharField(max_length=300, blank=True)
     description = models.TextField(blank=True)
 
+    video = models.FileField(
+        upload_to="products/videos/",
+        blank=True,
+        null=True,
+        help_text="Upload MP4, WEBM or MOV video."
+    )
+
     brand = models.ForeignKey(
         "products.Brand",
         on_delete=models.SET_NULL,
@@ -636,7 +643,16 @@ class Product(TimeStampedModel):
     occasion = models.CharField(max_length=20, choices=OCCASION_CHOICES, blank=True)
 
     meta_title = models.CharField(max_length=255, blank=True)
-    meta_description = models.CharField(max_length=500, blank=True)
+    meta_description = models.CharField(
+        max_length=500,
+        blank=True
+    )
+
+    og_image = models.ImageField(
+        upload_to="products/seo/",
+        blank=True,
+        null=True,
+    )
 
     seo_keywords = models.CharField(
         max_length=500,
@@ -740,6 +756,26 @@ class Product(TimeStampedModel):
         )
     
     @property
+    def primary_image(self):
+
+        return (
+            self.images
+            .filter(is_primary=True)
+            .first()
+        )
+
+
+    @property
+    def primary_image_url(self):
+
+        image = self.primary_image
+
+        if image and image.image:
+            return image.image.url
+
+        return None
+    
+    @property
     def stock_status(self):
 
         if self.total_stock <= 0:
@@ -809,30 +845,35 @@ class Product(TimeStampedModel):
 
 # -------------------- PRODUCT IMAGE -------------------- #
 class ProductImage(TimeStampedModel):
+    IMAGE_TYPE_CHOICES = (
+        ("primary", "Primary"),
+        ("gallery", "Gallery"),
+        ("zoom", "Zoom"),
+    )
+
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
         related_name="images",
     )
-    image = models.ImageField(upload_to="products/")
 
-    image_type = models.CharField(
-        max_length=30,
-        choices=(
-            ("thumbnail", "Thumbnail"),
-            ("gallery", "Gallery"),
-            ("zoom", "Zoom"),
-        ),
-        default="gallery"
+    image = models.ImageField(
+        upload_to="products/images/"
     )
 
-    alt_text = models.CharField(max_length=255, blank=True)
+    image_type = models.CharField(
+        max_length=20,
+        choices=IMAGE_TYPE_CHOICES,
+        default="gallery",
+    )
+
+    alt_text = models.CharField(max_length=255, blank=True,)
     is_primary = models.BooleanField(default=False)
     sort_order = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = "products_product_image"
-        ordering = ["sort_order", "id"]
+        ordering = ["-is_primary","sort_order", "id",]
         indexes = [
             models.Index(fields=["product"]),
             models.Index(fields=["is_primary"]),

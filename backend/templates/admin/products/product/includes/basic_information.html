@@ -1,236 +1,288 @@
-{% load i18n %}
-
-<section
-    class="admin-card basic-information-card"
-    data-basic-information-card>
-
-    <header class="card-header">
+<section class="admin-card basic-information-card">
+    <div class="card-header">
         <div class="card-header-content">
-            <div class="card-title-group">
-                <h2 class="card-title">
-                    {% trans "Basic Information" %}
-                </h2>
+            <h2>
+                Product Information
+            </h2>
 
-                <p class="card-description">
-                    {% trans "Manage product identity, categorization, branding, and customer-facing descriptions." %}
-                </p>
-            </div>
+            <p>
+                Configure product identity, categorization, branding, and descriptive content.
+            </p>
         </div>
-    </header>
+    </div>
 
     <div class="card-body">
-        <fieldset class="form-fieldset">
+        {% if adminform.form.non_field_errors %}
+            <div class="form-errors">
 
-            <legend class="fieldset-legend">
-                {% trans "Product Information" %}
-            </legend>
+                {% for error in adminform.form.non_field_errors %}
+                    <div class="field-error">
 
-            <!-- PRODUCT NAME -->
-            <div class="form-group full-width">
-                <label
-                    for="{{ adminform.form.name.id_for_label }}"
-                    class="form-label">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-                    <span class="label-text">
-                        {{ adminform.form.name.label }}
-                    </span>
+        <!-- BASIC DETAILS -->
+        <div class="form-fieldset">
+            <div class="section-header">
+                <h3 class="legend">
+                    Basic Information
+                </h3>
 
-                    {% if adminform.form.name.field.required %}
-                        <span class="required-indicator">*</span>
-                    {% endif %}
-                </label>
+                <p>
+                    Define the core identity and classification of the product.
+                </p>
+            </div>
 
-                <div class="admin-input-wrapper">
-                    {{ adminform.form.name }}
-                </div>
+            <div class="form-grid">
+                {% if adminform.form.name %}
 
-                {% if adminform.form.name.errors %}
-                    <div class="field-errors">
-                        {{ adminform.form.name.errors }}
+                    <div class="form-group full-width">
+                        <label
+                            for="{{ adminform.form.name.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.name.label }}
+
+                            {% if adminform.form.name.field.required %}
+                                <span class="required-mark">*</span>
+                            {% endif %}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.name }}
+                        </div>
+
+                        {% if adminform.form.name.help_text %}
+                            <div class="field-help">
+
+                                {{ adminform.form.name.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.name.errors %}
+                            <div class="field-error">
+
+                                {{ error }}
+                            </div>
+                        {% endfor %}
                     </div>
                 {% endif %}
             </div>
 
-            <!-- SLUG -->
-            {% if adminform.form.slug %}
-            <div class="form-group full-width">
-
-                <label
-                    for="{{ adminform.form.slug.id_for_label }}"
-                    class="form-label">
-
-                    <span class="label-text">
-                        {{ adminform.form.slug.label }}
-                    </span>
-                </label>
-
-                <div class="admin-input-wrapper">
-                    {{ adminform.form.slug }}
-                </div>
-
-                {% if adminform.form.slug.errors %}
-                    <div class="field-errors">
-                        {{ adminform.form.slug.errors }}
-                    </div>
-                {% endif %}
-            </div>
-            {% endif %}
-        </fieldset>
-
-        <fieldset class="form-fieldset">
-            <legend class="fieldset-legend">
-                {% trans "Brand & Classification" %}
-            </legend>
-
-            <div class="form-grid three-column-grid">
-
+            <div class="tag-form-grid two-column-grid">
                 {% if adminform.form.brand %}
-                <div class="form-group">
 
-                    <label
-                        for="{{ adminform.form.brand.id_for_label }}"
-                        class="form-label">
+                    <div class="form-group">
+                        <label
+                            for="{{ adminform.form.brand.id_for_label }}"
+                            class="form-label">
 
-                        {{ adminform.form.brand.label }}
-                    </label>
+                            {{ adminform.form.brand.label }}
 
-                    <div class="admin-select-wrapper">
-                        {{ adminform.form.brand }}
+                            {% if adminform.form.brand.field.required %}
+                                <span class="required-mark">*</span>
+                            {% endif %}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.brand }}
+                        </div>
+
+                        {% if adminform.form.brand.help_text %}
+                            <div class="field-help">
+
+                                {{ adminform.form.brand.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.brand.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
                     </div>
-                </div>
                 {% endif %}
 
-                {% if adminform.form.collection %}
+                {% if adminform.form.child_category %}
                     <div class="form-group">
 
                         <label
-                            for="{{ adminform.form.collection.id_for_label }}"
+                            for="{{ adminform.form.child_category.id_for_label }}"
                             class="form-label">
 
-                            {{ adminform.form.collection.label }}
+                            Category
+
+                            {% if adminform.form.category.field.required %}
+                                <span class="required-mark">*</span>
+                            {% endif %}
                         </label>
 
-                        <div class="admin-input-wrapper">
-                            {{ adminform.form.collection }}
+                        <div class="field-wrapper">
+                            {{ adminform.form.child_category }}
                         </div>
-                    </div>
-                {% endif %}
 
-                {% if adminform.form.gender %}
-                <div class="form-group">
+                        {% if adminform.form.category.help_text %}
+                            <div class="field-help">
 
-                    <label
-                        for="{{ adminform.form.gender.id_for_label }}"
-                        class="form-label">
+                                {{ adminform.form.child_category.help_text }}
+                            </div>
+                        {% endif %}
 
-                        {{ adminform.form.gender.label }}
-                    </label>
+                        {% for error in adminform.form.child_category.errors %}
+                            <div class="field-error">
 
-                    <div class="admin-select-wrapper">
-                        {{ adminform.form.gender }}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="form-grid two-column-grid"
-            style="margin-top: 20px;">
-                {% if adminform.form.occasion %}
-                <div class="form-group">
-
-                    <label
-                        for="{{ adminform.form.occasion.id_for_label }}"
-                        class="form-label">
-
-                        {{ adminform.form.occasion.label }}
-                    </label>
-
-                    <div class="admin-select-wrapper">
-                        {{ adminform.form.occasion }}
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if adminform.form.tags %}
-                <div class="form-group">
-
-                    <label
-                        for="{{ adminform.form.tags.id_for_label }}"
-                        class="form-label">
-
-                        {{ adminform.form.tags.label }}
-                    </label>
-
-                    <div class="admin-tags-wrapper">
-                        {{ adminform.form.tags }}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </fieldset>
-
-        <fieldset class="form-fieldset">
-            <legend class="fieldset-legend">
-                {% trans "Category" %}
-            </legend>
-
-            <div class="form-group">
-                <label
-                    for="{{ adminform.form.child_category.id_for_label }}"
-                    class="form-label">
-
-                    Category
-                </label>
-
-                <div class="admin-select-wrapper">
-                    {{ adminform.form.child_category }}
-                </div>
-
-                {% if adminform.form.child_category.errors %}
-                    <div class="field-errors">
-                        {{ adminform.form.child_category.errors }}
+                                {{ error }}
+                            </div>
+                        {% endfor %}
                     </div>
                 {% endif %}
             </div>
-        </fieldset>
 
-        <fieldset class="form-fieldset">
-            <legend class="fieldset-legend">
-                {% trans "Content" %}
-            </legend>
+            {% if adminform.form.tags %}
+                <div class="tag-form-grid">
+                    <div class="form-group full-width">
+                        <label
+                            for="{{ adminform.form.tags.id_for_label }}"
+                            class="form-label">
 
-            {% if adminform.form.short_description %}
-            <div class="form-group full-width">
+                            {{ adminform.form.tags.label }}
+                        </label>
 
-                <label
-                    for="{{ adminform.form.short_description.id_for_label }}"
-                    class="form-label">
+                        <div class="field-wrapper">
+                            {{ adminform.form.tags }}
+                        </div>
 
-                    {{ adminform.form.short_description.label }}
-                </label>
+                        {% if adminform.form.tags.help_text %}
+                            <div class="field-help">
 
-                <div class="admin-input-wrapper">
-                    {{ adminform.form.short_description }}
+                                {{ adminform.form.tags.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.tags.errors %}
+                            <div class="field-error">
+
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
             {% endif %}
+        </div>
 
-            {% if adminform.form.description %}
-            <div class="form-group full-width" 
-                style="margin-top: 15px;">
+        <!-- PRODUCT CONTENT -->
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Product Content
+                </h3>
 
-                <label
-                    for="{{ adminform.form.description.id_for_label }}"
-                    class="form-label">
-
-                    {{ adminform.form.description.label }}
-                </label>
-
-                <div class="admin-textarea-wrapper">
-                    {{ adminform.form.description }}
-                </div>
+                <p>
+                    Create customer-facing content and product descriptions.
+                </p>
             </div>
-            {% endif %}
-        </fieldset>
+
+            <div class="form-grid">
+                {% if adminform.form.content %}
+
+                    <div class="form-group full-width">
+                        <label
+                            for="{{ adminform.form.content.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.content.label }}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.content }}
+                        </div>
+
+                        {% if adminform.form.content.help_text %}
+                            <div class="field-help">
+
+                                {{ adminform.form.content.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.content.errors %}
+                            <div class="field-error">
+
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-grid">
+
+                {% if adminform.form.short_description %}
+                    <div class="form-group full-width">
+
+                        <label
+                            for="{{ adminform.form.short_description.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.short_description.label }}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.short_description }}
+                        </div>
+
+                        {% if adminform.form.short_description.help_text %}
+                            <div class="field-help">
+
+                                {{ adminform.form.short_description.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.short_description.errors %}
+                            <div class="field-error">
+
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-grid">
+
+                {% if adminform.form.description %}
+                    <div class="form-group full-width">
+
+                        <label
+                            for="{{ adminform.form.description.id_for_label }}"
+                            class="form-label">
+
+                            {{ adminform.form.description.label }}
+                        </label>
+
+                        <div class="field-wrapper">
+                            {{ adminform.form.description }}
+                        </div>
+
+                        {% if adminform.form.description.help_text %}
+                            <div class="field-help">
+
+                                {{ adminform.form.description.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in adminform.form.description.errors %}
+                            <div class="field-error">
+
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </section>

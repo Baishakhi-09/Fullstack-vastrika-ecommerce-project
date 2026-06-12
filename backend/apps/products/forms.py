@@ -56,6 +56,21 @@ class ProductAdminForm(forms.ModelForm):
                     "class": "admin-select",
                 }
             ),
+
+            "video": forms.ClearableFileInput(
+                attrs={
+                    "accept": "video/mp4,video/webm"
+                }
+            ),
+
+            "meta_description": forms.Textarea(
+                attrs={
+                    "rows": 5,
+                    "class": "admin-textarea",
+                    "maxlength": 500,
+                    "placeholder": "Meta description",
+                }
+            ),
         }
 
     BASE_INPUT_CLASS = "admin-input"

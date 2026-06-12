@@ -1,0 +1,287 @@
+<section class="admin-card quick-actions-card">
+
+    <div class="card-header">
+
+        <div class="card-header-content">
+
+            <h2>
+                Quick Actions
+            </h2>
+
+            <p>
+                Frequently used product management shortcuts and administrative actions.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if original %}
+
+            <div class="quick-actions-list">
+
+                <!-- EDIT PRODUCT -->
+
+                <a
+                    href="{% url 'admin:products_product_change' original.pk %}"
+                    class="quick-action-item">
+
+                    <div class="quick-action-icon">
+                        ✏️
+                    </div>
+
+                    <div class="quick-action-content">
+
+                        <div class="quick-action-title">
+                            Edit Product
+                        </div>
+
+                        <div class="quick-action-description">
+                            Update product information and settings.
+                        </div>
+
+                    </div>
+
+                </a>
+
+                <!-- MANAGE VARIANTS -->
+
+                <a
+                    href="{% url 'admin:products_productvariant_changelist' %}?product__id__exact={{ original.pk }}"
+                    class="quick-action-item">
+
+                    <div class="quick-action-icon">
+                        🎨
+                    </div>
+
+                    <div class="quick-action-content">
+
+                        <div class="quick-action-title">
+                            Manage Variants
+                        </div>
+
+                        <div class="quick-action-description">
+                            View and manage color, size, and stock variants.
+                        </div>
+
+                    </div>
+
+                </a>
+
+                <!-- PRODUCT IMAGES -->
+
+                <a
+                    href="{% url 'admin:products_productimage_changelist' %}"
+                    class="quick-action-item">
+
+                    <div class="quick-action-icon">
+                        🖼️
+                    </div>
+
+                    <div class="quick-action-content">
+
+                        <div class="quick-action-title">
+                            Manage Media
+                        </div>
+
+                        <div class="quick-action-description">
+                            Upload and organize product gallery images.
+                        </div>
+
+                    </div>
+
+                </a>
+
+                <!-- INVENTORY -->
+
+                <a
+                    href="#inventory-section"
+                    class="quick-action-item">
+
+                    <div class="quick-action-icon">
+                        📦
+                    </div>
+
+                    <div class="quick-action-content">
+
+                        <div class="quick-action-title">
+                            Inventory Overview
+                        </div>
+
+                        <div class="quick-action-description">
+                            Review stock availability and warehouse allocation.
+                        </div>
+
+                    </div>
+
+                </a>
+
+                <!-- SEO -->
+
+                <a
+                    href="#seo-section"
+                    class="quick-action-item">
+
+                    <div class="quick-action-icon">
+                        🔍
+                    </div>
+
+                    <div class="quick-action-content">
+
+                        <div class="quick-action-title">
+                            SEO Review
+                        </div>
+
+                        <div class="quick-action-description">
+                            Check search optimization and metadata.
+                        </div>
+
+                    </div>
+
+                </a>
+
+                <!-- DUPLICATE PRODUCT -->
+
+                <button
+                    type="button"
+                    class="quick-action-item quick-action-button">
+
+                    <div class="quick-action-icon">
+                        📄
+                    </div>
+
+                    <div class="quick-action-content">
+
+                        <div class="quick-action-title">
+                            Duplicate Product
+                        </div>
+
+                        <div class="quick-action-description">
+                            Create a copy of this product for faster catalog management.
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </div>
+
+            <!-- PRODUCT STATUS -->
+
+            <div class="quick-action-status">
+
+                <div class="status-header">
+
+                    Product Workspace Status
+
+                </div>
+
+                <div class="status-grid">
+
+                    <div class="status-item">
+
+                        <span class="status-label">
+                            Product
+                        </span>
+
+                        <span class="status-value">
+
+                            {% if original.is_active %}
+
+                                <span class="status-badge status-success">
+                                    Active
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge status-warning">
+                                    Draft
+                                </span>
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                    <div class="status-item">
+
+                        <span class="status-label">
+                            SEO
+                        </span>
+
+                        <span class="status-value">
+
+                            {% if original.meta_title and original.meta_description %}
+
+                                <span class="status-badge status-success">
+                                    Ready
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge status-warning">
+                                    Pending
+                                </span>
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                    <div class="status-item">
+
+                        <span class="status-label">
+                            Inventory
+                        </span>
+
+                        <span class="status-value">
+
+                            {% if available_stock > 0 %}
+
+                                <span class="status-badge status-success">
+                                    Available
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge status-danger">
+                                    Out of Stock
+                                </span>
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-state-content">
+
+                    <h3>
+                        Quick Actions Unavailable
+                    </h3>
+
+                    <p>
+                        Save the product first to access variant management, media controls, inventory tools, and SEO utilities.
+                    </p>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>

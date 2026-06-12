@@ -1,33 +1,29 @@
 {% extends "admin/change_form.html" %}
-{% load admin_modify %}
-{% load admin_urls %}
-{% load static %}
+{% load static admin_modify %}
 
 {% block extrahead %}
-    {{ block.super }}
-    {{ media }}
-{% endblock %}
 
-{% block extrastyle %}
-{{ block.super }}
+    {{ block.super }}
+
+    {{ media }}
 
     <link
         rel="stylesheet"
         href="{% static 'admin/css/custom.css' %}">
 
-        <script
-            src="{% static 'admin/js/custom.js' %}"
-            defer>
-        </script>
+    <script
+        src="{% static 'admin/js/custom.js' %}"
+        defer>
+    </script>
 
 {% endblock %}
 
 {% block content %}
+
     <form
-        id="product-admin-form"
         method="post"
         enctype="multipart/form-data"
-        novalidate>
+        class="product-workspace">
 
         {% csrf_token %}
 
@@ -35,26 +31,18 @@
             {{ hidden }}
         {% endfor %}
 
-        {% if adminform.form.non_field_errors %}
-            <div class="global-form-errors">
-                {{ adminform.form.non_field_errors }}
-            </div>
-        {% endif %}
-
-        <div class="product-page">
-            <section class="product-page-header">
-
-                <!-- HEADER LEFT -->
+        <section class="product-page">
+            <header class="product-page-header">
                 <div class="product-page-header-left">
                     <h1 class="product-page-title">
                         {% if original %}
-                            {{ original }}
+                            {{ original.name }}
+
                         {% else %}
-                            Add Product
+                            Create Product
                         {% endif %}
                     </h1>
 
-                    <!-- BREADCRUMB -->
                     <div class="product-breadcrumb">
                         <a href="{% url 'admin:index' %}">
                             Dashboard
@@ -63,149 +51,150 @@
                         <span>/</span>
 
                         <a href="{% url 'admin:products_product_changelist' %}">
-                            {{ opts.verbose_name_plural|capfirst }}
+                            Products
                         </a>
 
                         <span>/</span>
 
                         <span class="active-page">
-                            {% if add %}
-                                Add
-                            {% else %}
-                                Edit
-                            {% endif %}
 
-                            {{ opts.verbose_name|capfirst }}
+                            {% if original %}
+                                Edit Product
+                            {% else %}
+                                Add Product
+                            {% endif %}
                         </span>
                     </div>
 
-                    <!-- SUBTITLE -->
                     <p class="product-page-subtitle">
-                        Create, manage and optimize
-                        your ecommerce product professionally.
+                        Create, manage and optimize your ecommerce product professionally.
                     </p>
+
+                    {% if original %}
+                        <div class="workspace-meta">
+                            {% if original.brand %}
+                                <span class="meta-item">
+                                    Brand:
+                                    {{ original.brand }}
+                                </span>
+                            {% endif %}
+
+                            {% if original.category %}
+                                <span class="meta-item">
+                                    Category:
+                                    {{ original.category }}
+                                </span>
+                            {% endif %}
+
+                            {% if original.sku %}
+                                <span class="meta-item">
+                                    SKU:
+                                    {{ original.sku }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
 
-                <!-- HEADER RIGHT -->
                 <div class="product-page-header-right">
                     <div class="header-action-group">
                         <button
                             type="submit"
                             name="_save"
-                            form="product-admin-form"
                             class="header-btn secondary-btn">
 
-                        {% if original %}
-                            Update Product
-                        {% else %}
-                            Save Product
-                        {% endif %}
+                            {% if original %}
+                                Update Product
+                            {% else %}
+                                Save Product
+                            {% endif %}
                         </button>
 
                         <button
                             type="submit"
                             name="_continue"
-                            form="product-admin-form"
                             class="header-btn primary-btn">
 
                             Save & Continue Editing
                         </button>
                     </div>
 
-                    <div class="header-status-card">
+                    <div class="header-status-card
+                        {% if original and original.is_active %}
+                            is-active
+                        {% else %}
+                            is-draft
+                        {% endif %}">
+
                         <span class="status-dot"></span>
 
                         <div class="status-content">
-                            <span class="status-label">
+                            <small class="status-label">
                                 Product Status
-                            </span>
+                            </small>
 
-                            <span class="status-value">
-                                {% if original %}
-                                    {{ original.get_status_display }}
+                            <strong class="status-value">
+                                {% if original and original.is_active %}
+                                    Active Product
                                 {% else %}
-                                    Draft
+                                    Draft Product
                                 {% endif %}
-                            </span>
+                            </strong>
                         </div>
                     </div>
                 </div>
-            </section>
+            </header>
 
-            <section class="product-overview-grid">
-
-                <!-- STATUS -->
-                <div class="overview-card">
-                    <span class="overview-label">
-                        Product Status
-                    </span>
-
-                    <strong class="overview-value success">
-                        {% if original and original.is_active %}
-                            {{ original.get_status_display }}
-                        {% else %}
-                            Draft
-                        {% endif %}
-                    </strong>
-                </div>
-
-                <!-- MEDIA -->
-                <div class="overview-card">
-                    <span class="overview-label">
-                        Media Assets
-                    </span>
-
-                    <strong class="overview-value">
-                        {% if original %}
-                            {{ original.images.count }}
-                        {% else %}
-                            0
-                        {% endif %}
-
-                        Images
-                    </strong>
-                </div>
-
-                <!-- INVENTORY -->
-                <div class="overview-card">
-                    <span class="overview-label">
-                        Inventory
-                    </span>
-
-                    <strong class="overview-value">
-                        {% if original %}
-                            {{ original.total_stock }}
-                        {% else %}
-                            0
-                        {% endif %}
-
-                        Units
-                    </strong>
-                </div>
-
-                <!-- SEO -->
-                <div class="overview-card">
-                    <span class="overview-label">
-                        SEO Score
-                    </span>
-
-                    <strong class="overview-value warning">
-                        {{ seo_score|default:"0" }}%
-                    </strong>
-                </div>
-            </section>
-
-            <section class="product-editor-layout">
+            <div class="product-editor-layout">
                 <main class="editor-main">
                     {% include "admin/products/product/includes/basic_information.html" %}
 
                     {% include "admin/products/product/includes/media_gallery.html" %}
 
+                    <section
+                        id="product-images-section"
+                        class="admin-card">
+
+                        <div class="card-header">
+
+                            <h2>
+                                Product Assets
+                            </h2>
+
+                            <p>
+                                Manage product images, variants, media assets,
+                                and related product content.
+                            </p>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            {% for inline_admin_formset in inline_admin_formsets %}
+
+                                <section class="inline-section">
+
+                                    <div class="inline-section-header">
+
+                                        <h3>
+                                            {{ inline_admin_formset.opts.verbose_name_plural }}
+                                        </h3>
+
+                                    </div>
+
+                                    {% include inline_admin_formset.opts.template %}
+
+                                </section>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </section>
+
                     {% include "admin/products/product/includes/pricing.html" %}
 
-                    {% include "admin/products/product/includes/inventory.html" %}
-
-                    {% include "admin/products/product/includes/variants.html" %}
+                    {% include "admin/products/product/includes/inventory_card.html" %}
 
                     {% include "admin/products/product/includes/shipping.html" %}
 
@@ -213,9 +202,53 @@
                 </main>
 
                 <aside class="editor-sidebar">
-                    {% include "admin/products/product/includes/sidebar.html" %}
+                    {% include "admin/products/product/includes/product_health.html" %}
+
+                    {% include "admin/products/product/includes/live_summary.html" %}
+
+                    {% include "admin/products/product/includes/analytics_card.html" %}
+
+                    {% include "admin/products/product/includes/quick_actions.html" %}
+
+                    {% include "admin/products/product/includes/activity_timeline.html" %}
                 </aside>
-            </section>
-        </div>
+            </div>
+        </section>
     </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            function removeDuplicateImageButtons() {
+
+                const imageAddRows = document.querySelectorAll(
+                    "#product-images-section .add-row"
+                );
+
+                imageAddRows.forEach((row, index) => {
+
+                    if (index > 0) {
+                        row.remove();
+                    }
+
+                });
+
+            }
+
+            removeDuplicateImageButtons();
+
+            const observer = new MutationObserver(() => {
+                removeDuplicateImageButtons();
+            });
+
+            observer.observe(
+                document.body,
+                {
+                    childList: true,
+                    subtree: true
+                }
+            );
+
+        });
+    </script>
 {% endblock %}

@@ -1,169 +1,560 @@
-<section class="admin-card media-gallery-card">
-
-    <!-- =====================================================
-        CARD HEADER
-    ====================================================== -->
-
+<section class="admin-card media-center-card">
     <div class="card-header">
         <div class="card-header-content">
-            <h2>  Media Gallery </h2>
+            <h2>
+                Media Center
+            </h2>
 
             <p>
-                Upload and manage product media assets professionally.
+                Manage product images, galleries, videos, storefront assets, and visual merchandising performance.
             </p>
         </div>
     </div>
 
-    <!-- =====================================================
-        CARD BODY
-    ====================================================== -->
-
     <div class="card-body">
+        {% if original and original.pk %}
 
-        <!-- =================================================
-            MEDIA UPLOAD
-        ================================================== -->
-
-        <div class="media-upload-section">
-            <label class="media-upload-label">
-                Product Images
-
-                <!-- HIDDEN INPUT -->
-                <div class="hidden-upload-input">
-                    <input type="file" name="images" id="id_images" multiple hidden>
-                </div>
-            </label>
-
-            <!-- <label
-                for="{{ adminform.form.images.id_for_label }}"
-                class="media-upload-label {% if adminform.form.images.field.required %}required{% endif %}">
-
-                Product Images
-            </label> -->
-
-            <!-- ERRORS -->
-            <div class="field-errors">
-                {{ adminform.form.images.errors }}
-            </div>
-
-            <!-- DROPZONE -->
-            <div
-                class="media-dropzone"
-                id="mediaDropzone"
-                role="button"
-                tabindex="0"
-                aria-label="Upload product images">
-
-                <!-- INNER -->
-                <div class="media-dropzone-inner">
-
-                    <!-- ICON -->
-                    <div class="media-dropzone-icon">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round">
-
-                            <path
-                                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
-                            </path>
-
-                            <polyline
-                                points="17 8 12 3 7 8">
-                            </polyline>
-
-                            <line
-                                x1="12"
-                                y1="3"
-                                x2="12"
-                                y2="15">
-                            </line>
-                        </svg>
+            <!-- MEDIA DASHBOARD -->
+            <div class="media-dashboard">
+                <div class="metric-card">
+                    <div class="metric-label">
+                        Media Score
                     </div>
 
-                    <!-- TITLE -->
-                    <h3> Drag & Drop Product Images </h3>
+                    <div class="metric-value">
+                        {% if media_score >= 90 %}
+                            Excellent
+                        {% elif media_score >= 70 %}
+                            Good
+                        {% elif media_score >= 40 %}
+                            Needs Work
+                        {% else %}
+                            Critical
+                        {% endif %}
+                    </div>
+                </div>
 
-                    <!-- TEXT -->
-                    <p>
-                        Upload high-quality product images
-                        or click to browse files.
-                    </p>
+                <div class="metric-card">
+                    <div class="metric-label">
+                        Gallery Assets
+                    </div>
 
-                    <!-- BUTTON -->
-                    <span class="upload-trigger-btn">
-                        Browse Files
-                    </span>
+                    <div class="metric-value">
+                        {{ gallery_count|default:"0" }}
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">
+                        Videos
+                    </div>
+
+                    <div class="metric-value">
+                        {{ video_count|default:"0" }}
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">
+                        Storefront Ready
+                    </div>
+
+                    <div class="metric-value">
+                        {{ storefront_readiness|default:"No" }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- FEATURED MEDIA -->
+        <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Featured Media
+                </h3>
+
+                <p>
+                    Primary visual asset displayed across storefront listings, collections, search results, and product pages.
+                </p>
+            </div>
+
+            <div class="media-featured-grid">
+                <div class="media-preview-card">
+                    <div class="preview-header">
+                        Primary Product Image
+                    </div>
+
+                    {% if original and original.primary_image_url %}
+                        <div class="preview-image-container">
+                            <img
+                                src="{{ original.primary_image_url }}"
+                                alt="{{ original.name }}"
+                                class="primary-product-image">
+                        </div>
+
+                        <div class="image-status-bar">
+                            <span class="status-badge success">
+                                Primary Image Configured
+                            </span>
+                        </div>
+                    {% else %}
+
+                        <div class="empty-preview">
+                            <div class="empty-preview-icon">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="72"
+                                    height="72"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5">
+
+                                    <rect
+                                        x="3"
+                                        y="3"
+                                        width="18"
+                                        height="18"
+                                        rx="2">
+                                    </rect>
+
+                                    <circle
+                                        cx="8.5"
+                                        cy="8.5"
+                                        r="1.5">
+                                    </circle>
+
+                                    <path
+                                        d="M21 15l-5-5L5 21">
+                                    </path>
+                                </svg>
+                            </div>
+
+                            <h4 class="empty-preview-title">
+                                No Primary Product Image
+                            </h4>
+
+                            <p class="empty-preview-description">
+                                Upload a product image and mark it as Primary
+                                to display it across storefront listings,
+                                collections, search results, and product pages.
+                            </p>
+
+                            <div class="image-info-grid">
+                                <div class="image-info-item">
+                                    <span class="info-label">
+                                        Images Uploaded
+                                    </span>
+
+                                    <span class="info-value">
+                                        {{ original.images.count|default:"0" }}
+                                    </span>
+                                </div>
+
+                                <div class="image-info-item">
+                                    <span class="info-label">
+                                        Primary Image
+                                    </span>
+
+                                    <span class="info-value warning">
+                                        Not Configured
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="empty-preview-actions">
+                                <button
+                                    type="button"
+                                    id="manage-product-images"
+                                    class="manage-images-btn">
+
+                                    Manage Product Images
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- =================================================
-            MEDIA PREVIEW
-        ================================================== -->
+        <!-- GALLERY MANAGEMENT -->
+        <div class="form-section">
+            <div class="section-header">
+                <h3 class="gallery-empty-title">
+                    Gallery Management
+                </h3>
 
-        <div class="media-preview-section">
-            <div class="media-preview-header">
-                <h3> Media Preview </h3>
-
-                <span class="media-count-badge">
-                    0 Images
-                </span>
+                <p class="gallery-empty-description">
+                    Manage supporting images used for merchandising and customer engagement.
+                </p>
             </div>
 
-            <!-- GRID -->
-            <div
-                class="media-preview-grid"
-                id="mediaPreviewGrid">
+            {% if original and original.pk %}
+                <div class="gallery-summary-grid">
 
-                <!-- EMPTY STATE -->
-                <div class="media-preview-empty">
+                    <div class="gallery-stat">
+                        <div class="gallery-stat-label">
+                            Gallery Assets
+                        </div>
 
-                    <!-- ICON -->
-                    <div class="media-preview-empty-icon">
+                        <div class="gallery-stat-value">
+                            {{ gallery_count|default:"0" }}
+                        </div>
+                    </div>
+
+                    <div class="gallery-stat">
+                        <div class="gallery-stat-label">
+                            Last Upload
+                        </div>
+
+                        <div class="gallery-stat-value">
+                            {{ last_media_upload|default:"—" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gallery-management-placeholder">
+                    <h4>
+                        Gallery Assets
+                    </h4>
+
+                    <p>
+                        Gallery images are managed through Product Image records and media asset management.
+                    </p>
+                </div>
+            {% else %}
+
+                <div class="empty-state">
+                    <div class="empty-state-content">
+                        <h3>
+                            Gallery Unavailable
+                        </h3>
+
+                        <p>
+                            Save the product first to begin managing gallery assets.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- VIDEO MANAGEMENT -->
+        <section class="form-section">
+            <div class="section-header">
+                <h3>
+                    Video Assets
+                </h3>
+
+                <p>
+                    Product demonstrations, promotional videos, tutorials, and merchandising content.
+                </p>
+            </div>
+
+            {% if adminform.form.video %}
+
+                <div class="video-upload-section">
+                    <div class="video-upload-card">
+                        <div class="video-upload-header">
+
+                            <h4>
+                                Product Video
+                            </h4>
+
+                            <p>
+                                Upload product demonstrations, promotional videos,
+                                tutorials, and merchandising content.
+                            </p>
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ adminform.form.video.id_for_label }}"
+                                class="form-label">
+
+                                {{ adminform.form.video.label }}
+
+                                {% if adminform.form.video.field.required %}
+                                    <span class="required-mark">*</span>
+                                {% endif %}
+                            </label>
+
+                            <div class="video-upload-field">
+                                {{ adminform.form.video }}
+
+                                <label
+                                    for="{{ adminform.form.video.auto_id }}"
+                                    class="custom-video-upload">
+
+                                    <div class="upload-icon">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="40"
+                                            height="40"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5">
+
+                                            <path d="M12 16V4"></path>
+                                            <path d="M8 8l4-4 4 4"></path>
+                                            <path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"></path>
+                                        </svg>
+                                    </div>
+
+                                    <div class="upload-title">
+                                        Upload Product Video
+                                    </div>
+
+                                    <div class="upload-subtitle">
+                                        MP4 • WEBM • MOV
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="upload-guidelines">
+                                <div class="guideline-item">
+                                    Recommended: 1920×1080 Resolution
+                                </div>
+
+                                <div class="guideline-item">
+                                    Maximum Size: 50 MB
+                                </div>
+                            </div>
+
+                            {% for error in adminform.form.video.errors %}
+                                <div class="field-error">
+
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="video-status-card">
+                        <div class="video-status-header">
+                            Video Status
+                        </div>
+
+                        {% if original and original.video %}
+                            <div class="video-status success">
+                                <div class="video-status-icon">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="56"
+                                        height="56"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+
+                                        <rect
+                                            x="2"
+                                            y="6"
+                                            width="15"
+                                            height="12"
+                                            rx="2">
+                                        </rect>
+
+                                        <path
+                                            d="M17 10l5-3v10l-5-3z">
+                                        </path>
+                                    </svg>
+                                </div>
+
+                                <div class="video-status-title">
+                                    Publishing Ready
+                                </div>
+
+                                <div class="video-status-description">
+                                    Product video is available and ready
+                                    for storefront display.
+                                </div>
+                            </div>
+                        {% else %}
+
+                            <div class="video-status pending">
+                                <div class="video-status-icon">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="56"
+                                        height="56"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+
+                                        <rect
+                                            x="2"
+                                            y="6"
+                                            width="15"
+                                            height="12"
+                                            rx="2">
+                                        </rect>
+
+                                        <path
+                                            d="M17 10l5-3v10l-5-3z">
+                                        </path>
+                                    </svg>
+                                </div>
+
+                                <div class="video-status-title">
+                                    No Video Uploaded
+                                </div>
+
+                                <div class="video-status-description">
+                                    Upload a video to improve product
+                                    engagement and conversion rates.
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="upload-video-btn"
+                                    id="upload-video-trigger">
+
+                                    Upload Video
+
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+
+                <div class="video-empty-state-card">
+                    <div class="video-empty-icon">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
+                            width="56"
+                            height="56"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="1.8"
+                            stroke-width="1.5"
                             stroke-linecap="round"
                             stroke-linejoin="round">
 
                             <rect
-                                x="3"
-                                y="5"
-                                width="18"
-                                height="14"
+                                x="2"
+                                y="6"
+                                width="15"
+                                height="12"
                                 rx="2">
                             </rect>
 
-                            <circle
-                                cx="8.5"
-                                cy="10"
-                                r="1.5">
-                            </circle>
-
                             <path
-                                d="M21 16l-5-5-4 4-2-2-4 3">
+                                d="M17 10l5-3v10l-5-3z">
                             </path>
                         </svg>
                     </div>
 
-                    <!-- TITLE -->
-                    <h4> No Images Uploaded </h4>
+                    <h4>
+                        Video Feature Not Configured
+                    </h4>
 
-                    <!-- TEXT -->
                     <p>
-                        Uploaded product images will appear here.
+                        Add a video field to enable product demonstrations,
+                        promotional videos, tutorials, and merchandising content.
                     </p>
                 </div>
+            {% endif %}
+        </section>
+
+        <!-- MEDIA HEALTH -->
+        <!-- <div class="form-section">
+            <div class="section-header">
+                <h3>
+                    Media Health
+                </h3>
+
+                <p>
+                    Storefront readiness and visual merchandising quality assessment.
+                </p>
             </div>
-        </div>
+
+            <div class="media-health-grid">
+                <div class="media-health-item">
+                    <div class="media-health-label">
+                        Featured Image
+                    </div>
+
+                    <div class="media-health-value">
+                        <span
+                            class="health-badge {{ featured_media_status_class|default:'warning' }}">
+
+                            {{ featured_media_status|default:"Pending" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="media-health-item">
+                    <div class="media-health-label">
+                        Gallery Health
+                    </div>
+
+                    <div class="media-health-value">
+                        <span
+                            class="health-badge {{ gallery_status_class|default:'warning' }}">
+
+                            {{ gallery_status|default:"Pending" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="media-health-item">
+                    <div class="media-health-label">
+                        Video Assets
+                    </div>
+
+                    <div class="media-health-value">
+                        <span
+                            class="health-badge {{ video_status_class|default:'warning' }}">
+
+                            {{ video_status|default:"Optional" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="media-health-item">
+                    <div class="media-health-label">
+                        Publishing Readiness
+                    </div>
+
+                    <div class="media-health-value">
+                        <span
+                            class="health-badge {{ storefront_status_class|default:'warning' }}">
+
+                            {{ storefront_status|default:"Pending" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </div>
 </section>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const uploadVideoBtn = document.getElementById(
+            "upload-video-trigger"
+        );
+
+        const videoInput = document.querySelector(
+            'input[name="video"]'
+        );
+
+        if (uploadVideoBtn && videoInput) {
+            uploadVideoBtn.addEventListener(
+                "click",
+                function () {
+                    videoInput.click();
+                }
+            );
+        }
+    });
+
+</script>

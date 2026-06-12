@@ -1,12 +1,8 @@
 <section class="admin-card seo-card">
 
-    <!-- =====================================================
-        CARD HEADER
-    ====================================================== -->
-
     <div class="card-header">
         <div class="card-header-content">
-            <h2> SEO </h2>
+            <h2> SEO & SEARCH OPTIMIZATION </h2>
 
             <p>
                 Optimize search engine visibility,
@@ -14,10 +10,6 @@
             </p>
         </div>
     </div>
-
-    <!-- =====================================================
-        CARD BODY
-    ====================================================== -->
 
     <div class="card-body">
         <fieldset class="form-fieldset">
@@ -56,10 +48,6 @@
                     {% endif %}
                 </div>
 
-                <!-- =============================================
-                    META DESCRIPTION
-                ============================================== -->
-
                 <div class="form-group full-width">
                     <div class="seo-label-row">
                         {{ adminform.form.meta_description.label_tag }}
@@ -90,10 +78,6 @@
                     {% endif %}
                 </div>
 
-                <!-- =============================================
-                    URL SLUG
-                ============================================== -->
-
                 <div class="form-group full-width">
                     {{ adminform.form.slug.label_tag }}
 
@@ -119,10 +103,6 @@
                     {% endif %}
                 </div>
 
-                <!-- =============================================
-                    OPENGRAPH IMAGE
-                ============================================== -->
-
                 <div class="form-group full-width">
                     {{ adminform.form.og_image.label_tag }}
 
@@ -134,7 +114,8 @@
                     <!-- UPLOAD -->
                     <div class="seo-og-upload" id="seoOgUpload">
                         <div class="seo-og-upload-content">
-                            <div class="seo-og-icon">
+                            <div class="seo-og-icon"
+                                id="seoOgIcon">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
@@ -164,29 +145,35 @@
                                 </svg>
                             </div>
 
-                            <h4> Upload OpenGraph Image </h4>
+                            <div
+                                id="seoOgPreview"
+                                class="seo-og-preview">
+                            </div>
 
-                            <p>
+
+                            <h4 id="seoOgTitle"> Upload OpenGraph Image </h4>
+
+                            <p id="seoOgFileName">
                                 Recommended size:
                                 1200 × 630 pixels
                             </p>
 
-                            <span class="seo-upload-btn">
+                            <button
+                                type="button"
+                                class="seo-upload-btn"
+                                id="seoUploadBtn">
+
                                 Browse Image
-                            </span>
+                            </button>
 
                             <div class="seo-hidden-input">
-                                {{ adminform.form.opengraph_image }}
+                                {{ adminform.form.og_image }}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </fieldset>
-
-        <!-- =================================================
-            SEO SCORE
-        ================================================== -->
 
         <div class="seo-score-grid">
 
@@ -233,10 +220,6 @@
             </div>
         </div>
 
-        <!-- =================================================
-            SEO PREVIEW
-        ================================================== -->
-
         <div class="seo-preview-wrapper">
             <div class="seo-preview-header">
                 <h3> SEO Preview </h3>
@@ -249,7 +232,7 @@
                     class="seo-preview-url"
                     id="seoPreviewUrl">
 
-                    https://example.com/products/
+                    {{ request.scheme }}://{{ request.get_host }}/
                 </div>
 
                 <!-- TITLE -->
@@ -272,3 +255,100 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const uploadBtn =
+                document.getElementById(
+                    "seoUploadBtn"
+                );
+
+            const fileInput =
+                document.getElementById(
+                    "id_og_image"
+                );
+
+            const preview =
+                document.getElementById(
+                    "seoOgPreview"
+                );
+
+            const fileName =
+                document.getElementById(
+                    "seoOgFileName"
+                );
+
+            const title =
+                document.getElementById(
+                    "seoOgTitle"
+                );
+
+            const icon =
+                document.getElementById(
+                    "seoOgIcon"
+                );
+
+            if (
+                uploadBtn &&
+                fileInput
+            ) {
+
+                uploadBtn.addEventListener(
+                    "click",
+                    function () {
+
+                        fileInput.click();
+
+                    }
+                );
+
+                fileInput.addEventListener(
+                    "change",
+                    function () {
+
+                        const file =
+                            this.files[0];
+
+                        if (!file) {
+                            return;
+                        }
+
+                        fileName.textContent =
+                            file.name;
+
+                        title.textContent =
+                            "Selected OpenGraph Image";
+
+                        const reader =
+                            new FileReader();
+
+                        reader.onload =
+                            function (e) {
+                                preview.innerHTML = `
+                                    <img
+                                        src="${e.target.result}"
+                                        alt="OpenGraph Preview">
+                                `;
+
+                                if (icon) {
+
+                                    icon.style.display =
+                                        "none";
+                                }
+
+                                uploadBtn.textContent =
+                                    "Change Image";
+                            };
+
+                        reader.readAsDataURL(
+                            file
+                        );
+                    }
+                );
+            }
+        }
+    );
+</script>

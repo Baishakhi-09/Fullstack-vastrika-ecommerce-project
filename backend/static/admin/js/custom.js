@@ -1332,6 +1332,45 @@ function initProductSaveButtons() {
 ========================================================= */
 
 function initMediaGallery() {
+
+    const manageImagesBtn = document.getElementById(
+        "manage-product-images"
+    );
+
+    if (manageImagesBtn) {
+
+        manageImagesBtn.addEventListener(
+            "click",
+            function () {
+
+                const imageSection =
+                    document.getElementById(
+                        "product-images-section"
+                    );
+
+                if (imageSection) {
+
+                    imageSection.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+                    imageSection.classList.add(
+                        "section-highlight"
+                    );
+
+                    setTimeout(() => {
+
+                        imageSection.classList.remove(
+                            "section-highlight"
+                        );
+
+                    }, 2000);
+                }
+            }
+        );
+    }
+    
     const dropzone = document.getElementById(
         "mediaDropzone"
     );
