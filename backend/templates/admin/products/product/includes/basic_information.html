@@ -72,7 +72,7 @@
                 {% endif %}
             </div>
 
-            <div class="tag-form-grid two-column-grid">
+            <div class="tag-form-grid two-column-grid">                
                 {% if adminform.form.brand %}
 
                     <div class="form-group">
@@ -116,7 +116,7 @@
 
                             Category
 
-                            {% if adminform.form.category.field.required %}
+                            {% if adminform.form.child_category.field.required %}
                                 <span class="required-mark">*</span>
                             {% endif %}
                         </label>
@@ -125,7 +125,7 @@
                             {{ adminform.form.child_category }}
                         </div>
 
-                        {% if adminform.form.category.help_text %}
+                        {% if adminform.form.child_category.help_text %}
                             <div class="field-help">
 
                                 {{ adminform.form.child_category.help_text }}
@@ -140,6 +140,44 @@
                         {% endfor %}
                     </div>
                 {% endif %}
+
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.gender.id_for_label }}"
+                        class="form-label">
+                    
+                        {{ adminform.form.gender.label }}
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.gender }}
+                    </div>
+
+                    {% for error in adminform.form.gender.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label
+                        for="{{ adminform.form.occasion.id_for_label }}"
+                        class="form-label">
+
+                        Occasion
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.occasion }}
+                    </div>
+
+                    {% for error in adminform.form.occasion.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
 
             {% if adminform.form.tags %}

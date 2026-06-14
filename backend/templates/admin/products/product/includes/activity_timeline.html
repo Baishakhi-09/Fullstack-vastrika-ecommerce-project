@@ -1,9 +1,6 @@
 <section class="admin-card activity-timeline-card">
-
     <div class="card-header">
-
         <div class="card-header-content">
-
             <h2>
                 Activity Timeline
             </h2>
@@ -11,25 +8,19 @@
             <p>
                 Product lifecycle events, inventory changes, publishing history, and administrative activity.
             </p>
-
         </div>
-
     </div>
 
     <div class="card-body">
-
         {% if original %}
 
             <div class="timeline">
-
-                <!-- CREATED -->
-
                 <div class="timeline-item">
-
-                    <div class="timeline-marker success"></div>
+                    <div class="timeline-marker success">
+                        ✓
+                    </div>
 
                     <div class="timeline-content">
-
                         <div class="timeline-title">
                             Product Created
                         </div>
@@ -39,31 +30,21 @@
                         </div>
 
                         <div class="timeline-meta">
-
                             {% if original.created_at %}
 
                                 {{ original.created_at|date:"M d, Y • H:i" }}
-
                             {% else %}
 
                                 Unknown
-
                             {% endif %}
-
                         </div>
-
                     </div>
-
                 </div>
 
-                <!-- UPDATED -->
-
                 <div class="timeline-item">
-
                     <div class="timeline-marker info"></div>
 
                     <div class="timeline-content">
-
                         <div class="timeline-title">
                             Last Updated
                         </div>
@@ -73,27 +54,18 @@
                         </div>
 
                         <div class="timeline-meta">
-
                             {% if original.updated_at %}
 
                                 {{ original.updated_at|date:"M d, Y • H:i" }}
-
                             {% else %}
 
                                 Unknown
-
                             {% endif %}
-
                         </div>
-
                     </div>
-
                 </div>
 
-                <!-- INVENTORY -->
-
                 <div class="timeline-item">
-
                     <div
                         class="timeline-marker
 
@@ -102,89 +74,63 @@
                         {% else %}
                             danger
                         {% endif %}">
-
                     </div>
 
                     <div class="timeline-content">
-
                         <div class="timeline-title">
                             Inventory Status
                         </div>
 
                         <div class="timeline-description">
-
                             {% if inventory_status %}
 
                                 {{ inventory_status }}
-
                             {% else %}
 
                                 Inventory status unavailable.
-
                             {% endif %}
-
                         </div>
 
                         <div class="timeline-meta">
-
                             Available Stock:
                             {{ available_stock|default_if_none:0 }}
-
                         </div>
-
                     </div>
-
                 </div>
 
-                <!-- PRICE -->
-
                 <div class="timeline-item">
-
                     <div class="timeline-marker warning"></div>
 
                     <div class="timeline-content">
-
                         <div class="timeline-title">
                             Pricing Configuration
                         </div>
 
                         <div class="timeline-description">
-
                             {% if original.selling_price %}
 
                                 Product pricing has been configured.
-
                             {% else %}
 
                                 Product pricing is pending.
-
                             {% endif %}
-
                         </div>
 
                         <div class="timeline-meta">
-
                             {% if original.selling_price %}
 
                                 Selling Price:
                                 ₹{{ original.selling_price }}
 
                             {% else %}
-
                                 Price not configured
 
                             {% endif %}
-
                         </div>
-
                     </div>
-
                 </div>
 
-                <!-- SEO -->
-
                 <div class="timeline-item">
-
                     <div
                         class="timeline-marker
 
@@ -193,44 +139,31 @@
                         {% else %}
                             warning
                         {% endif %}">
-
                     </div>
 
                     <div class="timeline-content">
-
                         <div class="timeline-title">
                             SEO Readiness
                         </div>
 
                         <div class="timeline-description">
-
                             {% if original.meta_title and original.meta_description %}
 
                                 SEO metadata configured successfully.
-
                             {% else %}
 
                                 SEO optimization requires attention.
-
                             {% endif %}
-
                         </div>
 
                         <div class="timeline-meta">
-
                             SEO Score:
                             {{ seo_score|default_if_none:0 }}%
-
                         </div>
-
                     </div>
-
                 </div>
 
-                <!-- PUBLICATION -->
-
                 <div class="timeline-item">
-
                     <div
                         class="timeline-marker
 
@@ -239,113 +172,77 @@
                         {% else %}
                             warning
                         {% endif %}">
-
                     </div>
 
                     <div class="timeline-content">
-
                         <div class="timeline-title">
                             Publication Status
                         </div>
 
                         <div class="timeline-description">
-
-                            {% if original.is_active %}
+                            {% if original and original.status == "published" %}
 
                                 Product is currently active and available.
-
                             {% else %}
 
                                 Product is currently in draft mode.
-
                             {% endif %}
-
                         </div>
 
                         <div class="timeline-meta">
-
-                            {% if original.is_active %}
+                            {% if original and original.status == "published" %}
 
                                 Published
-
                             {% else %}
 
                                 Draft
-
                             {% endif %}
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- ACTIVITY SUMMARY -->
-
             <div class="timeline-summary">
-
                 <div class="summary-header">
-
                     Product Activity Summary
-
                 </div>
 
                 <div class="summary-content">
-
                     <div class="summary-row">
-
                         <span>
                             Product Health
                         </span>
 
                         <strong>
-
                             {{ product_health_score|default_if_none:0 }}%
-
                         </strong>
-
                     </div>
 
                     <div class="summary-row">
-
                         <span>
                             Variants
                         </span>
 
                         <strong>
-
                             {{ variant_count|default_if_none:0 }}
-
                         </strong>
-
                     </div>
 
                     <div class="summary-row">
-
                         <span>
                             Revenue
                         </span>
 
                         <strong>
-
                             ₹{{ revenue|default_if_none:0 }}
-
                         </strong>
-
                     </div>
-
                 </div>
-
             </div>
-
         {% else %}
 
             <div class="empty-state">
-
                 <div class="empty-state-content">
-
                     <h3>
                         Timeline Unavailable
                     </h3>
@@ -353,13 +250,8 @@
                     <p>
                         Save the product first to generate lifecycle events, inventory activity, publishing history, and performance tracking.
                     </p>
-
                 </div>
-
             </div>
-
         {% endif %}
-
     </div>
-
 </section>

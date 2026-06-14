@@ -149,7 +149,7 @@ class ProductImageInline(admin.StackedInline):
         "image_preview",
     )
 
-    @admin.display(description="Preview")
+    @admin.display(description="")
     def image_preview(self, obj):
 
         if obj and obj.image:
@@ -1162,10 +1162,9 @@ class ProductAdmin(
         "admin/products/product/product_form.html"
     )
 
-    autocomplete_fields = []
-        # "brand",
-        # "tags",
-        # "child_category",
+    autocomplete_fields = [
+        "tags",
+    ]
 
     inlines = [
         ProductImageInline,
@@ -1402,22 +1401,33 @@ class ProductAdmin(
         score = 0
 
         if product.meta_title:
-            score += 30
+            score += 20
 
-        if product.meta_title and (
+        if (
+            product.meta_title and
             50 <= len(product.meta_title) <= 60
         ):
-            score += 20
+            score += 10
 
         if product.meta_description:
-            score += 30
-
-        if product.meta_description and (
-            140 <= len(product.meta_description) <= 160
-        ):
             score += 20
 
-        return score
+        if (
+            product.meta_description and
+            140 <= len(product.meta_description) <= 160
+        ):
+            score += 10
+
+        if product.slug:
+            score += 15
+
+        if product.og_image:
+            score += 15
+
+        if product.description:
+            score += 10
+
+        return min(score, 100)
 
     def changelist_view(
         self,
@@ -1480,7 +1490,20 @@ class ProductAdmin(
                     product
                 )
 
-        extra_context["seo_score"] = seo_score
+                product_health_score = seo_score
+
+                extra_context["product_health_score"] = (
+                    product_health_score
+                )
+
+                if product.status == "published":
+                    extra_context["publishing_status"] = "Published"
+                    extra_context["publishing_status_class"] = "success"
+                else:
+                    extra_context["publishing_status"] = "Draft"
+                    extra_context["publishing_status_class"] = "warning"
+            
+            extra_context["seo_score"] = seo_score
 
         return super().changeform_view(
             request,
@@ -1680,7 +1703,7 @@ class ProductImageAdmin(
         "-created_at",
     )
 
-    @admin.display(description="Preview")
+    @admin.display(description="")
     def image_preview(self, obj):
 
         if obj.image:
@@ -1786,6 +1809,9 @@ class StockAdmin(
 
         available_stock = 0
 
+        warehouse_status = "Pending"
+        warehouse_status_class = "status-pending"
+
         if object_id:
             stock = self.get_object(
                 request,
@@ -1794,6 +1820,10 @@ class StockAdmin(
 
             if stock:
                 available_stock = stock.quantity
+
+                if stock and stock.warehouse:
+                    warehouse_status = stock.warehouse.name
+                    warehouse_status_class = "status-success"
 
         inventory_status = "Out Of Stock"
         inventory_status_class = "status-out-stock"
@@ -1837,6 +1867,12 @@ class StockAdmin(
 
             "inventory_status_class":
                 inventory_status_class,
+
+            "warehouse_status": 
+                warehouse_status,
+            
+            "warehouse_status_class": 
+                warehouse_status_class,
         })
 
         return super().changeform_view(

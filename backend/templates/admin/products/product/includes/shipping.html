@@ -1,9 +1,6 @@
 <section class="admin-card fulfillment-card">
-
     <div class="card-header">
-
         <div class="card-header-content">
-
             <h2>
                 Fulfillment & Logistics
             </h2>
@@ -11,19 +8,12 @@
             <p>
                 Configure shipping dimensions, weight, delivery settings, and logistics readiness.
             </p>
-
         </div>
-
     </div>
 
     <div class="card-body">
-
-        <!-- SHIPPING DIMENSIONS -->
-
         <div class="form-section">
-
             <div class="section-header">
-
                 <h3>
                     Physical Dimensions
                 </h3>
@@ -31,55 +21,40 @@
                 <p>
                     Define package measurements used for shipping calculations and carrier integrations.
                 </p>
-
             </div>
 
             <div class="form-grid four-column-grid">
-
                 {% if adminform.form.weight %}
 
                     <div class="form-group">
-
                         <label
                             for="{{ adminform.form.weight.id_for_label }}"
                             class="form-label">
 
                             {{ adminform.form.weight.label }}
-
                         </label>
 
                         <div class="field-wrapper">
-
                             {{ adminform.form.weight }}
-
                         </div>
 
                         {% if adminform.form.weight.help_text %}
-
                             <div class="field-help">
 
                                 {{ adminform.form.weight.help_text }}
-
                             </div>
-
                         {% endif %}
 
                         {% for error in adminform.form.weight.errors %}
-
                             <div class="field-error">
 
                                 {{ error }}
-
                             </div>
-
                         {% endfor %}
-
                     </div>
-
                 {% endif %}
 
                 {% if adminform.form.length %}
-
                     <div class="form-group">
 
                         <label
@@ -87,31 +62,22 @@
                             class="form-label">
 
                             {{ adminform.form.length.label }}
-
                         </label>
 
                         <div class="field-wrapper">
-
                             {{ adminform.form.length }}
-
                         </div>
 
                         {% for error in adminform.form.length.errors %}
-
                             <div class="field-error">
 
                                 {{ error }}
-
                             </div>
-
                         {% endfor %}
-
                     </div>
-
                 {% endif %}
 
                 {% if adminform.form.width %}
-
                     <div class="form-group">
 
                         <label
@@ -119,31 +85,22 @@
                             class="form-label">
 
                             {{ adminform.form.width.label }}
-
                         </label>
 
                         <div class="field-wrapper">
-
                             {{ adminform.form.width }}
-
                         </div>
 
                         {% for error in adminform.form.width.errors %}
-
                             <div class="field-error">
 
                                 {{ error }}
-
                             </div>
-
                         {% endfor %}
-
                     </div>
-
                 {% endif %}
 
                 {% if adminform.form.height %}
-
                     <div class="form-group">
 
                         <label
@@ -151,95 +108,56 @@
                             class="form-label">
 
                             {{ adminform.form.height.label }}
-
                         </label>
 
                         <div class="field-wrapper">
-
                             {{ adminform.form.height }}
-
                         </div>
 
                         {% for error in adminform.form.height.errors %}
-
                             <div class="field-error">
 
                                 {{ error }}
-
                             </div>
-
                         {% endfor %}
-
                     </div>
-
                 {% endif %}
-
             </div>
-
         </div>
 
-        <!-- SHIPPING SETTINGS -->
-
         <div class="form-section">
-
-            <div class="section-header">
-
-                <h3>
-                    Shipping Configuration
-                </h3>
-
-                <p>
-                    Configure delivery classes and fulfillment service requirements.
-                </p>
-
-            </div>
-
             <div class="form-grid two-column-grid">
-
                 {% if adminform.form.shipping_class %}
 
                     <div class="form-group">
-
                         <label
                             for="{{ adminform.form.shipping_class.id_for_label }}"
                             class="form-label">
 
                             {{ adminform.form.shipping_class.label }}
-
                         </label>
 
                         <div class="field-wrapper">
-
                             {{ adminform.form.shipping_class }}
-
                         </div>
 
                         {% if adminform.form.shipping_class.help_text %}
-
                             <div class="field-help">
 
                                 {{ adminform.form.shipping_class.help_text }}
-
                             </div>
-
                         {% endif %}
 
                         {% for error in adminform.form.shipping_class.errors %}
-
                             <div class="field-error">
 
                                 {{ error }}
-
                             </div>
-
                         {% endfor %}
-
                     </div>
-
                 {% endif %}
 
                 {% if adminform.form.delivery_time %}
-
                     <div class="form-group">
 
                         <label
@@ -247,49 +165,32 @@
                             class="form-label">
 
                             {{ adminform.form.delivery_time.label }}
-
                         </label>
 
                         <div class="field-wrapper">
-
                             {{ adminform.form.delivery_time }}
-
                         </div>
 
                         {% if adminform.form.delivery_time.help_text %}
-
                             <div class="field-help">
 
                                 {{ adminform.form.delivery_time.help_text }}
-
                             </div>
-
                         {% endif %}
 
                         {% for error in adminform.form.delivery_time.errors %}
-
                             <div class="field-error">
 
                                 {{ error }}
-
                             </div>
-
                         {% endfor %}
-
                     </div>
-
                 {% endif %}
-
             </div>
-
         </div>
 
-        <!-- FULFILLMENT HEALTH -->
-
         <div class="form-section">
-
             <div class="section-header">
-
                 <h3>
                     Fulfillment Readiness
                 </h3>
@@ -297,99 +198,73 @@
                 <p>
                     Review logistics readiness before publishing and selling.
                 </p>
-
             </div>
 
             <div class="fulfillment-health-grid">
-
                 <div class="health-item">
-
                     <div class="health-label">
                         Weight Configured
                     </div>
 
                     <div class="health-value">
-
                         {% if original and original.weight %}
 
                             <span class="health-badge success">
                                 Ready
                             </span>
-
                         {% else %}
 
                             <span class="health-badge warning">
                                 Missing
                             </span>
-
                         {% endif %}
-
                     </div>
-
                 </div>
 
                 <div class="health-item">
-
                     <div class="health-label">
                         Dimensions Configured
                     </div>
 
                     <div class="health-value">
-
                         {% if original.length and original.width and original.height %}
 
                             <span class="health-badge success">
                                 Ready
                             </span>
-
                         {% else %}
 
                             <span class="health-badge warning">
                                 Incomplete
                             </span>
-
                         {% endif %}
-
                     </div>
-
                 </div>
 
                 <div class="health-item">
-
                     <div class="health-label">
                         Shipping Setup
                     </div>
 
                     <div class="health-value">
-
                         {% if original.shipping_class %}
 
                             <span class="health-badge success">
                                 Configured
                             </span>
-
                         {% else %}
 
                             <span class="health-badge warning">
                                 Pending
                             </span>
-
                         {% endif %}
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
-        <!-- SHIPPING ANALYTICS -->
-
         <div class="form-section">
-
             <div class="section-header">
-
                 <h3>
                     Logistics Snapshot
                 </h3>
@@ -397,49 +272,38 @@
                 <p>
                     Operational overview for shipping and fulfillment.
                 </p>
-
             </div>
 
             <div class="analytics-grid">
-
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Weight
                     </div>
 
                     <div class="analytics-value">
-
                         {% if original.weight %}
                             {{ original.weight }}
                         {% else %}
                             —
                         {% endif %}
-
                     </div>
-
                 </div>
 
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Delivery SLA
                     </div>
 
                     <div class="analytics-value">
-
                         {% if original.delivery_time %}
                             {{ original.delivery_time }}
                         {% else %}
                             —
                         {% endif %}
-
                     </div>
-
                 </div>
 
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Shipping Class
                     </div>
@@ -451,15 +315,9 @@
                         {% else %}
                             —
                         {% endif %}
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </section>

@@ -894,15 +894,15 @@ class ProductImage(TimeStampedModel):
 
 # -------------------- PRODUCT VARIANT -------------------- #
 class ProductVariant(TimeStampedModel):
-    SIZE_CHOICES = (
-        ("XS", "XS"),
-        ("S", "S"),
-        ("M", "M"),
-        ("L", "L"),
-        ("XL", "XL"),
-        ("XXL", "XXL"),
-        ("FREE", "Free Size"),
-    )
+    # SIZE_CHOICES = (
+    #     ("XS", "XS"),
+    #     ("S", "S"),
+    #     ("M", "M"),
+    #     ("L", "L"),
+    #     ("XL", "XL"),
+    #     ("XXL", "XXL"),
+    #     ("FREE", "Free Size"),
+    # )
 
     product = models.ForeignKey(
         Product,
@@ -911,7 +911,7 @@ class ProductVariant(TimeStampedModel):
     )
 
     color = models.CharField(max_length=50)
-    size = models.CharField(max_length=20, choices=SIZE_CHOICES, default="M")
+    size = models.CharField(max_length=20, default="M")
     variant_sku = models.CharField(max_length=80, unique=True, blank=True)
 
     barcode = models.CharField(

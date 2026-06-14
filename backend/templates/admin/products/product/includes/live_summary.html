@@ -1,9 +1,6 @@
 <section class="admin-card summary-card">
-
     <div class="card-header">
-
         <div class="card-header-content">
-
             <h2>
                 Live Summary
             </h2>
@@ -11,75 +8,52 @@
             <p>
                 Real-time overview of product information, pricing, inventory, and publication status.
             </p>
-
         </div>
-
     </div>
 
     <div class="card-body">
-
         <div class="summary-list">
-
             <div class="summary-row">
-
                 <span class="summary-label">
                     Product
                 </span>
 
                 <strong class="summary-value">
-
                     {% if original and original.name %}
-
                         {{ original.name }}
 
                     {% else %}
-
                         Not Available
 
                     {% endif %}
-
                 </strong>
-
             </div>
 
             {% if original.brand %}
-
                 <div class="summary-row">
-
                     <span class="summary-label">
                         Brand
                     </span>
 
                     <strong class="summary-value">
-
                         {{ original.brand }}
-
                     </strong>
-
                 </div>
-
             {% endif %}
 
             {% if original.category %}
-
                 <div class="summary-row">
-
                     <span class="summary-label">
                         Category
                     </span>
 
                     <strong class="summary-value">
-
                         {{ original.category }}
-
                     </strong>
-
                 </div>
-
             {% endif %}
 
             {% if original.sku %}
-
                 <div class="summary-row">
 
                     <span class="summary-label">
@@ -87,83 +61,60 @@
                     </span>
 
                     <strong class="summary-value">
-
                         {{ original.sku }}
-
                     </strong>
-
                 </div>
-
             {% endif %}
 
             <div class="summary-row">
-
                 <span class="summary-label">
                     Selling Price
                 </span>
 
                 <strong class="summary-value">
-
                     {% if original.selling_price %}
-
                         ₹{{ original.selling_price }}
 
                     {% else %}
-
                         Not Set
 
                     {% endif %}
-
                 </strong>
-
             </div>
 
             <div class="summary-row">
-
                 <span class="summary-label">
                     Stock
                 </span>
 
                 <strong class="summary-value">
-
                     {% if original.stock %}
-
                         {{ original.stock }}
 
                     {% else %}
-
                         0
 
                     {% endif %}
-
                 </strong>
-
             </div>
 
             <div class="summary-row">
-
                 <span class="summary-label">
                     Available Stock
                 </span>
 
                 <strong class="summary-value">
-
                     {% if available_stock is not None %}
 
                         {{ available_stock }}
-
                     {% else %}
 
                         0
-
                     {% endif %}
-
                 </strong>
-
             </div>
 
             <div class="summary-row">
-
                 <span class="summary-label">
                     Inventory Status
                 </span>
@@ -172,35 +123,27 @@
                     class="status-badge
 
                     {% if inventory_status == 'In Stock' %}
-
                         status-success
 
                     {% elif inventory_status == 'Low Stock' %}
-
                         status-warning
 
                     {% else %}
-
                         status-danger
 
                     {% endif %}">
 
                     {% if inventory_status %}
-
                         {{ inventory_status }}
 
                     {% else %}
-
                         Unknown
 
                     {% endif %}
-
                 </span>
-
             </div>
 
             <div class="summary-row">
-
                 <span class="summary-label">
                     Publication Status
                 </span>
@@ -208,68 +151,47 @@
                 <span
                     class="status-badge
 
-                    {% if original and original.is_active %}
-
+                    {% if original and original.status == "published" %}
                         status-success
 
                     {% else %}
-
                         status-warning
 
                     {% endif %}">
 
-                    {% if original and original.is_active %}
-
+                    {% if original and original.status == "published" %}
                         Active
 
                     {% else %}
-
                         Draft
 
                     {% endif %}
-
                 </span>
-
             </div>
 
             {% if original and original.created_at %}
-
                 <div class="summary-row">
-
                     <span class="summary-label">
                         Created
                     </span>
 
                     <strong class="summary-value">
-
                         {{ original.created_at|date:"M d, Y" }}
-
                     </strong>
-
                 </div>
-
             {% endif %}
 
             {% if original and original.updated_at %}
-
                 <div class="summary-row">
-
                     <span class="summary-label">
                         Updated
                     </span>
 
                     <strong class="summary-value">
-
                         {{ original.updated_at|date:"M d, Y" }}
-
                     </strong>
-
                 </div>
-
             {% endif %}
-
         </div>
-
     </div>
-
 </section>

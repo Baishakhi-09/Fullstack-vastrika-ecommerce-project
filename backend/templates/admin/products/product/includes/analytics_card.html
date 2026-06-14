@@ -1,9 +1,6 @@
 <section class="admin-card analytics-card">
-
     <div class="card-header">
-
         <div class="card-header-content">
-
             <h2>
                 Product Analytics
             </h2>
@@ -11,117 +8,81 @@
             <p>
                 Real-time product performance, inventory insights, sales activity, and business intelligence metrics.
             </p>
-
         </div>
-
     </div>
 
     <div class="card-body">
-
         {% if original %}
 
-            <!-- KPI GRID -->
-
             <div class="analytics-grid">
-
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Total Variants
                     </div>
 
                     <div class="analytics-value">
-
                         {{ variant_count|default_if_none:0 }}
-
                     </div>
-
                 </div>
 
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Total Stock
                     </div>
 
                     <div class="analytics-value">
-
                         {{ total_stock|default_if_none:0 }}
-
                     </div>
-
                 </div>
 
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Available Stock
                     </div>
 
                     <div class="analytics-value">
-
                         {{ available_stock|default_if_none:0 }}
-
                     </div>
-
                 </div>
 
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Product Views
                     </div>
 
                     <div class="analytics-value">
-
                         {{ product_views|default_if_none:0 }}
-
                     </div>
-
                 </div>
 
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Orders
                     </div>
 
                     <div class="analytics-value">
-
                         {{ order_count|default_if_none:0 }}
-
                     </div>
-
                 </div>
 
                 <div class="analytics-item">
-
                     <div class="analytics-label">
                         Revenue
                     </div>
 
                     <div class="analytics-value">
-
                         ₹{{ revenue|default_if_none:0 }}
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- BUSINESS SUMMARY -->
-
             <div class="analytics-summary">
-
                 <div class="summary-row">
-
                     <span class="summary-label">
                         Inventory Status
                     </span>
 
                     <span class="summary-value">
-
                         {% if inventory_status == "In Stock" %}
 
                             <span class="status-badge status-success">
@@ -129,31 +90,25 @@
                             </span>
 
                         {% elif inventory_status == "Low Stock" %}
-
                             <span class="status-badge status-warning">
                                 Low Stock
                             </span>
 
                         {% else %}
-
                             <span class="status-badge status-danger">
                                 Critical
                             </span>
 
                         {% endif %}
-
                     </span>
-
                 </div>
 
                 <div class="summary-row">
-
                     <span class="summary-label">
                         Revenue Performance
                     </span>
 
                     <span class="summary-value">
-
                         {% if revenue and revenue > 100000 %}
 
                             <span class="status-badge status-success">
@@ -161,31 +116,25 @@
                             </span>
 
                         {% elif revenue and revenue > 10000 %}
-
                             <span class="status-badge status-warning">
                                 Average
                             </span>
 
                         {% else %}
-
                             <span class="status-badge status-danger">
                                 Low
                             </span>
 
                         {% endif %}
-
                     </span>
-
                 </div>
 
                 <div class="summary-row">
-
                     <span class="summary-label">
                         Conversion Health
                     </span>
 
                     <span class="summary-value">
-
                         {% if conversion_rate and conversion_rate >= 5 %}
 
                             <span class="status-badge status-success">
@@ -193,71 +142,48 @@
                             </span>
 
                         {% elif conversion_rate and conversion_rate >= 2 %}
-
                             <span class="status-badge status-warning">
                                 Average
                             </span>
 
                         {% else %}
-
                             <span class="status-badge status-danger">
                                 Needs Attention
                             </span>
 
                         {% endif %}
-
                     </span>
-
                 </div>
-
             </div>
 
-            <!-- PERFORMANCE INSIGHT -->
-
             <div class="analytics-insight">
-
                 {% if revenue and revenue > 100000 %}
 
                     <div class="insight-badge insight-success">
-
                         High Revenue Product
-
                     </div>
 
                 {% elif order_count and order_count > 50 %}
-
                     <div class="insight-badge insight-info">
-
                         Strong Customer Demand
-
                     </div>
 
                 {% elif available_stock == 0 %}
-
                     <div class="insight-badge insight-danger">
-
                         Inventory Replenishment Required
-
                     </div>
 
                 {% else %}
-
                     <div class="insight-badge insight-neutral">
-
                         Monitoring Product Performance
-
                     </div>
 
                 {% endif %}
-
             </div>
-
         {% else %}
 
             <div class="empty-state">
-
                 <div class="empty-state-content">
-
                     <h3>
                         Analytics Unavailable
                     </h3>
@@ -265,13 +191,8 @@
                     <p>
                         Save the product first to generate inventory metrics, sales analytics, revenue insights, and performance intelligence.
                     </p>
-
                 </div>
-
             </div>
-
         {% endif %}
-
     </div>
-
 </section>

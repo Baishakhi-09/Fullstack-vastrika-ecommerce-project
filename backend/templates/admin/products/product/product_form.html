@@ -5,8 +5,6 @@
 
     {{ block.super }}
 
-    {{ media }}
-
     <link
         rel="stylesheet"
         href="{% static 'admin/css/custom.css' %}">
@@ -24,6 +22,9 @@
         method="post"
         enctype="multipart/form-data"
         class="product-workspace">
+
+        {{ adminform.form.errors }}
+        {{ adminform.form.non_field_errors }}
 
         {% csrf_token %}
 
@@ -120,7 +121,7 @@
                     </div>
 
                     <div class="header-status-card
-                        {% if original and original.is_active %}
+                        {% if original and original.status == "published" %}
                             is-active
                         {% else %}
                             is-draft
@@ -134,7 +135,7 @@
                             </small>
 
                             <strong class="status-value">
-                                {% if original and original.is_active %}
+                                {% if original and original.status == "published" %}
                                     Active Product
                                 {% else %}
                                     Draft Product
@@ -156,7 +157,6 @@
                         class="admin-card">
 
                         <div class="card-header">
-
                             <h2>
                                 Product Assets
                             </h2>
@@ -165,31 +165,22 @@
                                 Manage product images, variants, media assets,
                                 and related product content.
                             </p>
-
                         </div>
 
                         <div class="card-body">
-
                             {% for inline_admin_formset in inline_admin_formsets %}
 
                                 <section class="inline-section">
-
                                     <div class="inline-section-header">
-
                                         <h3>
                                             {{ inline_admin_formset.opts.verbose_name_plural }}
                                         </h3>
-
                                     </div>
 
                                     {% include inline_admin_formset.opts.template %}
-
                                 </section>
-
                             {% endfor %}
-
                         </div>
-
                     </section>
 
                     {% include "admin/products/product/includes/pricing.html" %}

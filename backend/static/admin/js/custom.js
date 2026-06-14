@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initializeAdminApp() {
+
     initProfileDropdown();
     initAdminSearch();
     initProductSearchRedirect();
@@ -27,10 +28,10 @@ function initializeAdminApp() {
     initProductFormEnhancements();
     initProductSaveButtons();
     initSelect2Fixes();
-    initBasicInformationUI();
-    initMediaGallery();
-
     initSelect2AccessibilityFix();
+    initBasicInformationUI();
+    
+    initMediaGallery();
     initPricingCalculator();
     initInventorySystem();
     initShippingSystem();
@@ -1250,29 +1251,24 @@ function initSelect2AccessibilityFix() {
 ========================================================= */
 
 function initBasicInformationUI() {
-    const select2Containers = document.querySelectorAll(
-        ".select2-container"
-    );
 
-    if (!select2Containers.length) {
-        return;
-    }
+    setTimeout(() => {
 
-    select2Containers.forEach((container) => {
+        document
+            .querySelectorAll(
+                '.select2-container'
+            )
+            .forEach((container) => {
 
-        container.style.width = "100%";
+                container.style.width = '100%';
+                container.style.maxWidth = '100%';
+                container.removeAttribute('style');
 
-        const selection = container.querySelector(
-            ".select2-selection"
-        );
+                container.style.width = '100%';
 
-        if (selection) {
+            });
 
-            selection.style.width = "100%";
-
-        }
-
-    });
+    }, 500);
 
 }
 
