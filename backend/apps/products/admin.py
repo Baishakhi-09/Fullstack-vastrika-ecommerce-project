@@ -1275,12 +1275,6 @@ class ProductAdmin(
         "Search by product name, SKU, slug or brand."
     )
 
-    actions = (
-        "mark_active",
-        "mark_inactive",
-        "mark_featured",
-    )
-
     fieldsets = (
 
         ("Basic Information", {
@@ -1428,6 +1422,42 @@ class ProductAdmin(
             score += 10
 
         return min(score, 100)
+    
+    actions = [
+        "delete_selected_product",
+        "mark_active",
+        "mark_inactive",
+        "mark_featured",
+    ]
+
+    def get_actions(
+        self,
+        request
+    ):
+        actions = super().get_actions(request)
+
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+
+        return actions
+    
+    @admin.action(
+        description="Delete selected product"
+    )
+
+    def delete_selected_product(
+        self,
+        request,
+        queryset
+    ):
+        total_deleted = queryset.count()
+
+        queryset.delete()
+
+        self.message_user(
+            request,
+            f"{total_deleted} product(s) deleted successfully."
+        )
 
     def changelist_view(
         self,
@@ -1460,10 +1490,24 @@ class ProductAdmin(
                 ).distinct().count(),
         })
 
-        return super().changelist_view(
+        response = super().changelist_view(
             request,
             extra_context=extra_context,
         )
+
+        if hasattr(response, "context_data"):
+            action_form = response.context_data.get(
+                "action_form"
+            )
+
+            if action_form:
+                action_form.fields[
+                    "action"
+                ].widget.attrs.update({
+                    "id": "id_action"
+                })
+
+        return response
 
     def changeform_view(
         self,

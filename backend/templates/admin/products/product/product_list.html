@@ -185,7 +185,7 @@
         </div>
     </div>
 
-    <div class="product-dashboard-content product-layout filters-hidden" id="product-layout">
+    <section class="product-dashboard-content product-layout filters-hidden" id="product-layout">
         <div class="table-container product-table-area">
             <form id="changelist-form" method="post" novalidate>
                 {% csrf_token %}
@@ -193,26 +193,264 @@
                 {% if cl.formset %}
                     {{ cl.formset.management_form }}
                 {% endif %}
-                
-                {% if action_form and actions_on_top and cl.show_admin_actions %}
-                <div class="admin-actions-top">
-                    {% admin_actions %}
-                </div>
-                {% endif %}
-                <!-- RESULT TABLE -->
-                {% result_list cl %}
-                {% if action_form and actions_on_bottom and cl.show_admin_actions %}
-                    <div class="admin-actions-bottom">
+
+                <!-- {% if action_form and actions_on_top and cl.show_admin_actions %}
+                    <div class="admin-actions-top">
                         {% admin_actions %}
                     </div>
-                {% endif %}
-            </form>
+                {% endif %} -->
 
-            <!-- PAGINATION -->
-            <div class="pagination-wrapper">
-                {% pagination cl %}
-            </div>
+                <section class="product-toolbar">
+                    {% if action_form %}
+
+                        <div class="product-toolbar-left">
+                            <label
+                                for="id_action"
+                                class="toolbar-label">
+                                
+                                Action
+                            </label>
+
+                            <select
+                                id="id_action"
+                                name="action"
+                                required>
+
+                                {% for choice in action_form.action.field.choices %}
+                                    <option value="{{ choice.0 }}">
+                                        {{ choice.1 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <button
+                                type="submit"
+                                name="index"
+                                value="0"
+                                class="toolbar-go-btn"
+                                title="Run selected action">
+
+                                Go
+                            </button>
+                        </div>
+
+                        <div class="product-toolbar-right">
+                            <div class="toolbar-count-badge">
+                                {{ cl.result_count }}
+                                Parent Categories{{ cl.result_count|pluralize }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section class="product-table-container">
+
+                    <table class="product-table"
+                        id="result_list">
+
+                        <thead>
+                            <tr>
+                                <th class="action-checkbox-column">
+                                    <input 
+                                        type="checkbox"
+                                        id="action-toggle"
+                                        class="action-select"
+                                        aria-label="Select all variant tags">
+                                </th>
+
+                                <th class="column-product_image">
+                                    Product Image
+                                </th>
+
+                                <th class="column-display_name">
+                                    Product Name
+                                </th>
+
+                                <th class="column-product_brand">
+                                    Brand
+                                </th>
+
+                                <th class="column-category_display">
+                                    Category
+                                </th>
+
+                                <th class="gender-column">
+                                    Gender
+                                </th>
+
+                                <th class="occasion-column">
+                                    Occasion
+                                </th>
+
+                                <th class="column-product_selling_price">
+                                    Selling-Price
+                                </th>
+
+                                <th class="column-product_mrp">
+                                    MRP
+                                </th>
+
+                                <th class="column-discount_badge">
+                                    Discount
+                                </th>
+
+                                <th class="column-stock_badge">
+                                    Stock
+                                </th>
+
+                                <th class="column-display_created_at">
+                                    Created Date
+                                </th>
+
+                                <th class="column-edit_product">
+                                    Edit
+                                </th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            {% for result in cl.result_list %}
+
+                                <tr>
+                                    <td class="action-checkbox-column">
+                                        <input
+                                            type="checkbox"
+                                            class="action-select"
+                                            name="_selected_action"
+                                            value="{{ result.pk }}">
+                                    </td>
+
+                                    <td class="column-product_image">
+                                        <div class="product-table-image">
+                                            {% if result.primary_image_url %}
+                                                <img
+                                                    src="{{ result.primary_image_url }}"
+                                                    class="product_image">
+                                            {% else %}
+
+                                                <div class="logo-placeholder">
+                                                    <svg
+                                                        width="24"
+                                                        height="24"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="2">
+
+                                                        <rect
+                                                            x="3"
+                                                            y="3"
+                                                            width="18"
+                                                            height="18"
+                                                            rx="2">
+                                                        </rect>
+
+                                                        <circle
+                                                            cx="8.5"
+                                                            cy="8.5"
+                                                            r="1.5">
+                                                        </circle>
+
+                                                        <path
+                                                            d="M21 15l-5-5L5 21">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                    <td class="column-display_name">
+                                        <strong>
+                                            {{ result.name }}
+                                        </strong>
+                                    </td>
+
+                                    <td class="column-product_brand">
+                                        {{ result.brand|default:"-" }}
+                                    </td>
+
+                                    <td class="column-category_display">
+                                        {{ result.child_category.name|default:"-" }}
+                                    </td>
+
+                                    <td class="gender-column">
+                                        {{ result.gender|default:"-" }}
+                                    </td>
+
+                                    <td class="occasion-column">
+                                        {{ result.occasion|default:"-" }}
+                                    </td>
+
+                                    <td class="column-product_selling_price">
+                                        ₹{{ result.final_selling_price|floatformat:2 }}
+                                    </td>
+
+                                    <td class="column-product_mrp">
+                                        ₹{{ result.mrp }}
+                                    </td>
+
+                                    <td class="column-discount_badge">
+                                        {% if result.discount_percent %}
+                                            {{ result.discount_percent }}%
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="column-stock_badge">
+                                        {{ result.total_stock|default:"0" }}
+                                    </td>
+
+                                    <td class="column-display_created_at">
+                                        {{ result.created_at|date:"d M Y" }}
+                                    </td>
+
+                                    <td class="column-edit_product">
+                                        <a
+                                            href="{% url 'admin:products_product_change' result.pk %}"
+                                            class="edit-btn">
+
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                {% empty %}
+
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="empty-state">
+
+                                            <h3>
+                                                No Sub Categories Found
+                                            </h3>
+
+                                            <p>
+                                                Create your first sub category to get started.
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+            </form>
         </div>
+
+        <!-- PAGINATION FOOTER -->
+        {% if cl.result_count %}
+
+            <section class="product-pagination-footer">
+                <div class="product-pagination-info">
+                    Showing
+                        {{ cl.result_count }}
+                    Product{{ cl.result_count|pluralize }}
+                </div>
+            </section>
+
+        {% endif %}
 
         {% if cl.has_filters %}
             <aside id="changelist-filter" class="product-filter-sidebar">
@@ -229,13 +467,48 @@
                 </div>
             </aside>
         {% endif %}
-    </div>
+    </section>
 
     <!-- ======================================
     DELETE CONFIRM MODAL
     ====================================== -->
 
-    <div class="delete-modal" id="delete-modal">
+    <div
+        id="delete-modal"
+        class="delete-modal">
+
+        <div class="delete-modal-backdrop"></div>
+
+        <div class="delete-modal-content">
+            <h3> Delete Selected Products? </h3>
+
+            <p>
+                This action cannot be undone.
+                Selected products and related
+                records will be permanently deleted.
+            </p>
+
+            <div class="delete-modal-actions">
+                <button
+                    type="button"
+                    id="modal-cancel-btn"
+                    class="modal-cancel-btn">
+
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    id="modal-delete-btn"
+                    class="modal-delete-btn">
+
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="delete-modal" id="delete-modal">
         <div class="delete-modal-backdrop"></div>
         <div class="delete-modal-card">
             <div class="delete-modal-header">
@@ -288,7 +561,7 @@
             </div>
 
         </div>
-    </div>
+    </div> -->
     
 </div>
 {% endblock %}
@@ -297,4 +570,28 @@
     {{ block.super }}
 
     <script src="{% static 'admin/js/custom.js' %}"></script>
+
+    <!-- <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const toggle =
+                document.getElementById("action-toggle");
+
+            if (!toggle) return;
+
+            toggle.addEventListener("change", function() {
+
+                document
+                    .querySelectorAll(".action-select")
+                    .forEach(function(cb) {
+
+                        cb.checked = toggle.checked;
+
+                    });
+
+            });
+
+        });
+    </script> -->
+
 {% endblock %}

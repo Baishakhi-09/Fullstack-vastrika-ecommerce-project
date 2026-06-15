@@ -110,9 +110,7 @@ class Review(models.Model):
     # =====================================================
     class Meta:
 
-        db_table = (
-            "product_reviews"
-        )
+        db_table = "product_reviews"
 
         ordering = [
             "-created_at",

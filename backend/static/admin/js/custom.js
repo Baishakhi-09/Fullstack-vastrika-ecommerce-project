@@ -1014,6 +1014,8 @@ function initDeleteModal() {
             }
 
             const deleteActions = [
+                "delete_selected_product",
+                
                 "delete_selected_brands",
 
                 "delete_selected_product_tags",

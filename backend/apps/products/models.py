@@ -743,6 +743,29 @@ class Product(TimeStampedModel):
     @property
     def profit(self):
         return self.selling_price - self.cost_price
+
+    @property
+    def final_selling_price(self):
+        gst_map = {
+            "gst_0": Decimal("0"),
+            "gst_5": Decimal("5"),
+            "gst_12": Decimal("12"),
+            "gst_18": Decimal("18"),
+            "gst_28": Decimal("28"),
+        }
+
+        gst_percent = gst_map.get(
+            self.tax,
+            Decimal("0")
+        )
+
+        tax_amount = (
+            self.selling_price *
+            gst_percent /
+            Decimal("100")
+        )
+
+        return self.selling_price + tax_amount
     
     @property
     def in_stock(self):
