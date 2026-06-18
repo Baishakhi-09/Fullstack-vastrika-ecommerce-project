@@ -605,12 +605,14 @@ class ProductVariantAdminForm(forms.ModelForm):
 
         fields = (
             "product",
+            "variant_name",
             "color",
             "size",
             "variant_sku",
             "barcode",
             "stock",
             "reserved_stock",
+            "damaged_quantity",
             "is_active",
         )
 
@@ -628,6 +630,16 @@ class WarehouseAdminForm(forms.ModelForm):
         if "name" in self.fields:
             self.fields["name"].widget.attrs.update({
                 "autocomplete": "organization"
+            })
+
+        if "contact_person" in self.fields:
+            self.fields["contact_person"].widget.attrs.update({
+                "autocomplete": "name"
+            })
+
+        if "manager_name" in self.fields:
+            self.fields["manager_name"].widget.attrs.update({
+                "autocomplete": "name"
             })
 
         if "email" in self.fields:

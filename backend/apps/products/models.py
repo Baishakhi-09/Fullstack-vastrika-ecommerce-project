@@ -477,18 +477,52 @@ class Product(TimeStampedModel):
 
     OCCASION_CHOICES = (
         ("casual", "Casual"),
+        ("daily-wear", "Daily Wear"),
+        ("office-wear", "Office Wear"),
         ("formal", "Formal"),
-        ("party", "Party"),
-        ("sports", "Sports"),
-        ("festive", "Festive"),
-        ("ethnic", "Ethnic"),
+        ("business", "Business"),
+        ("party-wear", "Party Wear"),
+        ("wedding", "Wedding"),
         ("lounge", "Lounge"),
+        ("festive", "Festive"),
+        ("sports", "Sports"),
+        ("running", "Running"),
+        ("training", "Training"),
+        ("gym", "Gym"),
+        ("walking", "Walking"),
+        ("travel", "Travel"),
+        ("outdoor", "Outdoor"),
+        ("adventure", "Adventure"),
+        ("hiking", "Hiking"),
+        ("trekking", "Trekking"),
+        ("camping", "Camping"),
+        ("school", "School"),
+        ("college", "College"),
+        ("weekend", "Weekend"),
+        ("beach", "Beach"),
+        ("vacation", "Vacation"),
+        ("driving", "Driving"),
+        ("winter-wear", "Winter Wear"),
+        ("rainy-season", "Rainy Season"),
+        ("premium-collection", "Premium Collection"),
+        ("luxury-events", "Luxury Events"),
+        ("athleisure", "Athleisure"),
+        ("streetwear", "Streetwear"),
+        ("ethnic", "Ethnic"),
     )
 
     SHIPPING_CLASS_CHOICES = (
-        ("standard", "Standard"),
-        ("express", "Express"),
-        ("fragile", "Fragile"),
+        ("lightweight-footwear", "Lightweight Footwear"),
+        ("standard-footwear", "Standard Footwear"),
+        ("premium-footwear", "Premium Footwear"),
+        ("outdoor-footwear", "Outdoor Footwear"),
+        ("heavy-duty-footwear", "Heavy Duty Footwear"),
+        ("express-shipping", "Express Shipping"),
+        ("standard-shipping", "Standard Shipping"),
+        ("free-shipping", "Free Shipping"),
+        ("international-shipping", "International Shipping"),
+        ("lifestyle-footwear", "Lifestyle Footwear"),
+        ("training-footwear", "Training Footwear"),
     )
 
     DELIVERY_TIME_CHOICES = (
@@ -933,6 +967,12 @@ class ProductVariant(TimeStampedModel):
         related_name="variants",
     )
 
+    variant_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Display name for this variant."
+    )
+
     color = models.CharField(max_length=50)
     size = models.CharField(max_length=20, default="M")
     variant_sku = models.CharField(max_length=80, unique=True, blank=True)
@@ -971,6 +1011,11 @@ class ProductVariant(TimeStampedModel):
     )
 
     reserved_stock = models.PositiveIntegerField(default=0)
+    damaged_quantity = models.PositiveIntegerField(
+        default=0,
+        help_text="Damaged units not available for sale."
+    )
+    
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -996,11 +1041,19 @@ class ProductVariant(TimeStampedModel):
         ]
 
     def __str__(self):
-        return f"{self.product.name} | {self.color} | {self.size}"
+        return (
+            # f"{self.product.name} | "
+            f"{self.variant_name or f'{self.color} / {self.size}'}"
+        )
 
     @property
     def available_stock(self):
-        return max(self.stock - self.reserved_stock, 0)
+        return max(
+            self.stock
+            - self.reserved_stock
+            - self.damaged_quantity,
+            0
+        )
 
     def clean(self):
         if self.reserved_stock > self.stock:
@@ -1009,6 +1062,9 @@ class ProductVariant(TimeStampedModel):
             })
 
     def save(self, *args, **kwargs):
+        if not self.variant_name:
+            self.variant_name = f"{self.color} / {self.size}"
+
         if not self.variant_sku:
             self.variant_sku = f"VAR-{uuid.uuid4().hex[:10].upper()}"
 
@@ -1028,6 +1084,40 @@ class Warehouse(TimeStampedModel):
     code = models.CharField(
         max_length=30,
         unique=True
+    )
+
+    contact_person = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    storage_type = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    manager_name = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    fulfillment_center = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    inventory_location = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    shipping_zone = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    delivery_coverage_area = models.TextField(
+        blank=True
     )
 
     email = models.EmailField(
@@ -1065,7 +1155,10 @@ class Stock(TimeStampedModel):
         null=True,
         blank=True,
     )
-    quantity = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Warehouse Capacity"
+    )
 
     class Meta:
         db_table = "products_stock"

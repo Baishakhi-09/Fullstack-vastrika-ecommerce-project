@@ -116,6 +116,61 @@
                     {% endfor %}
                 </div>
             {% endif %}
+
+            {% if adminform.form.inventory_location %}
+                <div class="form-group full-width">
+                    <label for="{{ adminform.form.inventory_location.id_for_label }}" class="form-label">
+                        Inventory Location
+                    </label>
+                    <div class="field-wrapper">
+                        {{ adminform.form.inventory_location }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if adminform.form.storage_type %}
+                <div class="form-group">
+                    <label for="{{ adminform.form.storage_type.id_for_label }}" class="form-label">
+                        Storage Type
+                    </label>
+                    <div class="field-wrapper">
+                        {{ adminform.form.storage_type }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if adminform.form.fulfillment_center %}
+                <div class="form-group">
+                    <label for="{{ adminform.form.fulfillment_center.id_for_label }}" class="form-label">
+                        Fulfillment Center
+                    </label>
+                    <div class="field-wrapper">
+                        {{ adminform.form.fulfillment_center }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if adminform.form.shipping_zone %}
+                <div class="form-group">
+                    <label for="{{ adminform.form.shipping_zone.id_for_label }}" class="form-label">
+                        Shipping Zone
+                    </label>
+                    <div class="field-wrapper">
+                        {{ adminform.form.shipping_zone }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if adminform.form.delivery_coverage_area %}
+                <div class="form-group full-width">
+                    <label for="{{ adminform.form.delivery_coverage_area.id_for_label }}" class="form-label">
+                        Delivery Coverage Area
+                    </label>
+                    <div class="field-wrapper">
+                        {{ adminform.form.delivery_coverage_area }}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </section>

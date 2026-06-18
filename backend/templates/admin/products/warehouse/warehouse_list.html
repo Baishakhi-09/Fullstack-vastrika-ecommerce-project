@@ -146,6 +146,10 @@
                                     Location
                                 </th>
 
+                                <th class="contact-column">
+                                    Contact Person
+                                </th>
+
                                 <th class="phone-column">
                                     Phone
                                 </th>
@@ -194,6 +198,10 @@
 
                                     <td class="location-column">
                                         {{ warehouse.location|default:"—" }}
+                                    </td>
+
+                                    <td class="contact-column">
+                                        {{ warehouse.contact_person|default:"—" }}
                                     </td>
 
                                     <td class="phone-column">

@@ -2,7 +2,7 @@ from django import forms
 
 from django.contrib import admin
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.utils.html import format_html
 from django.urls import reverse
 
@@ -190,11 +190,13 @@ class ProductVariantInline(admin.TabularInline):
     show_change_link = True
 
     fields = (
+        "variant_name",
         "color",
         "size",
         "variant_sku",
         "stock",
         "reserved_stock",
+        "damaged_quantity",
         "available_stock_display",
         "is_active",
     )
@@ -236,11 +238,13 @@ class ProductVariantAdmin(
 
     list_display = (
         "product_name",
+        "variant_name",
         "color",
         "size",
         "variant_sku",
         "stock",
         "reserved_stock",
+        "damaged_quantity",
         "available_stock_display",
         "is_active",
         "created_at",
@@ -255,11 +259,13 @@ class ProductVariantAdmin(
 
     search_fields = ( 
         "product__name", 
+        "variant_name",
         "variant_sku", 
     )
 
     ordering = ( 
         "product", 
+        "variant_name",
         "color", 
         "size", 
     )
@@ -2085,7 +2091,10 @@ class WarehouseAdmin(
     list_display = (
         "name",
         "location",
+        "contact_person",
+        "manager_name",
         "phone",
+        "shipping_zone",
         "is_active",
         "created_at",
     )
@@ -2095,6 +2104,9 @@ class WarehouseAdmin(
         "code",
         "location",
         "phone",
+        "contact_person",
+        "manager_name",
+        "fulfillment_center",
     )
 
     list_filter = (
@@ -2206,6 +2218,82 @@ class WarehouseAdmin(
                 })
 
         return response
+
+    def changeform_view(
+        self,
+        request,
+        object_id=None,
+        form_url="",
+        extra_context=None,
+    ):
+        extra_context = extra_context or {}
+
+        if object_id:
+
+            warehouse = self.get_object(
+                request,
+                object_id
+            )
+
+            warehouse_stocks = Stock.objects.filter(
+                warehouse=warehouse
+            )
+
+            total_variants = warehouse_stocks.count()
+
+            total_stock = (
+                warehouse_stocks.aggregate(
+                    total=Sum(
+                        "product_variant__stock"
+                    )
+                )["total"] or 0
+            )
+
+            reserved_stock = (
+                warehouse_stocks.aggregate(
+                    total=Sum(
+                        "product_variant__reserved_stock"
+                    )
+                )["total"] or 0
+            )
+
+            damaged_quantity = (
+                warehouse_stocks.aggregate(
+                    total=Sum(
+                        "product_variant__damaged_quantity"
+                    )
+                )["total"] or 0
+            )
+
+            available_stock = (
+                total_stock
+                - reserved_stock
+                - damaged_quantity
+            )
+
+            extra_context.update({
+                "total_variants": 
+                    total_variants,
+
+                "total_stock": 
+                    total_stock,
+
+                "reserved_stock": 
+                    reserved_stock,
+
+                "damaged_quantity": 
+                    damaged_quantity,
+
+                "available_stock": 
+                    available_stock,
+            })
+
+        return super().changeform_view(
+            request,
+            object_id,
+            form_url,
+            extra_context,
+        )
 
 # =========================================================
 # ADMIN REGISTRATION

@@ -58,6 +58,66 @@
                 </div>
             {% endif %}
 
+            {% if original.inventory_location %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Inventory Location
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.inventory_location }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.storage_type %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Storage Type
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.storage_type }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.fulfillment_center %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Fulfillment Center
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.fulfillment_center }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.shipping_zone %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Shipping Zone
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.shipping_zone }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.delivery_coverage_area %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Coverage Area
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.delivery_coverage_area }}
+                    </strong>
+                </div>
+            {% endif %}
+
             {% if original.email %}
 
                 <div class="summary-row">
@@ -80,6 +140,30 @@
 
                     <strong class="summary-value">
                         {{ original.phone }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.contact_person %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Contact Person
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.contact_person }}
+                    </strong>
+                </div>
+            {% endif %}
+
+            {% if original.manager_name %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        Manager
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.manager_name }}
                     </strong>
                 </div>
             {% endif %}

@@ -67,6 +67,24 @@
             <div class="form-grid two-column-grid">
                 <div class="form-group">
                     <div class="field-header">
+                        {{ adminform.form.variant_name.label_tag }}
+
+                        {% if adminform.form.variant_name.field.required %}
+                            <span class="required-mark">*</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.variant_name }}
+                    </div>
+
+                    {% for error in adminform.form.variant_name.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                    <div class="field-header" style= "margin-top: 20px;">
                         {{ adminform.form.color.label_tag }}
 
                         {% if adminform.form.color.field.required %}

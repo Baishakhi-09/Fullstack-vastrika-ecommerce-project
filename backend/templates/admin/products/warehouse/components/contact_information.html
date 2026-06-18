@@ -13,6 +13,30 @@
 
     <div class="card-body">
         <div class="form-grid">
+            {% if adminform.form.contact_person %}
+                <div class="form-group">
+                    <label for="{{ adminform.form.contact_person.id_for_label }}" class="form-label">
+                        Contact Person
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.contact_person }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if adminform.form.manager_name %}
+                <div class="form-group">
+                    <label for="{{ adminform.form.manager_name.id_for_label }}" class="form-label">
+                        Manager Name
+                    </label>
+
+                    <div class="field-wrapper">
+                        {{ adminform.form.manager_name }}
+                    </div>
+                </div>
+            {% endif %}
+
             {% if adminform.form.email %}
 
                 <div class="form-group">

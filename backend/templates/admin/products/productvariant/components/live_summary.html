@@ -31,6 +31,18 @@
                 </span>
             </div>
 
+            {% if original.variant_name %}
+                <div class="summary-row">
+                    <span class="summary-key">
+                        Variant Name
+                    </span>
+
+                    <strong class="summary-value">
+                        {{ original.variant_name }}
+                    </strong>
+                </div>
+            {% endif %}
+
             <!-- Color -->
             <div class="summary-row">
                 <span class="summary-key">

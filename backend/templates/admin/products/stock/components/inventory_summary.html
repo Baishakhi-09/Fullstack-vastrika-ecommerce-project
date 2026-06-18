@@ -25,7 +25,7 @@
                 </span>
 
                 <strong>
-                    {{ current_stock|default_if_none:"0" }}
+                    {{ original.product_variant.stock|default_if_none:"0" }}
                 </strong>
             </div>
 
@@ -38,7 +38,20 @@
                 </span>
 
                 <strong>
-                    {{ reserved_stock|default_if_none:"0" }}
+                    {{ original.product_variant.reserved_stock|default_if_none:"0" }}
+                </strong>
+            </div>
+
+            <div 
+                class="summary-item"
+                role="listitem">
+
+                <span>
+                    Damaged Quantity
+                </span>
+
+                <strong>
+                    {{ original.product_variant.damaged_quantity|default_if_none:"0" }}
                 </strong>
             </div>
 
@@ -48,7 +61,7 @@
                 </span>
 
                 <strong>
-                    {{ available_stock|default_if_none:"0" }}
+                    {{ original.product_variant.available_stock|default_if_none:"0" }}
                 </strong>
             </div>
 

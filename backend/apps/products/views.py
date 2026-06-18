@@ -103,9 +103,24 @@ def export_products_csv(request):
             product.id,
             product.name,
             getattr(product.brand, "name", "-"),
-            getattr(product.parent_category, "name", "-"),
-            getattr(product.sub_category, "name", "-"),
-            getattr(product.child_category, "name", "-"),
+            getattr(
+                product.child_category.sub_category.parent_category,
+                "name",
+                "-"
+            ) if product.child_category else "-",
+
+            getattr(
+                product.child_category.sub_category,
+                "name",
+                "-"
+            ) if product.child_category else "-",
+
+            getattr(
+                product.child_category,
+                "name",
+                "-"
+            ) if product.child_category else "-",
+
             product.selling_price,
             product.mrp,
             total_stock,
@@ -159,9 +174,24 @@ def export_products_excel(request):
             product.id,
             product.name,
             getattr(product.brand, "name", "-"),
-            getattr(product.parent_category, "name", "-"),
-            getattr(product.sub_category, "name", "-"),
-            getattr(product.child_category, "name", "-"),
+            getattr(
+                product.child_category.sub_category.parent_category,
+                "name",
+                "-"
+            ) if product.child_category else "-",
+
+            getattr(
+                product.child_category.sub_category,
+                "name",
+                "-"
+            ) if product.child_category else "-",
+
+            getattr(
+                product.child_category,
+                "name",
+                "-"
+            ) if product.child_category else "-",
+
             product.selling_price,
             product.mrp,
             total_stock,
@@ -450,9 +480,9 @@ class ProductListAPIView(generics.ListAPIView):
             Product.objects.filter(is_active=True)
             .select_related(
                 "brand",
-                "parent_category",
-                "sub_category",
                 "child_category",
+                "child_category__sub_category",
+                "child_category__sub_category__parent_category",
             )
             .prefetch_related(
                 "images",

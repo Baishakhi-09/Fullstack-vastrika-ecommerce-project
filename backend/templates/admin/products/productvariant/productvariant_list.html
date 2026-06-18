@@ -133,17 +133,13 @@
                                         aria-label="Select all variant tags">
                                 </th>
 
-                                <th class="name-column">
-                                    Product
-                                </th>
-
                                 <th class="variant-column">
                                     Variant
                                 </th>
 
-                                <th class="sku-column">
+                                <!-- <th class="sku-column">
                                     SKU
-                                </th>
+                                </th> -->
 
                                 <th class="total-stock-column">
                                     Total Stock
@@ -155,6 +151,10 @@
 
                                 <th class="reserved-stock-column">
                                     Reserved Stock
+                                </th>
+
+                                <th class="damaged-stock-column">
+                                    Damaged Stock
                                 </th>
 
                                 <th class="status-column">
@@ -183,19 +183,13 @@
                                             class="action-select">
                                     </td>
 
-                                    <td class="name-column">
-                                        {{ variant.product.name }}
-                                    </td>
-
                                     <td class="variant-column">
-                                        {{ variant.color }}
-                                        /
-                                        {{ variant.size }}
+                                        {{ variant.variant_name }}
                                     </td>
 
-                                    <td class="sku-column">
+                                    <!-- <td class="sku-column">
                                         {{ variant.variant_sku }}
-                                    </td>
+                                    </td> -->
 
                                     <td class="total-stock-column">
                                         {{ variant.stock }}
@@ -207,6 +201,10 @@
 
                                     <td class="reserved-stock-column">
                                         {{ variant.reserved_stock }}
+                                    </td>
+
+                                    <td class="damaged-stock-column">
+                                        {{ variant.damaged_quantity }}
                                     </td>
 
                                     <td class="status-column">
