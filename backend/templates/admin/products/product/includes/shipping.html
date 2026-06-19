@@ -36,6 +36,7 @@
 
                         <div class="field-wrapper">
                             {{ adminform.form.weight }}
+                            <span class="unit-badge">kg</span>
                         </div>
 
                         {% if adminform.form.weight.help_text %}
@@ -66,6 +67,7 @@
 
                         <div class="field-wrapper">
                             {{ adminform.form.length }}
+                            <span class="unit-badge">cm</span>
                         </div>
 
                         {% for error in adminform.form.length.errors %}
@@ -89,6 +91,7 @@
 
                         <div class="field-wrapper">
                             {{ adminform.form.width }}
+                            <span class="unit-badge">cm</span>
                         </div>
 
                         {% for error in adminform.form.width.errors %}
@@ -112,6 +115,7 @@
 
                         <div class="field-wrapper">
                             {{ adminform.form.height }}
+                            <span class="unit-badge">cm</span>
                         </div>
 
                         {% for error in adminform.form.height.errors %}
@@ -282,7 +286,7 @@
 
                     <div class="analytics-value">
                         {% if original.weight %}
-                            {{ original.weight }}
+                            {{ original.weight }} kg
                         {% else %}
                             —
                         {% endif %}

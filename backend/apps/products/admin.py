@@ -137,7 +137,7 @@ class ProductImageInline(admin.StackedInline):
     ordering = ("sort_order",)
 
     fields = (
-        "image_preview",
+        # "image_preview",
         "image",
         "alt_text",
         "image_type",
@@ -145,9 +145,7 @@ class ProductImageInline(admin.StackedInline):
         "sort_order",
     )
 
-    readonly_fields = (
-        "image_preview",
-    )
+    readonly_fields = ()
 
     @admin.display(description="")
     def image_preview(self, obj):
@@ -1535,12 +1533,355 @@ class ProductAdmin(
             )
 
             if product:
+                gallery_assets = product.images.count()
+
+                video_count = 1 if product.video else 0
+
+                storefront_ready = (
+                    gallery_assets > 0
+                )
+
+                last_image = (
+                    product.images.order_by("-created_at").first()
+                )
+
+                last_media_upload = (
+                    last_image.created_at.strftime("%d %b %Y")
+                    if last_image
+                    else "—"
+                )
+
+                if gallery_assets >= 5:
+                    media_score = 100
+
+                elif gallery_assets >= 3:
+                    media_score = 75
+
+                elif gallery_assets >= 1:
+                    media_score = 50
+
+                else:
+                    media_score = 0
+
+                total_stock = sum(
+                    variant.stock
+                    for variant in product.variants.all()
+                )
+
+                reserved_stock = sum(
+                    variant.reserved_stock
+                    for variant in product.variants.all()
+                )
+
+                damaged_stock = sum(
+                    variant.damaged_quantity
+                    for variant in product.variants.all()
+                )
+
+                available_stock = sum(
+                    variant.available_stock
+                    for variant in product.variants.all()
+                )
+
+                if total_stock > 0:
+                    reserved_percentage = round(
+                        (reserved_stock / total_stock) * 100,
+                        2
+                    )
+
+                    availability_percentage = round(
+                        (available_stock / total_stock) * 100,
+                        2
+                    )
+
+                    damage_percentage = round(
+                        (damaged_stock / total_stock) * 100,
+                        2
+                    ) if total_stock > 0 else 0
+
+                else:
+                    reserved_percentage = 0
+                    availability_percentage = 0
+
+                inventory_value = sum(
+                    variant.stock * product.selling_price
+                    for variant in product.variants.all()
+                )
+
+                warehouse_stock = Stock.objects.filter(
+                    product_variant__product=product
+                ).select_related("warehouse").first()
+
+                warehouse_status = (
+                    warehouse_stock.warehouse.name
+                    if warehouse_stock and warehouse_stock.warehouse
+                    else "Unassigned"
+                )
+
+                warehouse_status_class = (
+                    "status-success"
+                    if warehouse_stock and warehouse_stock.warehouse
+                    else "status-warning"
+                )
+
+                if available_stock <= 0:
+                    stock_status = "Out Of Stock"
+                    stock_status_class = "status-danger"
+
+                elif available_stock <= 10:
+                    stock_status = "Low Stock"
+                    stock_status_class = "status-warning"
+
+                else:
+                    stock_status = "In Stock"
+                    stock_status_class = "status-success"
+
+
+                if warehouse_stock and warehouse_stock.warehouse:
+                    fulfillment_status = "Ready"
+                    fulfillment_status_class = "status-success"
+                else:
+                    fulfillment_status = "Pending"
+                    fulfillment_status_class = "status-warning"
+
+
+                if available_stock <= 10:
+                    reorder_status = "Reorder Required"
+                    reorder_status_class = "status-danger"
+                else:
+                    reorder_status = "Monitoring"
+                    reorder_status_class = "status-success"
+
+                extra_context["warehouse_status"] = warehouse_status
+
+                extra_context["warehouse_status_class"] = (
+                    warehouse_status_class
+                )
+
+                variant_count = product.variants.count()
+
+                active_variant_count = product.variants.filter(
+                    is_active=True
+                ).count()
+
+                out_of_stock_variant_count = product.variants.filter(
+                    stock__lte=0
+                ).count()
+
+                if available_stock <= 0:
+                    inventory_score = 0
+
+                elif damaged_stock > available_stock:
+                    inventory_score = 40
+
+                elif damaged_stock > 0:
+                    inventory_score = 75
+
+                else:
+                    inventory_score = 100
 
                 seo_score = self.calculate_seo_score(
                     product
                 )
 
+                # SEO Status
+                if seo_score >= 80:
+                    seo_status = "Excellent"
+                    seo_status_class = "success"
+
+                elif seo_score >= 50:
+                    seo_status = "Good"
+                    seo_status_class = "warning"
+
+                else:
+                    seo_status = "Poor"
+                    seo_status_class = "danger"
+
+                # Media status
+                if media_score >= 80:
+                    media_status = "Excellent"
+                    media_status_class = "success"
+
+                elif media_score >= 50:
+                    media_status = "Good"
+                    media_status_class = "warning"
+
+                else:
+                    media_status = "Poor"
+                    media_status_class = "danger"
+
                 product_health_score = seo_score
+
+                # commerce score
+                commerce_score = round(
+                    (
+                        media_score +
+                        seo_score +
+                        inventory_score
+                    ) / 3
+                )
+
+                # Commerce Status
+                if commerce_score >= 80:
+                    commerce_status = "Ready"
+                    commerce_status_class = "success"
+
+                elif commerce_score >= 50:
+                    commerce_status = "Average"
+                    commerce_status_class = "warning"
+
+                else:
+                    commerce_status = "Poor"
+                    commerce_status_class = "danger"
+
+                health_message = (
+                    "Product is ready for sale"
+                    if commerce_score >= 80
+                    else "Needs optimization"
+                )
+
+                inventory_status = stock_status
+                inventory_status_class = stock_status_class
+
+                product_views = 0
+
+                order_count = getattr(
+                    product,
+                    "order_count",
+                    0
+                )
+
+                revenue = order_count * product.selling_price
+
+                # Conversion Rate
+                if product_views > 0:
+                    conversion_rate = round(
+                        (order_count / product_views) * 100,
+                        2
+                    )
+                else:
+                    conversion_rate = 0
+
+                extra_context.update({
+
+                    "gallery_count":
+                        gallery_assets,
+
+                    "video_count":
+                        video_count,
+
+                    "storefront_readiness":
+                        "Yes" if storefront_ready else "No",
+
+                    "media_score":
+                        media_score,
+
+                    "last_media_upload":
+                        last_media_upload,
+
+                    "total_stock":
+                        total_stock,
+
+                    "reserved_stock":
+                        reserved_stock,
+
+                    "available_stock":
+                        available_stock,
+
+                    "inventory_value":
+                        inventory_value,
+
+                    "stock_status":
+                        stock_status,
+
+                    "stock_status_class":
+                        stock_status_class,
+
+                    "fulfillment_status":
+                        fulfillment_status,
+
+                    "fulfillment_status_class":
+                        fulfillment_status_class,
+
+                    "reorder_status":
+                        reorder_status,
+
+                    "reorder_status_class":
+                        reorder_status_class,
+
+                    "reserved_percentage":
+                        reserved_percentage,
+
+                    "availability_percentage":
+                        availability_percentage,
+
+                    "inventory_score":
+                        inventory_score,
+
+                    "commerce_score":
+                        commerce_score,
+
+                    "variant_count":
+                        variant_count,
+
+                    "active_variant_count":
+                        active_variant_count,
+
+                    "out_of_stock_variant_count":
+                        out_of_stock_variant_count,
+
+                    "health_message":
+                        health_message,
+
+                    "seo_status":
+                        seo_status,
+
+                    "seo_status_class":
+                        seo_status_class,
+
+                    "media_status":
+                        media_status,
+
+                    "media_status_class":
+                        media_status_class,
+
+                    "commerce_status":
+                        commerce_status,
+
+                    "commerce_status_class":
+                        commerce_status_class,
+
+                    "inventory_status":
+                        inventory_status,
+
+                    "inventory_status_class":
+                        inventory_status_class,
+
+                    "product_views":
+                        product_views,
+
+                    "order_count":
+                        order_count,
+
+                    "revenue":
+                        revenue,
+
+                    "conversion_rate":
+                        conversion_rate,
+
+                    "damaged_stock":
+                        damaged_stock,
+
+                    "damage_percentage":
+                        damage_percentage,
+                })
+
+                preview_url = (
+                    f"{request.scheme}://{request.get_host()}"
+                    f"/products/{product.slug}/"
+                )
+
+                extra_context["preview_url"] = preview_url
 
                 extra_context["product_health_score"] = (
                     product_health_score

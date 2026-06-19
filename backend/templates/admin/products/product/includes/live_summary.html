@@ -88,13 +88,17 @@
                 </span>
 
                 <strong class="summary-value">
-                    {% if original.stock %}
-                        {{ original.stock }}
+                    {{ total_stock|default:"0" }}
+                </strong>
+            </div>
 
-                    {% else %}
-                        0
+            <div class="summary-row">
+                <span class="summary-label">
+                    Damaged Stock
+                </span>
 
-                    {% endif %}
+                <strong class="summary-value">
+                    {{ damaged_stock|default:"0" }}
                 </strong>
             </div>
 

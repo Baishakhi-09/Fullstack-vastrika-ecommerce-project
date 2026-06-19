@@ -50,105 +50,22 @@
 
             <div class="metric-card">
                 <div class="metric-label">
+                    Damaged Stock
+                </div>
+
+                <div class="metric-value">
+                    {{ damaged_stock|default:"0" }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
                     Inventory Value
                 </div>
 
                 <div class="metric-value">
                     {{ currency_symbol|default:"₹" }}
                     {{ inventory_value|default:"0" }}
-                </div>
-            </div>
-        </div>
-
-        <!-- INVENTORY CONFIGURATION -->
-        <div class="form-section">
-            <div class="section-header">
-                <h3>
-                    Inventory Configuration
-                </h3>
-
-                <p>
-                    Configure inventory allocation and stock management settings.
-                </p>
-            </div>
-
-            <div class="form-grid three-column-grid">
-                {% if adminform.form.stock %}
-
-                    <div class="form-group">
-                        <label
-                            for="{{ adminform.form.stock.id_for_label }}"
-                            class="form-label">
-
-                            {{ adminform.form.stock.label }}
-
-                            {% if adminform.form.stock.field.required %}
-                                <span class="required-mark">*</span>
-                            {% endif %}
-                        </label>
-
-                        <div class="field-wrapper">
-                            {{ adminform.form.stock }}
-                        </div>
-
-                        {% if adminform.form.stock.help_text %}
-                            <div class="field-help">
-
-                                {{ adminform.form.stock.help_text }}
-                            </div>
-                        {% endif %}
-
-                        {% for error in adminform.form.stock.errors %}
-                            <div class="field-error">
-                                {{ error }}
-                            </div>
-
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                {% if adminform.form.reserved_stock %}
-
-                    <div class="form-group">
-                        <label
-                            for="{{ adminform.form.reserved_stock.id_for_label }}"
-                            class="form-label">
-
-                            {{ adminform.form.reserved_stock.label }}
-                        </label>
-
-                        <div class="field-wrapper">
-                            {{ adminform.form.reserved_stock }}
-                        </div>
-
-                        {% if adminform.form.reserved_stock.help_text %}
-                            <div class="field-help">
-
-                                {{ adminform.form.reserved_stock.help_text }}
-                            </div>
-                        {% endif %}
-
-                        {% for error in adminform.form.reserved_stock.errors %}
-                            <div class="field-error">
-
-                                {{ error }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <div class="form-group">
-                    <div class="form-label">
-                        Available Stock
-                    </div>
-
-                    <div class="readonly-metric">
-                        {{ available_stock|default:"0" }}
-                    </div>
-
-                    <div class="field-help">
-                        Automatically calculated inventory available for sale.
-                    </div>
                 </div>
             </div>
         </div>
@@ -228,9 +145,9 @@
                     <div class="inventory-health-value">
                         <span
                             class="health-badge
-                            {{ inventory_status_class|default:'warning' }}">
+                            {{ stock_status_class|default:'warning' }}">
 
-                            {{ inventory_status|default:"Unknown" }}
+                            {{ stock_status|default:"Unknown" }}
                         </span>
                     </div>
                 </div>
@@ -298,6 +215,16 @@
 
                     <div class="analytics-value">
                         {{ reserved_percentage|default:"0" }}%
+                    </div>
+                </div>
+
+                <div class="analytics-item">
+                    <div class="analytics-label">
+                        Damage %
+                    </div>
+
+                    <div class="analytics-value">
+                        {{ damage_percentage }}%
                     </div>
                 </div>
 

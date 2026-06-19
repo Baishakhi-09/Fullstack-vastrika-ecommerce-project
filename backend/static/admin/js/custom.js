@@ -2320,9 +2320,13 @@ function initSeoSystem() {
                 "Your SEO meta description preview will appear here automatically.";
         }
 
-        if (previewUrl) {
+        if (previewUrl && slug) {
+
+            const baseUrl =
+                previewUrl.dataset.baseUrl;
+
             previewUrl.textContent =
-                `https://example.com/products/${slug}`;
+                `${window.location.origin}/products/${slug}/`;
         }
 
         if (seoTitleStatus) {

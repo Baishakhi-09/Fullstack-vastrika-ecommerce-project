@@ -23,6 +23,8 @@ from django.views.generic import RedirectView
 from apps.accounts.views import AdminPasswordChangeView
 from vastrika_backend.admin_site import admin_site
 
+from apps.products.views import ProductDetailPageView
+
 urlpatterns = [
 
     # =========================================================
@@ -67,6 +69,13 @@ urlpatterns = [
     # API ROUTES
     # =========================================================
     path("api/auth/", include("apps.accounts.urls")), # User
+
+    path(
+        "products/<slug:slug>/",
+        ProductDetailPageView.as_view(),
+        name="product_detail_page",
+    ),
+    
     path("api/products/", include("apps.products.urls")), #Products
     path("api/settings/", include("apps.site_settings.urls")),
 ]

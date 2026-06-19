@@ -266,7 +266,12 @@ class ProductDetailSerializer(ProductCategoryMixin, serializers.ModelSerializer)
     in_stock = serializers.ReadOnlyField()
     total_stock = serializers.ReadOnlyField()
 
+    review_count = serializers.SerializerMethodField()
+
     related_products = serializers.SerializerMethodField()
+
+    def get_review_count(self, obj):
+        return 0
 
     class Meta:
         model = Product
@@ -308,14 +313,14 @@ class ProductDetailSerializer(ProductCategoryMixin, serializers.ModelSerializer)
     def get_related_products(self, obj):
         queryset = Product.objects.filter(
             is_active=True
-        ).exclude(id=obj.id)
+        ).exclude(
+            id=obj.id
+        )
 
         if obj.child_category:
-            queryset = queryset.filter(child_category=obj.child_category)
-        elif obj.sub_category:
-            queryset = queryset.filter(sub_category=obj.sub_category)
-        elif obj.parent_category:
-            queryset = queryset.filter(parent_category=obj.parent_category)
+            queryset = queryset.filter(
+                child_category=obj.child_category
+            )
         else:
             return []
 
@@ -324,8 +329,6 @@ class ProductDetailSerializer(ProductCategoryMixin, serializers.ModelSerializer)
             "variants",
         ).select_related(
             "brand",
-            "parent_category",
-            "sub_category",
             "child_category",
         )[:8]
 

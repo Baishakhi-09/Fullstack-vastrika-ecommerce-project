@@ -652,24 +652,40 @@ class Product(TimeStampedModel):
     weight = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        default=0
+        default=0,
+        help_text="Weight in kg"
     )
 
     length = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        default=0
+        default=0,
+        help_text="Length in cm"
     )
 
     width = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        default=0
+        default=0,
+        help_text="Width in cm"
     )
 
     height = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        default=0,
+        help_text="Height in cm"
+    )
+
+    view_count = models.PositiveIntegerField(
+        default=0
+    )
+
+    review_count = models.PositiveIntegerField(
+        default=0
+    )
+
+    wishlist_count = models.PositiveIntegerField(
         default=0
     )
 
@@ -873,6 +889,11 @@ class Product(TimeStampedModel):
             })
     
     def save(self, *args, **kwargs):
+        if self.status == "published":
+            self.is_active = True
+
+        elif self.status == "archived":
+            self.is_active = False
         
         if not self.sku:
             self.sku = f"SKU-{uuid.uuid4().hex[:10].upper()}"

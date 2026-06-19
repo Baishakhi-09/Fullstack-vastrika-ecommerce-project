@@ -623,7 +623,6 @@ class ProductListAPIView(generics.ListAPIView):
 
         return queryset.distinct().order_by(*sort_options.get(sort, ("-created_at",)))
 
-
 # -------------------- PRODUCT DETAIL -------------------- #
 class ProductDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ProductDetailSerializer
@@ -635,8 +634,6 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
             Product.objects.filter(is_active=True)
             .select_related(
                 "brand",
-                "parent_category",
-                "sub_category",
                 "child_category",
             )
             .prefetch_related(
@@ -830,6 +827,13 @@ class BrandDetailView(DetailView):
     model = Brand
     template_name = "admin/products/brand-detail.html"
     context_object_name = "brand"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+
+class ProductDetailPageView(DetailView):
+    model = Product
+    template_name = "admin/products/product-detail.html"
+    context_object_name = "product"
     slug_field = "slug"
     slug_url_kwarg = "slug"
 

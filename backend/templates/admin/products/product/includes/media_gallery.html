@@ -85,17 +85,17 @@
                     </div>
 
                     {% if original and original.primary_image_url %}
+                        <!-- <div class="image-status-bar">
+                            <span class="status-badge success">
+                                Primary Image Configured
+                            </span>
+                        </div> -->
+
                         <div class="preview-image-container">
                             <img
                                 src="{{ original.primary_image_url }}"
                                 alt="{{ original.name }}"
                                 class="primary-product-image">
-                        </div>
-
-                        <div class="image-status-bar">
-                            <span class="status-badge success">
-                                Primary Image Configured
-                            </span>
                         </div>
                     {% else %}
 

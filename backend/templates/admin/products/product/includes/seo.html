@@ -230,9 +230,10 @@
                 <!-- URL -->
                 <div
                     class="seo-preview-url"
-                    id="seoPreviewUrl">
+                    id="seoPreviewUrl"
+                    data-base-url="{{ request.scheme }}://{{ request.get_host }}">
 
-                    {{ request.scheme }}://{{ request.get_host }}/
+                    {{ preview_url }}
                 </div>
 
                 <!-- TITLE -->
